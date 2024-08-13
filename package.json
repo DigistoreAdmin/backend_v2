@@ -1,0 +1,52 @@
+{
+  "name": "digistore-apis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start:dev": "node node_modules/cross-env/src/bin/cross-env.js NODE_ENV=development nodemon server.js",
+    "start": "node node_modules/cross-env/src/bin/cross-env.js NODE_ENV=development node server.js",
+    "start:test": "node node_modules/cross-env/src/bin/cross-env.js NODE_ENV=test node server.js",
+    "start:prod": "node node_modules/cross-env/src/bin/cross-env.js NODE_ENV=production node server.js",
+    "migrate:dev": "cross-env NODE_ENV=development sequelize db:migrate",
+    "migrate-undo:dev": "cross-env NODE_ENV=development sequelize db:migrate:undo",
+    "migrate:test": "cross-env NODE_ENV=test sequelize db:migrate",
+    "migrate:prod": "cross-env NODE_ENV=production sequelize db:migrate",
+    "seed:dev": "cross-env NODE_ENV=development sequelize db:seed:all",
+    "seed:test": "cross-env NODE_ENV=test sequelize db:seed:all",
+    "seed:prod": "cross-env NODE_ENV=production sequelize db:seed:all"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "sequelize",
+    "rest",
+    "api",
+    "postgresql"
+  ],
+  "author": "digistore",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "azure-storage": "^2.10.7",
+    "bcrypt": "^5.1.1",
+    "connect-pg-simple": "^9.0.1",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "express-fileupload": "^1.5.0",
+    "express-session": "^1.18.0",
+    "into-stream": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.13",
+    "nodemon": "^3.1.0",
+    "pg": "^8.11.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.36.0",
+    "twilio": "^5.0.4"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.2"
+  }
+}
