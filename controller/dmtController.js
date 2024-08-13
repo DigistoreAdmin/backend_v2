@@ -9,11 +9,6 @@ const dmtUserData = require("../db/models/dmtuserdata");
 const user = require("../db/models/user");
 const sequelize = require("../config/database");
 
-
-
-
-
-
 var ra;
 const DMTsendOtp = catchAsync(async (req, res, next) => {
   const random12DigitNumber = generateRandomNumber();
@@ -241,7 +236,6 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
   const body = req.body;
   const user = req.user;
   const credentials = req.externalServiceData;
-  
 
   const Data = await Franchise.findOne({ where: { email: user.email } });
 
@@ -327,7 +321,7 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
     } else {
       AMT = body.amount;
     }
-    const random12DigitNumber =  generateRandomNumber15();
+    const random12DigitNumber = generateRandomNumber15();
     raNo = `10174${random12DigitNumber}`;
     console.log("rrrrrrrrrr", raNo);
     try {
@@ -374,7 +368,12 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
       console.error("Error:", error.message);
     }
   }
-  let successCount = 0;let failureCount = 0;let successAmount = 0;let failureAmount = 0;let successIds = [];let failureIds = [];
+  let successCount = 0;
+  let failureCount = 0;
+  let successAmount = 0;
+  let failureAmount = 0;
+  let successIds = [];
+  let failureIds = [];
 
   logArray.forEach((log) => {
     if (log.success) {
@@ -398,7 +397,11 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
 
   if (successAmount > 0 || failureAmount > 0) {
     const cal = calculateTransactionShares(successAmount);
-    let newBalance = walletData.balance - successAmount - cal.serviceCharge + cal.totalFranchiseShare;
+    let newBalance =
+      walletData.balance -
+      successAmount -
+      cal.serviceCharge +
+      cal.totalFranchiseShare;
 
     console.log("walletData.balance", walletData.balance);
     console.log("successAmount", successAmount);
@@ -406,7 +409,10 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
     console.log("cal.totalFranchiseShare", cal.totalFranchiseShare);
     console.log("newBalance", newBalance);
 
-    const updated = await Wallet.update({ balance: newBalance },{ where: { uniqueId: Data.franchiseUniqueId } });
+    const updated = await Wallet.update(
+      { balance: newBalance },
+      { where: { uniqueId: Data.franchiseUniqueId } }
+    );
     console.log("updatedBalance", updated);
 
     const random12DigitNumber = generateRandomNumber();
@@ -428,7 +434,15 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
       walletBalance: newBalance,
     });
     console.log("transatinH", transatinH);
-    return res.status(200).json({status: success,successAmount,failureAmount,successCount,failureCount,});
+    return res
+      .status(200)
+      .json({
+        status: success,
+        successAmount,
+        failureAmount,
+        successCount,
+        failureCount,
+      });
   } else {
     console.log("fail");
     new AppError("operation failed", 401);
@@ -599,8 +613,6 @@ const DMTbankDownApi = catchAsync(async (req, res, next) => {
   }
 });
 
-
-
 const fetchDTHRechargePlans = catchAsync(async (req, res, next) => {
   const { operator_id, circle_id, recharge_type } = req.query;
 
@@ -620,13 +632,11 @@ const fetchDTHRechargePlans = catchAsync(async (req, res, next) => {
   }
 });
 
-
-
 function calculateTransactionShares(transactionAmounts) {
   const dmtShare = 3.54;
   let franchiseShare = 5.5;
   let serviceCharge;
-  let remainingAmount; 
+  let remainingAmount;
   // console.log("fffffff",typeof(transactionAmounts));
   transactionAmounts = Number(transactionAmounts);
 
@@ -667,7 +677,6 @@ function calculateTransactionShares(transactionAmounts) {
   return data;
 }
 
-
 function generateRandomNumber() {
   const randomNumber =
     Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
@@ -681,9 +690,6 @@ function generateRandomNumber15() {
   const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
   return randomNumber.toString();
 }
-
-
-
 
 module.exports = {
   DMTsendOtp,

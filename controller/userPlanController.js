@@ -3,15 +3,14 @@ const catchAsync = require("../utils/catchAsync");
 const Franchise = require("../db/models/franchise");
 const userPlans = require("../db/models/userplan");
 
-
-
-
 const userPlan = catchAsync(async (req, res, next) => {
   const body = req.body;
   const { id, selectedPlan } = req.body;
   console.log(id, selectedPlan);
 
-  const franchise = await Franchise.findOne({ where: { franchiseUniqueId: body.id } });
+  const franchise = await Franchise.findOne({
+    where: { franchiseUniqueId: body.id },
+  });
 
   if (!franchise) {
     return next(new AppError("Franchise not found", 404));
@@ -64,7 +63,6 @@ const userPlan = catchAsync(async (req, res, next) => {
   }
 });
 
-
 module.exports = {
-  userPlan
-}
+  userPlan,
+};

@@ -6,14 +6,6 @@ const fileUpload = require("express-fileupload");
 const path = require("path");
 const session = require("express-session");
 const PgSession = require("connect-pg-simple")(session);
-// const authRouter = require("./route/authRoute");
-// const projectRouter = require("./route/projectRoute");
-// const userRouter = require("./route/userRoute");
-// const distributorRoute = require("./route/distributorRoute");
-// const franchiseRouter = require("./route/franchiseRouter");
-// const dmtRoute = require("./route/dmtRoute");
-// const blobRoutes = require("./route/blobRoutes");
-// const studentRouter = require("./route/studentRouter");
 const router = require('./route/index');
 const catchAsync = require("./utils/catchAsync");
 const AppError = require("./utils/appError");
@@ -102,14 +94,6 @@ app.get("/", (req, res) => {
 
 // All routes will be here
 
-// app.use("/api/v1/auth", authRouter);
-// app.use("/api/v1/projects", projectRouter);
-// app.use("/api/v1/users", userRouter);
-// app.use("/api/v1/distributor", distributorRoute);
-// app.use("/api/v1/franchiseRouter", franchiseRouter);
-// app.use("/api/v1/dmtRoute", dmtRoute);
-// app.use("/api/v1/studentRouter", studentRouter);
-// app.use("/api/v1/blobs", blobRoutes);
 app.use("/api", router);
 
 app.use(

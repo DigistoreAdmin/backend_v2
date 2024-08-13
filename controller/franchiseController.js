@@ -322,8 +322,6 @@ const creatFranchise = catchAsync(async (req, res, next) => {
   }
 });
 
-
-
 const wallet = catchAsync(async (req, res, next) => {
   try {
     const user = req.user;
@@ -357,13 +355,4 @@ module.exports = {
   sendOtpEmail,
   creatFranchise,
   wallet,
-  // userPlan,
-  // rechargePage,
-  // mobileRecharge,
-  // moneyTransferDetails,
-  // fetchBill,
-  // billPaymentRequest,
-  // transactionHistory,
-  // fetchMobileRechargePlans,
-  // circle,
 };

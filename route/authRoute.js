@@ -1,9 +1,6 @@
 const {
   login,
   logout,
-  // moneyTransferVerify,
-  // updatemoneyTransfer,
-  // transationHistory
 } = require("../controller/authController");
 const { authentication, restrictTo,senndOtp, checkOTP  } = require("../controller/authController");
 const { verifyToken, verifyRefreshToken } = require("../utils/token");

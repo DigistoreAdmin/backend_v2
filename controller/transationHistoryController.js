@@ -4,9 +4,6 @@ const TransationHistory = require("../db/models/transationhistory");
 const transationHistories = require("../db/models/transationhistory");
 const Franchise = require("../db/models/franchise");
 
-
-
-
 const transationHistoryAdmin = catchAsync(async (req, res, next) => {
   try {
     const data = await TransationHistory.findAll();
@@ -36,15 +33,14 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
 
     console.log("Matching transactionHistories records of franchise", data);
 
-    return res.status(200).json({ data: data,count:data.length });
+    return res.status(200).json({ data: data, count: data.length });
   } catch (error) {
     console.error("Error fetching wallet data:", error);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
 module.exports = {
   transationHistoryAdmin,
-  transactionHistoryFranchise
-}
+  transactionHistoryFranchise,
+};

@@ -157,5 +157,4 @@ const registerDistributor = async (req, res) => {
 
 module.exports = {
   registerDistributor,
-  
 };

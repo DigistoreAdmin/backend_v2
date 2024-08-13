@@ -1,10 +1,4 @@
-const { authentication, restrictTo, verifyOTP } = require("../controller/authController");
-const {
-  registerDistributor,
-  senndOtp,
-  checkOTP,
-  // login
-} = require("../controller/distributorController");
+const { restrictTo, verifyOTP } = require("../controller/authController");
 const { registerStudent,countOfFranchise } = require("../controller/studentController");
 const { verifyToken, verifyRefreshToken } = require("../utils/token");
 

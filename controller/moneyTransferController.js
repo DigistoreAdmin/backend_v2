@@ -24,9 +24,6 @@ const transationHistories = require("../db/models/transationhistory");
 const sequelize = require("../config/database");
 const walletsModel = require("../db/models/wallet");
 
-
-
-
 /// request by franchise //
 
 const moneyTransferDetails = catchAsync(async (req, res, next) => {
@@ -211,7 +208,6 @@ const updatemoneyTransfer = catchAsync(async (req, res, next) => {
   }
 });
 
-
 function generateRandomNumber() {
   const randomNumber =
     Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
@@ -219,9 +215,8 @@ function generateRandomNumber() {
   return randomNumber.toString();
 }
 
-
 module.exports = {
   moneyTransferDetails,
   moneyTransferVerify,
-  updatemoneyTransfer
-}
+  updatemoneyTransfer,
+};

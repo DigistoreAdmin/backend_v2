@@ -23,16 +23,15 @@ const transationHistories = require("../db/models/transationhistory");
 const sequelize = require("../config/database");
 const Circles = require("../db/models/circle");
 
-
-
-
 const mobileRecharge = catchAsync(async (req, res, next) => {
   const { phoneNumber, sp_key, circle, amount } = req.body;
 
   const user = req.user;
   const Data = await Franchise.findOne({ where: { email: user.email } });
 
-  const walletData = await Wallet.findOne({ where: { uniqueId: Data.franchiseUniqueId } });
+  const walletData = await Wallet.findOne({
+    where: { uniqueId: Data.franchiseUniqueId },
+  });
   console.log(walletData.balance);
   const result = await Operator.findOne({ where: { SP_key: sp_key } });
 
@@ -63,7 +62,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
     `https://livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${phoneNumber}&Amount=${amount}&SPKey=${sp_key}&APIRequestID=${random12DigitNumber}&Optional1={Optional1}&Optional2={Optional2}&Optional3={Optional3}&Optional4={Optional4}&RefID={RefID}&GEOCode=${circle}&CustomerNumber=8606172833&Pincode=691536&Format=1&OutletID=0`
   );
   console.log("res ", response);
-  console.log("res ", response.data.rpid);// transation id in history 
+  console.log("res ", response.data.rpid); // transation id in history
   console.log("res status", response.status);
   console.log("res amount", response.data.amount);
   console.log("res statusText", response.statusText);
@@ -120,7 +119,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
     }
   } else {
     //
-     const serr = `Mobile Recharge Number:${phoneNumber} sim:${result.serviceProvider}`;
+    const serr = `Mobile Recharge Number:${phoneNumber} sim:${result.serviceProvider}`;
     const transatinH = await transationHistory.create({
       transactionId: response.data.rpid,
       uniqueId: Data.franchiseUniqueId,
@@ -128,7 +127,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       userType: user.userType,
       service: serr,
       status: "fail",
-      amount: 0.00,
+      amount: 0.0,
       walletBalance: walletData.balance,
     });
     if (transatinH) {
@@ -145,7 +144,6 @@ function generateRandomNumber() {
     100000000000;
   return randomNumber.toString();
 }
-
 
 module.exports = {
   mobileRecharge,

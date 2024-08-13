@@ -16,8 +16,6 @@ const User = require("../db/models/user");
 const { generateOTP, sendOTP } = require("../utils/otpUtils");
 const student = require("../db/models/student");
 
-
-
 const senndOtp = catchAsync(async (req, res, next) => {
   try {
     const { mobileNumber } = req.body;
@@ -84,7 +82,6 @@ const verifyOTP = (req, res, next) => {
   // OTP is valid
   next(); // Call next to proceed to the next middleware
 };
-
 
 const login = catchAsync(async (req, res, next) => {
   const { phoneNumber, password } = req.body;
@@ -343,12 +340,6 @@ const restrictTo = (...userType) => {
   return checkPermission;
 };
 
-
-
-
-
-
-
 function generateRandomNumber() {
   const randomNumber =
     Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
@@ -363,8 +354,5 @@ module.exports = {
   authentication,
   restrictTo,
   verifyOTP,
-  // moneyTransferVerify,
-  // updatemoneyTransfer,
-  // transationHistory,
   logout,
 };

@@ -6,11 +6,6 @@ const axios = require("axios");
 const sequelize = require("../config/database");
 const Circles = require("../db/models/circle");
 
-
-
-
-
-
 const rechargePage = catchAsync(async (req, res, next) => {
   const data = await Operator.findAll();
   if (!data) {
@@ -19,7 +14,6 @@ const rechargePage = catchAsync(async (req, res, next) => {
 
   return res.status(200).json({ data: data, message: "success" });
 });
-
 
 const circle = catchAsync(async (req, res, next) => {
   try {
@@ -31,7 +25,6 @@ const circle = catchAsync(async (req, res, next) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 const fetchMobileRechargePlans = catchAsync(async (req, res, next) => {
   const { operator_id, circle_id, recharge_type } = req.query;
@@ -59,9 +52,8 @@ const fetchMobileRechargePlans = catchAsync(async (req, res, next) => {
   }
 });
 
-
 module.exports = {
   rechargePage,
   fetchMobileRechargePlans,
-  circle
+  circle,
 };
