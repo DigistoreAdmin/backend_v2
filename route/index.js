@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 
 const authRouter = require("../route/authRoute");
 const projectRouter = require("../route/projectRoute");
@@ -14,10 +14,11 @@ const userPlanRoute = require("../route/userPlanRoute");
 const fixedDataRoute = require("../route/fixedDataRoute");
 const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
-const busBookingRoute = require("../route/busRoutes")
+const busBookingRoute = require("../route/busRoutes");
+const packingLicenceRoute = require("../route/packingLicenceRoute");
+
 
 const router = express.Router();
-
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);
@@ -33,6 +34,7 @@ router.use("/v1/userPlanRoute", userPlanRoute);
 router.use("/v1/fixedDataRoute", fixedDataRoute);
 router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
-router.use("/v1/bus", busBookingRoute)
+router.use("/v1/bus", busBookingRoute);
+router.use("/v1/packingLicenceRoute", packingLicenceRoute);
 
-module.exports = router;
+module.exports = router;    
