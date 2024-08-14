@@ -19,6 +19,7 @@ const adminViewRoute = require("../route/adminViewRoute")
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
 const busBookingRoute = require("../route/busRoutes")
+const pancardRoute = require('../route/pancardRoute')
 
 
 const router = express.Router();
@@ -42,5 +43,6 @@ router.use("/v1/admin",adminViewRoute)
 router.use("/v1/passport", passportRoute);
 router.use("/v1/kswift", kswiftRoute);
 router.use("/v1/bus", busBookingRoute)
+router.use("/v1/pancard", pancardRoute)
 
 module.exports = router;
