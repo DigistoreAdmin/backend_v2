@@ -15,6 +15,7 @@ const fixedDataRoute = require("../route/fixedDataRoute");
 const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
 const trainRoute = require("../route/trainRoute");
+const adminViewRoute = require("../route/adminViewRoute")
 
 const router = express.Router();
 
@@ -34,5 +35,6 @@ router.use("/v1/fixedDataRoute", fixedDataRoute);
 router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
 router.use("/v1/train", trainRoute);
+router.use("/v1/admin",adminViewRoute)
 
 module.exports = router;
