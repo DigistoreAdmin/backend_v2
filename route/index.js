@@ -16,6 +16,7 @@ const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
+const staffRoute =require("../route/staffRoute")
 const router = express.Router();
 
 router.use("/v1/auth", authRouter);
@@ -34,4 +35,5 @@ router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
 router.use("/v1/passport", passportRoute);
 router.use("/v1/kswift", kswiftRoute);
+router.use("/v1/staff", staffRoute);
 module.exports = router;
