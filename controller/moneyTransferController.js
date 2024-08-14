@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 
 // const Contact = require("../db/models/contact");
 // const OTP = require("../db/models/otp");
@@ -77,10 +77,81 @@ const moneyTransferDetails = catchAsync(async (req, res, next) => {
 const moneyTransferVerify = catchAsync(async (req, res, next) => {
   try {
     const moneyTransferDetailsModel = defineMoneyTransferDetails();
-    const data = await moneyTransferDetailsModel.findAll();
-    // console.log("d",data);
 
-    return res.status(200).json({ data: data, count: data.length });
+    const { search, filter, page, pageLimit, sort } = req.query;
+
+    if (!page || !pageLimit) {
+      return res.status(400).json({ success: false, message: "Invalid page or pageLimit" });
+    }
+
+    const limit = parseInt(pageLimit) || 10;
+    const offset = (parseInt(page) - 1) * limit;
+
+    const where = {};
+    const searchNumber = parseFloat(search);
+    const searchDate = new Date(search);
+    const startOfDay = new Date(searchDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setHours(24, 59, 59, 999);
+
+    if (search) {
+      where[Op.or] = [
+        { userName: { [Op.iLike]: `%${search}%` } },
+        { executiveName: { [Op.iLike]: `%${search}%` } }
+      ];
+
+      if (!isNaN(searchNumber)) {
+        where[Op.or].push({ amount: { [Op.eq]: searchNumber } });
+      }
+
+      if (!isNaN(searchDate.getTime())) {
+        where[Op.or].push({
+          date: {
+            [Op.between]: [startOfDay, endOfDay]
+          }
+        });
+      }
+    }
+
+    if (filter) {
+      const filters = JSON.parse(filter);
+      if (filters.userName) {
+        where.userName = filters.userName;
+      }
+      if (filters.executiveName) {
+        where.executiveName = filters.executiveName;
+      }
+      if (filters.transactionType) {
+        where.transactionType = filters.transactionType;
+      }
+      if (filters.status) {
+        where.status = filters.status;
+      }
+      if (filters.amount) {
+        where.amount = filters.amount;
+      }
+    }
+
+    const datas = await moneyTransferDetailsModel.findAndCountAll({
+      where,
+      limit,
+      offset,
+      order: sort ? [[sort, 'ASC']] : []
+    });
+
+    if (datas.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No money transfer details found"
+      });
+    }
+
+    return res.status(200).json({
+      datas: datas.rows,
+      totalItems: datas.count,
+      totalPages: Math.ceil(datas.count / limit),
+      currentPage: parseInt(page)
+    });
   } catch (error) {
     next(error);
   }
