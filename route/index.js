@@ -36,5 +36,4 @@ router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
 router.use("/v1/bus", busBookingRoute);
 router.use("/v1/incomeTax", incomeTaxFilingRoute);
-
 module.exports = router;
