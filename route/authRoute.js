@@ -1,6 +1,7 @@
 const {
   login,
   logout,
+  changePassword,
 } = require("../controller/authController");
 const { authentication, restrictTo,senndOtp, checkOTP  } = require("../controller/authController");
 const { verifyToken, verifyRefreshToken } = require("../utils/token");
@@ -14,6 +15,7 @@ router.route("/verify-otp").post(verifyToken,verifyRefreshToken, restrictTo("adm
 
 router.route("/login").post(login);
 router.route("/logout").post(logout);
+router.route('/changePassword').post(verifyToken,verifyRefreshToken,changePassword)
 
 
 
