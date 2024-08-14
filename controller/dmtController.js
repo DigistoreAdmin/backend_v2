@@ -437,7 +437,6 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
     return res
       .status(200)
       .json({
-        status: success,
         successAmount,
         failureAmount,
         successCount,
@@ -453,8 +452,8 @@ const DMTneftAPI = catchAsync(async (req, res, next) => {
   const body = req.body;
   const user = req.user;
   const credentials = req.externalServiceData;
-  const random12DigitNumber = generateRandomNumber();
-  raNo = `10174${random12DigitNumber}123`;
+  const random15DigitNumber = generateRandomNumber15();
+  raNo = `10174${random15DigitNumber}`;
 
   const response = await axios.post(
     "https://services.bankit.in:8443/DMR/transact/NEFT/v1/remit?",
@@ -485,8 +484,8 @@ const DMTaccountVerification = catchAsync(async (req, res, next) => {
   const body = req.body;
   const user = req.user;
   const credentials = req.externalServiceData;
-  const random12DigitNumber = generateRandomNumber();
-  raNo = `10174${random12DigitNumber}123`;
+  const random15DigitNumber = generateRandomNumber15();
+  raNo = `10174${random15DigitNumber}`;
 
   const response = await axios.post(
     "https://services.bankit.in:8443/DMRV1.1/transact/IMPS/accountverification?",
@@ -565,7 +564,7 @@ const DMTfetchBankList = catchAsync(async (req, res, next) => {
   const credentials = req.externalServiceData;
 
   const response = await axios.post(
-    "https://services.bankit.in:8443/DMR/generic/bankList",
+    "https://services.bankit.in:8443/DMR/generic/bankList",{},
     {
       headers: {
         "Content-Type": "application/json",
