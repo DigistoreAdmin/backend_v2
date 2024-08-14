@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 
 const authRouter = require("../route/authRoute");
 const projectRouter = require("../route/projectRoute");
@@ -16,9 +16,12 @@ const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
 const trainRoute = require("../route/trainRoute");
 const adminViewRoute = require("../route/adminViewRoute")
+const passportRoute = require("../route/passportRoute");
+const kswiftRoute = require("../route/kswiftRoute");
+const busBookingRoute = require("../route/busRoutes")
+
 
 const router = express.Router();
-
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);
@@ -36,5 +39,8 @@ router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
 router.use("/v1/train", trainRoute);
 router.use("/v1/admin",adminViewRoute)
+router.use("/v1/passport", passportRoute);
+router.use("/v1/kswift", kswiftRoute);
+router.use("/v1/bus", busBookingRoute)
 
 module.exports = router;
