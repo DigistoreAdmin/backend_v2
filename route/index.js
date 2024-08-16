@@ -16,6 +16,7 @@ const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
 const busBookingRoute = require("../route/busRoutes")
 const pancardRoute = require('../route/pancardRoute')
+const getPancardRoute = require('../route/getPancardRoute')
 
 const router = express.Router();
 
@@ -36,5 +37,6 @@ router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
 router.use("/v1/bus", busBookingRoute)
 router.use("/v1/pancard", pancardRoute)
+router.use("/v1/getPancard", getPancardRoute)
 
 module.exports = router;
