@@ -424,7 +424,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
               if (typeof addressLine1 !== 'string' || addressLine1.trim() === '') {
                 throw new Error('Address must be a non-empty string');
               }
-
+              console.log(latitude,longitude);
               // Check latitude and longitude (valid decimal numbers)
               const decimalRegex = /^-?\d+(\.\d+)?$/;
               if (!decimalRegex.test(latitude) || !decimalRegex.test(longitude)) {
