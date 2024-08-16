@@ -1,6 +1,5 @@
 const { login, logout } = require("../controller/authController");
 const {
-  transationHistory,
   authentication,
   restrictTo,
   senndOtp,
@@ -16,9 +15,6 @@ router
 router
   .route("/verify-otp")
   .post(verifyToken, verifyRefreshToken, restrictTo("admin"), checkOTP);
-router
-  .route("/transationHistory")
-  .get(verifyToken, verifyRefreshToken, restrictTo("admin"), transationHistory);
 
 router.route("/login").post(login);
 router.route("/logout").post(logout);
