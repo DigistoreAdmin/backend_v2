@@ -25,7 +25,7 @@ const staffRoute =require("../route/staffRoute")
 const busBookingRoute = require("../route/busRoutes")
 const pancardRoute = require('../route/pancardRoute')
 const financialStatementRoute = require("../route/financialStatementRoute");
-
+const companyFormationRoute = require("../route/companyFormationRoute");
 
 
 const router = express.Router();
@@ -55,6 +55,7 @@ router.use("/v1/staff", staffRoute);
 router.use("/v1/bus", busBookingRoute)
 router.use("/v1/pancard", pancardRoute)
 router.use("/v1/financialStatementRoute",financialStatementRoute)
+router.use("/v1/companyFormationRoute",companyFormationRoute)
 
 
 
