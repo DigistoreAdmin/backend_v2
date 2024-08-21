@@ -128,7 +128,7 @@ const createPackingLicence = catchAsync(async (req, res, next) => {
   console.log("updatedAt:", new Date());
 
   if (!newPackingLicence) {
-    return next(new AppError("Booking failed", 500));
+    return next(new AppError("Packing Licence Failed", 500));
   }
   return res.status(200).json({
     status: "success",
