@@ -103,6 +103,18 @@ const businessLoanExistingDetails = (cibil) => {
           },
         },
       },
+      cibil: {
+        type: DataTypes.ENUM("approved","noCibil"),
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: 'cibil cannot be null',
+          },
+          notEmpty: {
+            msg: 'cibil cannot be empty',
+          }
+        },
+      },
       cibilScore: {
         type: DataTypes.INTEGER,
         allowNull: cibilNullVal,

@@ -12,8 +12,8 @@ module.exports = {
       uniqueId: {
         type: Sequelize.STRING
       },
-      workId:{
-        type:Sequelize.STRING,
+      workId: {
+        type: Sequelize.STRING,
       },
       customerName: {
         type: Sequelize.STRING
@@ -23,6 +23,9 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING
+      },
+      cibil: {
+        type: Sequelize.ENUM("approved","noCibil")
       },
       cibilScore: {
         type: Sequelize.INTEGER
@@ -82,7 +85,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       status: {
-        type: Sequelize.ENUM("inQueue","inProgress","completed")
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed")
       },
       assignedOn: {
         type: Sequelize.DATE

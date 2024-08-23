@@ -99,6 +99,7 @@ const businessLoanExisting = catchAsync(async (req, res, next) => {
             customerName,
             email,
             mobileNumber,
+            cibil,
             cibilScore: cibil === 'approved' ? cibilScore : null,
             loanAmount,
             cibilReport: cibil === 'approved' ? await uploadFile(req.files.cibilReport) : null,
