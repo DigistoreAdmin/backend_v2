@@ -22,11 +22,10 @@ const udyamRoute = require("../route/udyamRoute")
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
 const staffRoute =require("../route/staffRoute")
-const busBookingRoute = require("../route/busRoutes")
 const pancardRoute = require('../route/pancardRoute')
 const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
-
+const personalLoanRoute = require("../route/Loan/personalLoanRouter");
 
 const router = express.Router();
 
@@ -56,7 +55,7 @@ router.use("/v1/bus", busBookingRoute)
 router.use("/v1/pancard", pancardRoute)
 router.use("/v1/financialStatementRoute",financialStatementRoute)
 router.use("/v1/companyFormationRoute",companyFormationRoute)
-
+router.use("/v1/personalLoanRoute",personalLoanRoute)
 
 
 module.exports = router;    
