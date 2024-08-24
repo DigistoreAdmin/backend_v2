@@ -181,4 +181,3 @@ const createNewVehicleLoan = catchAsync(async (req, res, next) => {
 });
 
 module.exports = { createNewVehicleLoan };
-
