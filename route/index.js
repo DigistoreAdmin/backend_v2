@@ -51,7 +51,6 @@ router.use("/v1/udyam", udyamRoute);
 router.use("/v1/passport", passportRoute);
 router.use("/v1/kswift", kswiftRoute);
 router.use("/v1/staff", staffRoute);
-router.use("/v1/bus", busBookingRoute)
 router.use("/v1/pancard", pancardRoute)
 router.use("/v1/financialStatementRoute",financialStatementRoute)
 router.use("/v1/companyFormationRoute",companyFormationRoute)
