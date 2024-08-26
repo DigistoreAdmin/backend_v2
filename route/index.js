@@ -24,6 +24,10 @@ const kswiftRoute = require("../route/kswiftRoute");
 const staffRoute = require("../route/staffRoute")
 const pancardRoute = require('../route/pancardRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
+const financialStatementRoute = require("../route/financialStatementRoute");
+const getPancardRoute = require('../route/getPancardRoute')
+
+
 
 
 const router = express.Router();
@@ -53,6 +57,9 @@ router.use("/v1/staff", staffRoute);
 router.use("/v1/bus", busBookingRoute)
 router.use("/v1/pancard", pancardRoute)
 router.use("/v1/gst", gstRegistrationRoute)
+router.use("/v1/financialStatementRoute",financialStatementRoute)
+router.use("/v1/getPancard", getPancardRoute)
+
 
 
 module.exports = router;    
