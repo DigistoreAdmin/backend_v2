@@ -14,7 +14,6 @@ const userPlanRoute = require("../route/userPlanRoute");
 const fixedDataRoute = require("../route/fixedDataRoute");
 const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
-const busBookingRoute = require("../route/busRoutes");
 const packingLicenceRoute = require("../route/packingLicenceRoute");
 const trainRoute = require("../route/trainRoute");
 const adminViewRoute = require("../route/adminViewRoute")
@@ -22,11 +21,15 @@ const udyamRoute = require("../route/udyamRoute")
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
 const staffRoute = require("../route/staffRoute")
+const busBookingRoute = require("../route/busRoutes")
+const pancardRoute = require('../route/pancardRoute')
+const gstFilingRoute = require('../route/gstFilingRoute')
 const pancardRoute = require('../route/pancardRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
 const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
 const getPancardRoute = require('../route/getPancardRoute')
+
 
 
 
@@ -58,6 +61,7 @@ router.use("/v1/kswift", kswiftRoute);
 router.use("/v1/staff", staffRoute);
 router.use("/v1/bus", busBookingRoute)
 router.use("/v1/pancard", pancardRoute)
+router.use('/v1/gst/', gstFilingRoute)
 router.use("/v1/gst", gstRegistrationRoute)
 router.use("/v1/financialStatementRoute",financialStatementRoute)
 router.use("/v1/companyFormationRoute",companyFormationRoute)
