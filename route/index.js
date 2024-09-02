@@ -34,12 +34,12 @@ const loanAgainstPropertyRoute = require('../route/Loan/LoanAgainstPropertyRoute
 const houseLoanRoute = require('../route/Loan/HousingLoanRouter')
 const loanStatusRoute = require('../route/staffLoanUpdateRoute')
 const gstFilingRoute = require('../route/gstFilingRoute')
-const pancardRoute = require('../route/pancardRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
 const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
 const personalLoanRoute = require("../route/Loan/personalLoanRouter");
 const getPancardRoute = require('../route/getPancardRoute')
+const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanUnsecuredExistingRouter')
 
 
 
@@ -86,6 +86,7 @@ router.use("/v1/financialStatementRoute",financialStatementRoute)
 router.use("/v1/companyFormationRoute",companyFormationRoute)
 router.use("/v1/personalLoanRoute",personalLoanRoute)
 router.use("/v1/getPancard", getPancardRoute)
+router.use("/v1/BusinessLoanUnsecuredExisting", BusinessLoanUnsecuredExistingRouter)
 
 
 
