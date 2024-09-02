@@ -21,6 +21,7 @@ const adminViewRoute = require("../route/adminViewRoute");
 const udyamRoute = require("../route/udyamRoute");
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
+const businessLoanExistingRoute = require('../route/Loan/businessLoanExistingRouter')
 const cibilReportRoute = require("../route/Loan/cibilReportRouter");
 const forgotPasswordRoute = require('../route/forgotPasswordRoute')
 const fssaiLicenceRoute = require("../route/fssaiLicenceRoute")
@@ -68,6 +69,7 @@ router.use("/v1/udyam", udyamRoute);
 router.use("/v1/passport", passportRoute);
 router.use("/v1/kswift", kswiftRoute);
 router.use("/v1/staff", staffRoute);
+router.use("/v1/loan", businessLoanExistingRoute)
 router.use("/v1/bus", busBookingRoute);
 router.use("/v1/cibilReportRoute", cibilReportRoute);
 router.use("/v1/pancard", pancardRoute)
@@ -79,6 +81,7 @@ router.use("/v1/gst", gstRegistrationRoute)
 router.use("/v1/financialStatementRoute",financialStatementRoute)
 router.use("/v1/companyFormationRoute",companyFormationRoute)
 router.use("/v1/getPancard", getPancardRoute)
+
 
 
 
