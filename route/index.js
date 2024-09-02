@@ -16,10 +16,11 @@ const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
 const packingLicenceRoute = require("../route/packingLicenceRoute");
 const trainRoute = require("../route/trainRoute");
-const adminViewRoute = require("../route/adminViewRoute")
-const udyamRoute = require("../route/udyamRoute")
+const adminViewRoute = require("../route/adminViewRoute");
+const udyamRoute = require("../route/udyamRoute");
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
+const cibilReportRoute = require("../route/Loan/cibilReportRouter");
 const forgotPasswordRoute = require('../route/forgotPasswordRoute')
 const fssaiLicenceRoute = require("../route/fssaiLicenceRoute")
 const fssaiRegistrationRoute = require('../route/fssaiRegistrationRoute')
@@ -32,6 +33,7 @@ const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
 const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
 const getPancardRoute = require('../route/getPancardRoute')
+
 
 
 
@@ -58,11 +60,13 @@ router.use("/v1/billPaymentRoute", billPaymentRoute);
 router.use("/v1/bus", busBookingRoute);
 router.use("/v1/packingLicenceRoute", packingLicenceRoute);
 router.use("/v1/train", trainRoute);
-router.use("/v1/admin", adminViewRoute)
+router.use("/v1/admin", adminViewRoute);
 router.use("/v1/udyam", udyamRoute);
 router.use("/v1/passport", passportRoute);
 router.use("/v1/kswift", kswiftRoute);
 router.use("/v1/staff", staffRoute);
+router.use("/v1/bus", busBookingRoute);
+router.use("/v1/cibilReportRoute", cibilReportRoute);
 router.use("/v1/pancard", pancardRoute)
 router.use("/v1/forgotPassword",forgotPasswordRoute)
 router.use("/v1/fssai",fssaiLicenceRoute)
@@ -76,4 +80,4 @@ router.use("/v1/getPancard", getPancardRoute)
 
 
 
-module.exports = router;    
+module.exports = router;
