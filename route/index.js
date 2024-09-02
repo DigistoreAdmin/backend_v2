@@ -14,6 +14,7 @@ const userPlanRoute = require("../route/userPlanRoute");
 const fixedDataRoute = require("../route/fixedDataRoute");
 const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
+const housingLoanRoute = require("../route/Loan/HousingLoanRouter");
 const packingLicenceRoute = require("../route/packingLicenceRoute");
 const trainRoute = require("../route/trainRoute");
 const adminViewRoute = require("../route/adminViewRoute");
@@ -41,6 +42,7 @@ const getPancardRoute = require('../route/getPancardRoute')
 
 
 
+
 const router = express.Router();
 
 router.use("/v1/auth", authRouter);
@@ -58,6 +60,7 @@ router.use("/v1/fixedDataRoute", fixedDataRoute);
 router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
 router.use("/v1/bus", busBookingRoute);
+router.use("/v1/housingLoan", housingLoanRoute);
 router.use("/v1/packingLicenceRoute", packingLicenceRoute);
 router.use("/v1/train", trainRoute);
 router.use("/v1/admin", adminViewRoute);
