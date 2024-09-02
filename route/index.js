@@ -34,11 +34,8 @@ const pancardRoute = require('../route/pancardRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
 const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
+const personalLoanRoute = require("../route/Loan/personalLoanRouter");
 const getPancardRoute = require('../route/getPancardRoute')
-
-
-
-
 
 
 
@@ -80,6 +77,7 @@ router.use('/v1/gst/', gstFilingRoute)
 router.use("/v1/gst", gstRegistrationRoute)
 router.use("/v1/financialStatementRoute",financialStatementRoute)
 router.use("/v1/companyFormationRoute",companyFormationRoute)
+router.use("/v1/personalLoanRoute",personalLoanRoute)
 router.use("/v1/getPancard", getPancardRoute)
 
 
