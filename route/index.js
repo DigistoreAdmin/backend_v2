@@ -14,16 +14,33 @@ const userPlanRoute = require("../route/userPlanRoute");
 const fixedDataRoute = require("../route/fixedDataRoute");
 const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
-const busBookingRoute = require("../route/busRoutes");
+const housingLoanRoute = require("../route/Loan/HousingLoanRouter");
 const packingLicenceRoute = require("../route/packingLicenceRoute");
 const trainRoute = require("../route/trainRoute");
 const adminViewRoute = require("../route/adminViewRoute");
 const udyamRoute = require("../route/udyamRoute");
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
-const staffRoute = require("../route/staffRoute");
-const pancardRoute = require("../route/pancardRoute");
 const vehicleLoanRoute = require("../route/Loan/vehicleLoanRouter");
+const businessLoanExistingRoute = require('../route/Loan/businessLoanExistingRouter')
+const cibilReportRoute = require("../route/Loan/cibilReportRouter");
+const forgotPasswordRoute = require('../route/forgotPasswordRoute')
+const fssaiLicenceRoute = require("../route/fssaiLicenceRoute")
+const fssaiRegistrationRoute = require('../route/fssaiRegistrationRoute')
+const staffRoute = require("../route/staffRoute")
+const busBookingRoute = require("../route/busRoutes")
+const pancardRoute = require('../route/pancardRoute')
+const gstFilingRoute = require('../route/gstFilingRoute')
+const pancardRoute = require('../route/pancardRoute')
+const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
+const financialStatementRoute = require("../route/financialStatementRoute");
+const companyFormationRoute = require("../route/companyFormationRoute");
+const personalLoanRoute = require("../route/Loan/personalLoanRouter");
+const getPancardRoute = require('../route/getPancardRoute')
+
+
+
+
 
 const router = express.Router();
 
@@ -42,6 +59,7 @@ router.use("/v1/fixedDataRoute", fixedDataRoute);
 router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
 router.use("/v1/bus", busBookingRoute);
+router.use("/v1/housingLoan", housingLoanRoute);
 router.use("/v1/packingLicenceRoute", packingLicenceRoute);
 router.use("/v1/train", trainRoute);
 router.use("/v1/admin", adminViewRoute);
@@ -49,8 +67,23 @@ router.use("/v1/udyam", udyamRoute);
 router.use("/v1/passport", passportRoute);
 router.use("/v1/kswift", kswiftRoute);
 router.use("/v1/staff", staffRoute);
-router.use("/v1/bus", busBookingRoute);
-router.use("/v1/pancard", pancardRoute);
 router.use("/v1/vehicleLoanRoute", vehicleLoanRoute);
+router.use("/v1/loan", businessLoanExistingRoute)
+router.use("/v1/bus", busBookingRoute);
+router.use("/v1/cibilReportRoute", cibilReportRoute);
+router.use("/v1/pancard", pancardRoute)
+router.use("/v1/forgotPassword",forgotPasswordRoute)
+router.use("/v1/fssai",fssaiLicenceRoute)
+router.use("/v1/fssai",fssaiRegistrationRoute)
+router.use('/v1/gst/', gstFilingRoute)
+router.use("/v1/gst", gstRegistrationRoute)
+router.use("/v1/financialStatementRoute",financialStatementRoute)
+router.use("/v1/companyFormationRoute",companyFormationRoute)
+router.use("/v1/personalLoanRoute",personalLoanRoute)
+router.use("/v1/getPancard", getPancardRoute)
+
+
+
+
 
 module.exports = router;
