@@ -30,6 +30,9 @@ const fssaiRegistrationRoute = require('../route/fssaiRegistrationRoute')
 const staffRoute = require("../route/staffRoute")
 const busBookingRoute = require("../route/busRoutes")
 const pancardRoute = require('../route/pancardRoute')
+const loanAgainstPropertyRoute = require('../route/Loan/LoanAgainstPropertyRouter')
+const houseLoanRoute = require('../route/Loan/HousingLoanRouter')
+const loanStatusRoute = require('../route/staffLoanUpdateRoute')
 const gstFilingRoute = require('../route/gstFilingRoute')
 const pancardRoute = require('../route/pancardRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
@@ -37,6 +40,7 @@ const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
 const personalLoanRoute = require("../route/Loan/personalLoanRouter");
 const getPancardRoute = require('../route/getPancardRoute')
+
 
 
 
@@ -72,6 +76,7 @@ router.use("/v1/loan", businessLoanExistingRoute)
 router.use("/v1/bus", busBookingRoute);
 router.use("/v1/cibilReportRoute", cibilReportRoute);
 router.use("/v1/pancard", pancardRoute)
+router.use("/v1/loan", loanAgainstPropertyRoute)
 router.use("/v1/forgotPassword",forgotPasswordRoute)
 router.use("/v1/fssai",fssaiLicenceRoute)
 router.use("/v1/fssai",fssaiRegistrationRoute)
