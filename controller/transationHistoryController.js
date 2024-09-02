@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize ,Op} = require("sequelize");
 const catchAsync = require("../utils/catchAsync");
 const TransationHistory = require("../db/models/transationhistory");
 const transationHistories = require("../db/models/transationhistory");
@@ -43,26 +43,48 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
     }
 
     const where = { uniqueId: franchise.franchiseUniqueId };
+    const searchValue = search ? JSON.parse(search) : null;
 
-    const searchNumber = parseFloat(search);
-    const searchDate = new Date(search);
-    const startOfDay = new Date(searchDate.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setHours(23, 59, 59, 999);
+    if (searchValue?.field) {
+      const searchNumber = parseFloat(searchValue?.value);
+      const searchDate = new Date(searchValue?.value);
+      const startOfDay = new Date(searchDate?.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(startOfDay);
+      endOfDay.setHours(23, 59, 59, 999);
+      where[Op.or] = [];
 
-    if (search) {
-      where[Op.or] = [
-        { userName: { [Op.iLike]: `%${search}%` } },
-        { service: { [Op.iLike]: `%${search}%` } },
-        { uniqueId: { [Op.iLike]: `%${search}%` } },
-        { transactionId: { [Op.iLike]: `%${search}%` } },
-      ];
+      if (searchValue.field === "userName") {
+        console.log("searchValue.field: ", searchValue.field);
+        where[Op.or].push({
+          userName: { [Op.iLike]: `%${searchValue.value}%` },
+        });
+      }
+      if (searchValue.field === "service") {
+        console.log("searchValue.field: ", searchValue.field);
+        where[Op.or].push({
+          service: { [Op.iLike]: `%${searchValue.value}%` },
+        });
+      }
+      if (searchValue.field === "uniqueId") {
+        console.log("searchValue.field: ", searchValue.field);
+        where[Op.or].push({
+          uniqueId: { [Op.iLike]: `%${searchValue.value}%` },
+        });
+      }
+      if (searchValue.field === "transactionId") {
+        console.log("searchValue.field: ", searchValue.field);
+        where[Op.or].push({
+          transactionId: { [Op.iLike]: `%${searchValue.value}%` },
+        });
+      }
 
-      if (!isNaN(searchNumber)) {
+      if (searchValue.field === "amount" && !isNaN(searchNumber)) {
+        console.log("searchValue.field: ", searchValue.field);
         where[Op.or].push({ amount: { [Op.eq]: searchNumber } });
       }
 
-      if (searchDate.getTime()) {
+      if (searchValue.field === "createdAt" && !isNaN(searchDate.getTime())) {
+        console.log("searchValue.field: ", searchValue.field);
         where[Op.or].push({
           createdAt: {
             [Op.between]: [startOfDay, endOfDay],
@@ -91,7 +113,12 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
       }
     }
 
-    const order = sort ? [[sort, "ASC"]] : [];
+    //sorting based on feild value and order
+    let order = [];
+    const sortOrder = sort ? JSON.parse(sort) : [];
+    if (sortOrder.field && sortOrder.order) {
+      order = [[sortOrder.field, sortOrder.order]];
+    }
 
     const data = await transationHistories.findAndCountAll({
       where,
