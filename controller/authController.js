@@ -347,6 +347,54 @@ function generateRandomNumber() {
   return randomNumber.toString();
 }
 
+// change password functionality
+const changePassword = catchAsync(async (req, res, next) => {
+  const userData = req.user;
+  if (!userData) {
+    return next(new AppError("User not found", 404));
+  }
+  const Data = await user.findOne({ where: { email: userData.email } });
+  const franchiseData = await Franchise.findOne({
+    where: { email: userData.email },
+  });
+  if (!Data || !franchiseData) {
+    return next(new AppError("User not found", 404));
+  }
+  // const phoneNumber =Data.phoneNumber
+  // console.log(phoneNumber)where: { phoneNumber }
+
+  const { currentPassword, newPassword, confirmPassword } = req.body;
+
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    return next(new AppError("All fields are required", 400));
+  }
+
+  if (newPassword !== confirmPassword) {
+    return next(
+      new AppError("New password and confirm password doesn't match", 400)
+    );
+  }
+
+  const isMatch =
+    (await bcrypt.compare(currentPassword, Data.password)) &&
+    (await bcrypt.compare(currentPassword, franchiseData.password));
+  if (!isMatch) {
+    return next(new AppError("Current password is incorrect", 400));
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 8);
+
+  Data.password = hashedPassword;
+  await Data.save();
+  franchiseData.password = hashedPassword;
+  await franchiseData.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Password changed successfully",
+  });
+});
+
 module.exports = {
   senndOtp,
   checkOTP,
@@ -355,4 +403,5 @@ module.exports = {
   restrictTo,
   verifyOTP,
   logout,
+  changePassword
 };
