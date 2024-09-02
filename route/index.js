@@ -39,7 +39,9 @@ const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
 const personalLoanRoute = require("../route/Loan/personalLoanRouter");
 const getPancardRoute = require('../route/getPancardRoute')
+const businessLoanNewUnsecured =require('../route/Loan/businessLoanNewUnsecuredRouter')
 const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanUnsecuredExistingRouter')
+
 
 
 
@@ -86,6 +88,7 @@ router.use("/v1/financialStatementRoute",financialStatementRoute)
 router.use("/v1/companyFormationRoute",companyFormationRoute)
 router.use("/v1/personalLoanRoute",personalLoanRoute)
 router.use("/v1/getPancard", getPancardRoute)
+router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured)
 router.use("/v1/BusinessLoanUnsecuredExisting", BusinessLoanUnsecuredExistingRouter)
 
 
