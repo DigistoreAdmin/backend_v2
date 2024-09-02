@@ -20,6 +20,7 @@ const adminViewRoute = require("../route/adminViewRoute")
 const udyamRoute = require("../route/udyamRoute")
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
+const fssaiLicenceRoute = require("../route/fssaiLicenceRoute")
 const fssaiRegistrationRoute = require('../route/fssaiRegistrationRoute')
 const staffRoute = require("../route/staffRoute")
 const busBookingRoute = require("../route/busRoutes")
@@ -62,6 +63,7 @@ router.use("/v1/passport", passportRoute);
 router.use("/v1/kswift", kswiftRoute);
 router.use("/v1/staff", staffRoute);
 router.use("/v1/pancard", pancardRoute)
+router.use("/v1/fssai",fssaiLicenceRoute)
 router.use("/v1/fssai",fssaiRegistrationRoute)
 router.use('/v1/gst/', gstFilingRoute)
 router.use("/v1/gst", gstRegistrationRoute)
