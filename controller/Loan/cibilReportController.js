@@ -74,6 +74,7 @@ const createCibilReport = catchAsync(async (req, res, next) => {
   const user = req.user;
   if (!user) {
     return next(new AppError("User not found", 401));
+
   } 
 
   const franchise = await Franchise.findOne({
@@ -134,7 +135,3 @@ const createCibilReport = catchAsync(async (req, res, next) => {
 });
 
 module.exports = { createCibilReport };
-
-
-
-
