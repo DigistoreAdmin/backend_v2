@@ -9,6 +9,7 @@ const defineMoneyTransferDetails = require("../db/models/moneytransferdetails");
 const Tokens = require("../utils/token");
 const Franchise = require("../db/models/franchise");
 const Distributor = require("../db/models/distributor");
+const TransationHistory = require("../db/models/transationhistory");
 const sequelize = require("../config/database");
 const transationHistories = require("../db/models/transationhistory");
 const User = require("../db/models/user");
