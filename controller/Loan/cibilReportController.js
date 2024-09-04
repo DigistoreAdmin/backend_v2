@@ -134,16 +134,23 @@ const createCibilReport = catchAsync(async (req, res, next) => {
 });
 
 const getCibilReports = catchAsync(async (req, res, next) => {
-try {
+  try {
+  const {customerName,mobileNumber} = req.query
+
   const cibilReports = cibilReport();
   // console.log("15",cibilReports);
 
-  const reports = await cibilReports.findAll();
+  const reports = await cibilReports.findAll({
+    where: {
+      customerName: customerName, 
+      mobileNumber: mobileNumber 
+    }
+  });
   console.log("12",reports);
 
-  // if (reports.length===0) {
-  //   return next(new AppError("No Cibil Reports found", 404));
-  // }
+  if (reports.length===0) {
+    return next(new AppError("No Cibil Reports found", 404));
+  }
 
   return res.status(200).json({ data: reports, count: reports.length });
 
