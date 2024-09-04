@@ -25,11 +25,11 @@ const staffRoute = require("../route/staffRoute")
 const busBookingRoute = require("../route/busRoutes")
 const pancardRoute = require('../route/pancardRoute')
 const gstFilingRoute = require('../route/gstFilingRoute')
-const pancardRoute = require('../route/pancardRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
 const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
 const getPancardRoute = require('../route/getPancardRoute')
+const getBestTeamRoute = require('../route/studentTeamRoute')
 
 
 
@@ -68,6 +68,7 @@ router.use("/v1/gst", gstRegistrationRoute)
 router.use("/v1/financialStatementRoute",financialStatementRoute)
 router.use("/v1/companyFormationRoute",companyFormationRoute)
 router.use("/v1/getPancard", getPancardRoute)
+router.use("/v1/student", getBestTeamRoute)
 
 
 
