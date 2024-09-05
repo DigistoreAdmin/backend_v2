@@ -33,7 +33,6 @@ const busBookingRoute = require("../route/busRoutes")
 const pancardRoute = require('../route/pancardRoute')
 const loanAgainstPropertyRoute = require('../route/Loan/LoanAgainstPropertyRouter')
 const houseLoanRoute = require('../route/Loan/HousingLoanRouter')
-// const loanStatusRoute = require('../route/staffLoanUpdateRoute')
 const gstFilingRoute = require('../route/gstFilingRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
 const financialStatementRoute = require("../route/financialStatementRoute");
@@ -43,7 +42,7 @@ const getPancardRoute = require('../route/getPancardRoute')
 const businessLoanNewSecuredRoute=require('../route/Loan/businessLoanNewSecuredRouter')
 const businessLoanNewUnsecured =require('../route/Loan/businessLoanNewUnsecuredRouter')
 const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanUnsecuredExistingRouter')
-
+const staffUpdateRouter = require('../route/staffUpdateRouter')
 
 
 
@@ -95,7 +94,7 @@ router.use("/v1/getPancard", getPancardRoute)
 router.use("/v1/businessLoanNewSecured", businessLoanNewSecuredRoute)
 router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured)
 router.use("/v1/BusinessLoanUnsecuredExisting", BusinessLoanUnsecuredExistingRouter)
-
+router.use("/v1/staffUpdateRouter", staffUpdateRouter)
 
 
 
