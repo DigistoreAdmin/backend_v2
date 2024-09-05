@@ -74,8 +74,7 @@ const createCibilReport = catchAsync(async (req, res, next) => {
   const user = req.user;
   if (!user) {
     return next(new AppError("User not found", 401));
-
-  } 
+  }
 
   const franchise = await Franchise.findOne({
     where: { email: user.email },
@@ -122,7 +121,7 @@ const createCibilReport = catchAsync(async (req, res, next) => {
     completedOn,
     createdAt: new Date(),
     updatedAt: new Date(),
-    deletedAt: new Date(),
+    // deletedAt: new Date(),
   });
 
   if (!newCibilReport) {
@@ -134,4 +133,30 @@ const createCibilReport = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { createCibilReport };
+const getCibilReports = catchAsync(async (req, res, next) => {
+  try {
+  const {customerName,mobileNumber} = req.query
+
+  const cibilReports = cibilReport();
+  // console.log("15",cibilReports);
+
+  const reports = await cibilReports.findAll({
+    where: {
+      customerName: customerName, 
+      mobileNumber: mobileNumber 
+    }
+  });
+  console.log("12",reports);
+
+  if (reports.length===0) {
+    return next(new AppError("No Cibil Reports found", 404));
+  }
+
+  return res.status(200).json({ data: reports, count: reports.length });
+
+}catch (error) {
+  next(error);
+}
+});
+
+module.exports = { createCibilReport, getCibilReports };

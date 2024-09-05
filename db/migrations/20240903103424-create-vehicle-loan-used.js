@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("vehicleLoan_New", {
+    await queryInterface.createTable("usedvehicleLoan", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -51,6 +51,12 @@ module.exports = {
       invoiceFromDealer: {
         type: Sequelize.STRING,
       },
+      RC_Copy: {
+        type: Sequelize.STRING,
+      },
+      insuranceCopy: {
+        type: Sequelize.STRING,
+      },
       cibil: {
         type: Sequelize.ENUM("approved", "noCibil"),
       },
@@ -85,12 +91,12 @@ module.exports = {
         type: Sequelize.DATE,
       },
       deletedAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE,
       },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("vehicleLoan_New");
+    await queryInterface.dropTable("usedvehicleLoan");
   },
 };
