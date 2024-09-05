@@ -1,10 +1,5 @@
-const { login, logout } = require("../controller/authController");
-const {
-  authentication,
-  restrictTo,
-  senndOtp,
-  checkOTP,
-} = require("../controller/authController");
+const { login,logout,authentication, restrictTo,senndOtp, checkOTP,changePassword  } = require("../controller/authController");
+
 const { verifyToken, verifyRefreshToken } = require("../utils/token");
 
 const router = require("express").Router();
@@ -18,5 +13,6 @@ router
 
 router.route("/login").post(login);
 router.route("/logout").post(logout);
+router.route('/changePassword').post(verifyToken,verifyRefreshToken,changePassword)
 
 module.exports = router;
