@@ -39,20 +39,20 @@ const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
 const personalLoanRoute = require("../route/Loan/personalLoanRouter");
 const getPancardRoute = require('../route/getPancardRoute')
-const businessLoanNewSecuredRoute=require('../route/Loan/businessLoanNewSecuredRouter')
-const businessLoanNewUnsecured =require('../route/Loan/businessLoanNewUnsecuredRouter')
+const businessLoanNewSecuredRoute = require('../route/Loan/businessLoanNewSecuredRouter')
+const businessLoanNewUnsecured = require('../route/Loan/businessLoanNewUnsecuredRouter')
 const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanUnsecuredExistingRouter')
 const collegeTeamRoute = require('../route/collegeTeamRoute')
 const staffUpdateRouter = require('../route/staffUpdateRouter')
-
-
-
-
-const router = express.Router();
+const updateFranchiseBlock = require('../route/blockRoutes')
 
 
 
 const router = express.Router();
+
+
+
+// const router = express.Router();
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);
@@ -83,21 +83,21 @@ router.use("/v1/bus", busBookingRoute);
 router.use("/v1/cibilReportRoute", cibilReportRoute);
 router.use("/v1/pancard", pancardRoute)
 router.use("/v1/loan", loanAgainstPropertyRoute)
-router.use("/v1/forgotPassword",forgotPasswordRoute)
-router.use("/v1/fssai",fssaiLicenceRoute)
-router.use("/v1/fssai",fssaiRegistrationRoute)
+router.use("/v1/forgotPassword", forgotPasswordRoute)
+router.use("/v1/fssai", fssaiLicenceRoute)
+router.use("/v1/fssai", fssaiRegistrationRoute)
 router.use('/v1/gst/', gstFilingRoute)
 router.use("/v1/gst", gstRegistrationRoute)
-router.use("/v1/financialStatementRoute",financialStatementRoute)
-router.use("/v1/companyFormationRoute",companyFormationRoute)
-router.use("/v1/personalLoanRoute",personalLoanRoute)
+router.use("/v1/financialStatementRoute", financialStatementRoute)
+router.use("/v1/companyFormationRoute", companyFormationRoute)
+router.use("/v1/personalLoanRoute", personalLoanRoute)
 router.use("/v1/getPancard", getPancardRoute)
 router.use("/v1/businessLoanNewSecured", businessLoanNewSecuredRoute)
 router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured)
 router.use("/v1/BusinessLoanUnsecuredExisting", BusinessLoanUnsecuredExistingRouter)
 router.use("/v1/students", collegeTeamRoute)
 router.use("/v1/staffUpdateRouter", staffUpdateRouter)
-
+router.use("/v1/franchiseBlock", updateFranchiseBlock)
 
 
 
