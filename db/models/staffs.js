@@ -357,6 +357,11 @@ const defineStaffsDetails = (employmentType, isTrainingRequired) => {
         type: DataTypes.STRING,
         allowNull: type,
       },
+      blocked:{
+        type: DataTypes.ENUM("blocked","unBlocked"),
+        allowNull: false,
+        defaultValue:"unBlocked"
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
