@@ -44,15 +44,14 @@ const businessLoanNewUnsecured =require('../route/Loan/businessLoanNewUnsecuredR
 const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanUnsecuredExistingRouter')
 const collegeTeamRoute = require('../route/collegeTeamRoute')
 const staffUpdateRouter = require('../route/staffUpdateRouter')
+const partnerShipDeedPreperationRoute = require("../route/partnerShipDeedPreperationRoute");
+
 
 
 
 
 const router = express.Router();
 
-
-
-// const router = express.Router();
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);
@@ -97,6 +96,8 @@ router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured)
 router.use("/v1/BusinessLoanUnsecuredExisting", BusinessLoanUnsecuredExistingRouter)
 router.use("/v1/students", collegeTeamRoute)
 router.use("/v1/staffUpdateRouter", staffUpdateRouter)
+router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute);
+
 
 
 
