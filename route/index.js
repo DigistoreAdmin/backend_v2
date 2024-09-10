@@ -31,7 +31,6 @@ const staffRoute = require("../route/staffRoute")
 const busBookingRoute = require("../route/busRoutes")
 const pancardRoute = require('../route/pancardRoute')
 const gstFilingRoute = require('../route/gstFilingRoute')
-const pancardRoute = require('../route/pancardRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
 const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
