@@ -289,5 +289,5 @@ function generateRandomNumber() {
 module.exports = {
   moneyTransferDetails,
   moneyTransferVerify,
-  updatemoneyTransfer,
-};
+  updatemoneyTransfer
+}

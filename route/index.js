@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 
 const authRouter = require("../route/authRoute");
 const projectRouter = require("../route/projectRoute");
@@ -45,14 +45,8 @@ const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanU
 const collegeTeamRoute = require('../route/collegeTeamRoute')
 const staffUpdateRouter = require('../route/staffUpdateRouter')
 
-
-
-
 const router = express.Router();
 
-
-
-const router = express.Router();
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);

@@ -19,6 +19,7 @@ const whitelist = [
   "capacitor://localhost",
   "https://localhost",
   "https://dev-digistorepay.azurewebsites.net",
+  "https://digistorepaydev-apis.azurewebsites.net/"
 ];
 
 // CORS options delegate function
