@@ -115,28 +115,22 @@ const moneyTransferVerify = catchAsync(async (req, res, next) => {
 
     if (filter) {
       const filters = JSON.parse(filter);
-      if (filters.userName) {
-        where.userName = filters.userName;
-      }
-      if (filters.executiveName) {
-        where.executiveName = filters.executiveName;
-      }
       if (filters.transactionType) {
         where.transactionType = filters.transactionType;
       }
       if (filters.status) {
         where.status = filters.status;
       }
-      if (filters.amount) {
-        where.amount = filters.amount;
-      }
     }
+
+    // Always sort by the specified field in descending order
+    const order = sort ? [[sort, 'DESC']] : [['createdAt', 'DESC']];  // Default to 'createdAt' descending
 
     const datas = await moneyTransferDetailsModel.findAndCountAll({
       where,
       limit,
       offset,
-      order: sort ? [[sort, 'ASC']] : []
+      order,  // Always descending order
     });
 
     if (datas.rows.length === 0) {
@@ -156,6 +150,7 @@ const moneyTransferVerify = catchAsync(async (req, res, next) => {
     next(error);
   }
 });
+
 
 const updatemoneyTransfer = catchAsync(async (req, res, next) => {
   const transaction = await sequelize.transaction();
