@@ -4,6 +4,7 @@ const Franchise = require("../../db/models/franchise");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const cibilReport = require("../../db/models/cibilreport");
+const { Op } = require("sequelize");
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -135,28 +136,91 @@ const createCibilReport = catchAsync(async (req, res, next) => {
 
 const getCibilReports = catchAsync(async (req, res, next) => {
   try {
-  const {customerName,mobileNumber} = req.query
+    const { customerName, mobileNumber } = req.query
 
-  const cibilReports = cibilReport();
-  // console.log("15",cibilReports);
+    const cibilReports = cibilReport();
+    // console.log("15",cibilReports);
 
-  const reports = await cibilReports.findAll({
-    where: {
-      customerName: customerName, 
-      mobileNumber: mobileNumber 
+    const reports = await cibilReports.findAll({
+      where: {
+        customerName: customerName,
+        mobileNumber: mobileNumber
+      }
+    });
+    console.log("12", reports);
+
+    if (reports.length === 0) {
+      return next(new AppError("No Cibil Reports found", 404));
     }
-  });
-  console.log("12",reports);
 
-  if (reports.length===0) {
-    return next(new AppError("No Cibil Reports found", 404));
+    return res.status(200).json({ data: reports, count: reports.length });
+
+  } catch (error) {
+    next(error);
   }
-
-  return res.status(200).json({ data: reports, count: reports.length });
-
-}catch (error) {
-  next(error);
-}
 });
 
-module.exports = { createCibilReport, getCibilReports };
+const getAllCibilReports = catchAsync(async (req, res, next) => {
+  const { sort, filter, search } = req.query;
+  console.log(req.query);
+  const order = sort ? [[sort, "DESC"]] : [];
+
+  const where = {};
+  if (filter) {
+    const filters = JSON.parse(filter);
+    if (filters.customerName) {
+      where.customerName = filters.customerName;
+    }
+    if (filters.purpose) {
+      where.purpose = filters.purpose;
+    }
+    if (filters.emailId) {
+      where.emailId = filters.emailId;
+    }
+    if (filters.mobileNumber) {
+      where.mobileNumber = filters.mobileNumber;
+    }
+  }
+
+  const mobileNumber = parseFloat(search);
+
+  if (search) {
+    where[Op.or] = [
+      { customerName: { [Op.iLike]: `%${search}%` } },
+      // { purpose: { [Op.iLike]: `%${search}%` } },
+      // { mbileNumber: { [Op.iLike]: `%${search}%` } },
+      { emailId: { [Op.iLike]: `%${search}%` } },
+    ];
+    if (!isNaN(mobileNumber)) {
+      where[Op.or].push({ mobileNumber: { [Op.eq]: mobileNumber } });
+    }
+  }
+
+  try {
+    const cibilReports = cibilReport()
+    const data = await cibilReports.findAndCountAll({
+      where,
+      order,
+    });
+    if (data.count === 0) {
+      return res.status(404).json({ succes: 'false', message: "No data to display" });
+    }
+    data.rows.forEach((row) => {
+      row.password = "";
+    });
+    if (data.rows.length === 0) {
+      return res.status(404).json({ succes: 'false', message: "No data to display" });
+    }
+
+    return res.json({
+      status: "success",
+      data: data,
+      totalItems: data.count,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+});
+
+module.exports = { createCibilReport, getCibilReports, getAllCibilReports };
