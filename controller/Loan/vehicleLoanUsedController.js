@@ -3,7 +3,7 @@ const AppError = require("../../utils/appError");
 const Franchise = require("../../db/models/franchise");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
-const usedVehicleLoan = require("../../db/models/usedvehicleloan");
+const usedVehicleLoan = require("../../db/models/vehicleloanused");
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -173,7 +173,6 @@ const createUsedVehicleLoan = catchAsync(async (req, res, next) => {
     completedOn,
     createdAt: new Date(),
     updatedAt: new Date(),
-    deletedAt: new Date(),
   });
 
   if (!createdVehicleLoan) {
@@ -187,3 +186,6 @@ const createUsedVehicleLoan = catchAsync(async (req, res, next) => {
 });
 
 module.exports = { createUsedVehicleLoan };
+
+
+ 

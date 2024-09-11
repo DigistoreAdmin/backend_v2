@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 
 const authRouter = require("../route/authRoute");
 const projectRouter = require("../route/projectRoute");
@@ -14,6 +14,7 @@ const userPlanRoute = require("../route/userPlanRoute");
 const fixedDataRoute = require("../route/fixedDataRoute");
 const phoneRechargeRoute = require("../route/phoneRechargeRoute");
 const billPaymentRoute = require("../route/billPaymentRoute");
+const incomeTaxFilingRoute = require("../route/incomeTaxFilingRoute");
 const housingLoanRoute = require("../route/Loan/HousingLoanRouter");
 const packingLicenceRoute = require("../route/packingLicenceRoute");
 const trainRoute = require("../route/trainRoute");
@@ -32,7 +33,6 @@ const busBookingRoute = require("../route/busRoutes")
 const pancardRoute = require('../route/pancardRoute')
 const loanAgainstPropertyRoute = require('../route/Loan/LoanAgainstPropertyRouter')
 const houseLoanRoute = require('../route/Loan/HousingLoanRouter')
-// const loanStatusRoute = require('../route/staffLoanUpdateRoute')
 const gstFilingRoute = require('../route/gstFilingRoute')
 const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
 const financialStatementRoute = require("../route/financialStatementRoute");
@@ -42,15 +42,13 @@ const getPancardRoute = require('../route/getPancardRoute')
 const businessLoanNewSecuredRoute=require('../route/Loan/businessLoanNewSecuredRouter')
 const businessLoanNewUnsecured =require('../route/Loan/businessLoanNewUnsecuredRouter')
 const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanUnsecuredExistingRouter')
-
-
-
-
-
-
+const collegeTeamRoute = require('../route/collegeTeamRoute')
+const staffUpdateRouter = require('../route/staffUpdateRouter')
+const partnerShipDeedPreperationRoute = require("../route/partnerShipDeedPreperationRoute");
 
 
 const router = express.Router();
+
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);
@@ -66,7 +64,7 @@ router.use("/v1/userPlanRoute", userPlanRoute);
 router.use("/v1/fixedDataRoute", fixedDataRoute);
 router.use("/v1/phoneRechargeRoute", phoneRechargeRoute);
 router.use("/v1/billPaymentRoute", billPaymentRoute);
-router.use("/v1/bus", busBookingRoute);
+router.use("/v1/incomeTax", incomeTaxFilingRoute);
 router.use("/v1/housingLoan", housingLoanRoute);
 router.use("/v1/packingLicenceRoute", packingLicenceRoute);
 router.use("/v1/train", trainRoute);
@@ -93,6 +91,9 @@ router.use("/v1/getPancard", getPancardRoute)
 router.use("/v1/businessLoanNewSecured", businessLoanNewSecuredRoute)
 router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured)
 router.use("/v1/BusinessLoanUnsecuredExisting", BusinessLoanUnsecuredExistingRouter)
+router.use("/v1/students", collegeTeamRoute)
+router.use("/v1/staffUpdateRouter", staffUpdateRouter)
+router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute);
 
 
 

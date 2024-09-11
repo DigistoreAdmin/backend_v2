@@ -23,15 +23,16 @@ const transationHistories = require("../db/models/transationhistory");
 const sequelize = require("../config/database");
 const Circles = require("../db/models/circle");
 
+
+
+
 const mobileRecharge = catchAsync(async (req, res, next) => {
   const { phoneNumber, sp_key, circle, amount } = req.body;
 
   const user = req.user;
   const Data = await Franchise.findOne({ where: { email: user.email } });
 
-  const walletData = await Wallet.findOne({
-    where: { uniqueId: Data.franchiseUniqueId },
-  });
+  const walletData = await Wallet.findOne({ where: { uniqueId: Data.franchiseUniqueId } });
   console.log(walletData.balance);
   const result = await Operator.findOne({ where: { SP_key: sp_key } });
 
@@ -62,7 +63,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
     `https://livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${phoneNumber}&Amount=${amount}&SPKey=${sp_key}&APIRequestID=${random12DigitNumber}&Optional1={Optional1}&Optional2={Optional2}&Optional3={Optional3}&Optional4={Optional4}&RefID={RefID}&GEOCode=${circle}&CustomerNumber=8606172833&Pincode=691536&Format=1&OutletID=0`
   );
   console.log("res ", response);
-  console.log("res ", response.data.rpid); // transation id in history
+  console.log("res ", response.data.rpid);// transation id in history
   console.log("res status", response.status);
   console.log("res amount", response.data.amount);
   console.log("res statusText", response.statusText);
@@ -117,9 +118,60 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
         .status(200)
         .json({ data: response.data, message: "recharge success" });
     }
-  } else {
-    //
+  } else if (
+    response.data.status === 1 &&
+    response.data.msg === "PENDING" 
+  ) 
+    {
+      const totalCommissionAmount =
+      result.commissionType === "percentage"
+        ? (response.data.amount * result.commission) / 100
+        : result.commission;
+
+    console.log("commission", result.commission);
+
+    console.log("toralCommittion", totalCommissionAmount);
+    const adminCommissionAmount = totalCommissionAmount * 0.25;
+
+    console.log("adminCommissionAmount", adminCommissionAmount);
+    const franciseCommissionAmount = totalCommissionAmount * 0.75;
+    console.log("franchiseCommission", franciseCommissionAmount);
+
+    let newBalance =
+      walletData.balance - response.data.amount + franciseCommissionAmount;
+
+    console.log("newBalance", newBalance);
+
+    const updated = await Wallet.update(
+      { balance: newBalance },
+      { where: { uniqueId: Data.franchiseUniqueId } }
+    );
+    console.log("updatedBalance", updated);
     const serr = `Mobile Recharge Number:${phoneNumber} sim:${result.serviceProvider}`;
+
+    const transatinH = await transationHistory.create({
+      transactionId: response.data.rpid,
+      uniqueId: Data.franchiseUniqueId,
+      userName: Data.franchiseName,
+      userType: user.userType,
+      service: serr,
+      status: "pending",
+      amount: amount,
+      franchiseCommission: franciseCommissionAmount,
+      adminCommission: adminCommissionAmount,
+      walletBalance: newBalance,
+    });
+
+    if (updated && transatinH) {
+      return res
+        .status(200)
+        .json({ data: response.data, message: "recharge Processing" });
+    }
+    } 
+   else 
+   {
+    //
+     const serr = `Mobile Recharge Number:${phoneNumber} sim:${result.serviceProvider}`;
     const transatinH = await transationHistory.create({
       transactionId: response.data.rpid,
       uniqueId: Data.franchiseUniqueId,
@@ -127,7 +179,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       userType: user.userType,
       service: serr,
       status: "fail",
-      amount: 0.0,
+      amount: amount,
       walletBalance: walletData.balance,
     });
     if (transatinH) {
@@ -138,6 +190,49 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
   }
 });
 
+
+const callBackUrl = catchAsync(async (req, res, next) => {
+  const { STATUS, MOBILE, AMOUNT, TRANID, AGENTID, LIVEID, MSG } = req.query;
+
+  // Log all the parameters
+  console.log("STATUS:", STATUS);
+  console.log("MOBILE:", MOBILE);
+  console.log("AMOUNT:", AMOUNT);
+  console.log("TRANID:", TRANID); //
+  console.log("AGENTID:", AGENTID);
+  console.log("LIVEID:", LIVEID);
+  console.log("MSG:", MSG);
+  
+  const data = await transationHistory.findOne({ where: { transactionId:TRANID } });
+  console.log("data:", data);
+  console.log("data.status:", data.status);//
+
+  if (data.status=="pending" && STATUS==2) {
+    const update = await transationHistory.update({ status:"success" },{where:{transactionId:TRANID}})
+    console.log("121",update);
+    
+  }else if (data.status=="pending" && STATUS==3) {
+    console.log("uniqueId",data.uniqueId);
+    // d = data.uniqueId
+    const amount = await Wallet.findOne({ where: { uniqueId:data.uniqueId } })
+    let newBalance = AMOUNT + amount.balance - data.franchiseCommission
+    const update = await transationHistory.update({ status:"fail", amount: AMOUNT,adminCommission: 0.00, franchiseCommission: 0.00, walletBalance: newBalance  },{where:{transactionId:TRANID}})
+    console.log("121",update);
+    console.log("newBalance",newBalance);
+    
+    const updated = await Wallet.update(
+      { balance: newBalance },
+      { where: {uniqueId:data.uniqueId} }
+    );
+    console.log(updated);
+    
+  }
+  
+})
+
+
+
+
 function generateRandomNumber() {
   const randomNumber =
     Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
@@ -145,6 +240,8 @@ function generateRandomNumber() {
   return randomNumber.toString();
 }
 
+
 module.exports = {
   mobileRecharge,
+  callBackUrl
 };

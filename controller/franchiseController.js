@@ -176,6 +176,7 @@ const creatFranchise = catchAsync(async (req, res, next) => {
   const transaction = await sequelize.transaction();
 
   try {
+    //
     if (!isverified) {
       throw new AppError("OTP needs to be verified", 401);
     }
@@ -189,6 +190,7 @@ const creatFranchise = catchAsync(async (req, res, next) => {
     ) {
       throw new AppError("OTP expired or phone number not correct", 401);
     }
+    //
 
     const existingPhoneNumber = await user.findOne({
       where: { phoneNumber: body.phoneNumber },
@@ -221,12 +223,13 @@ const creatFranchise = catchAsync(async (req, res, next) => {
       typeof body.onBoardedPersonName
     );
     const id = `DSP${body.phoneNumber}`;
-    const aadhaarPicFrontUrl = await uploadBlob(req.files.aadhaarPicFront);
-    const aadhaarPicbackUrl = await uploadBlob(req.files.aadhaarPicback);
-    const panPicUrl = await uploadBlob(req.files.panPic);
-    const bankPassbookPicUrl = await uploadBlob(req.files.bankPassbookPic);
-    const shopPicUrl = await uploadBlob(req.files.shopPic);
-
+    const aadhaarPicFrontUrl = req.files && req.files.aadhaarPicFront ? await uploadBlob(req.files.aadhaarPicFront) : null;
+    const aadhaarPicbackUrl = req.files && req.files.aadhaarPicback ? await uploadBlob(req.files.aadhaarPicback) : null;
+    const panPicUrl = req.files && req.files.panPic ? await uploadBlob(req.files.panPic) : null;
+    const bankPassbookPicUrl = req.files && req.files.bankPassbookPic ? await uploadBlob(req.files.bankPassbookPic) : null;
+    const shopPicUrl = req.files && req.files.shopPic ? await uploadBlob(req.files.shopPic) : null;
+    console.log("ssss",body.digitalElements);
+    console.log("ssss",typeof(body.digitalElements));
     const franchiseData = await Franchise.create(
       {
         franchiseUniqueId: id,
@@ -321,6 +324,8 @@ const creatFranchise = catchAsync(async (req, res, next) => {
     return next(error);
   }
 });
+
+
 
 const wallet = catchAsync(async (req, res, next) => {
   try {

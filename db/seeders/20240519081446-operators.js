@@ -15,7 +15,7 @@ module.exports = {
             {
               serviceProvider:"Bsnl Prepaid",
               SP_key:"5",
-              commission:5.00,
+              commission:4.00,
               createdAt: new Date(),
               updatedAt: new Date(),
               rechargeType:"prepaid",
@@ -33,7 +33,7 @@ module.exports = {
             {
               serviceProvider:"Jio Prepaid",
               SP_key:"116",
-              commission:0.80,
+              commission:0.50,
               createdAt: new Date(),
               updatedAt: new Date(),
               rechargeType:"prepaid",
@@ -105,7 +105,7 @@ module.exports = {
           {
             serviceProvider:"Sun Direct",
             SP_key:"DS",
-            commission:4.00,
+            commission:3.00,
             createdAt: new Date(),
             updatedAt: new Date(),
             rechargeType:"Dth",
@@ -114,7 +114,7 @@ module.exports = {
           {
             serviceProvider:"Tata Sky",
             SP_key:"DT",
-            commission:3.00,
+            commission:3.50,
             createdAt: new Date(),
             updatedAt: new Date(),
             rechargeType:"Dth",

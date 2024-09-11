@@ -6,6 +6,11 @@ const axios = require("axios");
 const sequelize = require("../config/database");
 const Circles = require("../db/models/circle");
 
+
+
+
+
+
 const rechargePage = catchAsync(async (req, res, next) => {
   const data = await Operator.findAll();
   if (!data) {
@@ -18,7 +23,6 @@ const rechargePage = catchAsync(async (req, res, next) => {
 const circle = catchAsync(async (req, res, next) => {
   try {
     const data = await Circles.findAll();
-    console.log("data", data);
     return res.status(200).json({ data: data, count: data.length });
   } catch (error) {
     console.error("Error fetching circle data:", error);
@@ -52,8 +56,9 @@ const fetchMobileRechargePlans = catchAsync(async (req, res, next) => {
   }
 });
 
+
 module.exports = {
   rechargePage,
   fetchMobileRechargePlans,
-  circle,
+  circle
 };
