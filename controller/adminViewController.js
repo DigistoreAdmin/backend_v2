@@ -130,53 +130,19 @@ const updateStaffDetails = catchAsync(async (req, res, next) => {
     const staffs = defineStaffsDetails();
 
     const findStaff = await staffs.findOne({
-      where: { employeeId: employeeId },
+      where: { employeeId },
     });
 
     if (!findStaff) {
-      await transaction.rollback();
       return res
         .status(404)
         .json({ success: false, message: "Staff not found" });
     }
 
-    const transaction = await sequelize.transaction();
-
-      if(emailId){
-        const findEmail = await user.findOne({
-          where: { email:emailId}
-        })
-  
-        if(findEmail){
-          await transaction.rollback()
-          return res.status(400).json({ success: false, message: " Email already exist" });
-        }
-       }
-
-     if(phoneNumber){
-      const findPhone = await user.findOne({
-        where: { phoneNumber: phoneNumber}
-      })
-
-      if(findPhone){
-        await transaction.rollback()
-        return res.status(400).json({ success: false, message: "Phone Number already exist" });
-      }
-     }
-
-      const newUser = await user.update(
-        { email: emailId, phoneNumber },
-        { where: { email:findStaff.emailId } },
-        { transaction }
-      )
-    
-    if (!newUser) {
-      await transaction.rollback();
-      return next(new AppError("user updation failed", 400));
-    }
-
-    const fieldsToUpdate = {
+    const updatedStaff = await staffs.update(
+      {
       userType,
+      employeeId,
       firstName,
       lastName,
       emailId,
@@ -211,20 +177,25 @@ const updateStaffDetails = catchAsync(async (req, res, next) => {
       other,
       phone,
       remarks,
-    };
-
-    for (const [key, value] of Object.entries(fieldsToUpdate)) {
-      if (value !== undefined && value !== null) {
-        findStaff[key] = value;
+      },
+      {
+        where: { employeeId },
       }
+    );
+
+    if(!updatedStaff){
+      return res
+       .status(400)
+       .json({ success: false, message: "Failed to update staff" });
     }
 
-    await findStaff.save();
-    await transaction.commit();
+    const updatedStaffs = await staffs.findOne({
+      where: { employeeId },
+    });
 
     return res
       .status(200)
-      .json({ success: true, message: "Updated staff", staffs: findStaff });
+      .json({ success: true, message: "Updated staff", staffs: updatedStaffs });
   } catch (error) {
     console.log("Error:", error);
     return next(new AppError(error.message, 500));
