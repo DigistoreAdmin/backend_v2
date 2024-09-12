@@ -46,6 +46,7 @@ const collegeTeamRoute = require('../route/collegeTeamRoute')
 const staffUpdateRouter = require('../route/staffUpdateRouter')
 const partnerShipDeedPreperationRoute = require("../route/partnerShipDeedPreperationRoute");
 const franchiseBlockRoute = require("../route/blockRoutes")
+const getLoanRoute = require("../route/Loan/fetchLoanRouter")
 
 const router = express.Router();
 
@@ -96,6 +97,7 @@ router.use("/v1/students", collegeTeamRoute)
 router.use("/v1/staffUpdateRouter", staffUpdateRouter)
 router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute);
 router.use("/v1/franchiseBlock", franchiseBlockRoute)
+router.use("/v1/getLoan",getLoanRoute)
 
 
 
