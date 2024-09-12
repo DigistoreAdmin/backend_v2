@@ -234,9 +234,42 @@ const Franchise = sequelize.define(
             },
         },
         digitalElements: {
-            type: DataTypes.ARRAY(DataTypes.STRING),
+            type: DataTypes.JSON,
             allowNull: true,
+            validate: {
+                isValidDigitalElements(value) {
+                    console.log("nnnnnnn", value);
+                    console.log("nnnnnnn", typeof(value));
+        
+                    // Convert string to array if it's a string
+                    if (typeof value === 'string') {
+                        try {
+                            // Handle strings without proper JSON formatting
+                            value = value
+                                .replace(/[\[\]']+/g, '') // Remove square brackets and single quotes
+                                .split(',') // Split by commas to create an array
+                                .map(item => item.trim()); // Trim whitespace
+                        } catch (error) {
+                            throw new Error('Digital elements must be a valid JSON array');
+                        }
+                    } 
+        
+                    if (this.panCenter) {
+                        if (!Array.isArray(value) || value.length === 0) {
+                            throw new Error('Digital elements must be a non-empty array when Pan Center is true');
+                        }
+                        value.forEach(element => {
+                            if (typeof element !== 'string') {
+                                throw new Error('Each digital element must be a string');
+                            }
+                        });
+                    } else {
+                        this.digitalElements = {};
+                    }
+                },
+            },
         },
+        
         panCenter: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
@@ -248,93 +281,93 @@ const Franchise = sequelize.define(
         },
         accountNumber: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'Account number cannot be null',
-                },
-                notEmpty: {
-                    msg: 'Account number cannot be empty',
-                },
-                isInt: {
-                    msg: 'Account number must be an integer',
-                },
-            },
+            allowNull: true,
+            // validate: {
+            //     notNull: {
+            //         msg: 'Account number cannot be null',
+            //     },
+            //     notEmpty: {
+            //         msg: 'Account number cannot be empty',
+            //     },
+            //     isInt: {
+            //         msg: 'Account number must be an integer',
+            //     },
+            // },
         },
         accountName: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'Account name cannot be null',
-                },
-                notEmpty: {
-                    msg: 'Account name cannot be empty',
-                },
-            },
+            allowNull: true,
+            // validate: {
+            //     notNull: {
+            //         msg: 'Account name cannot be null',
+            //     },
+            //     notEmpty: {
+            //         msg: 'Account name cannot be empty',
+            //     },
+            // },
         },
         bank: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'Bank name cannot be null',
-                },
-                notEmpty: {
-                    msg: 'Bank name cannot be empty',
-                },
-            },
+            allowNull: true,
+            // validate: {
+            //     notNull: {
+            //         msg: 'Bank name cannot be null',
+            //     },
+            //     notEmpty: {
+            //         msg: 'Bank name cannot be empty',
+            //     },
+            // },
         },
         branchName: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'Branch name cannot be null',
-                },
-                notEmpty: {
-                    msg: 'Branch name cannot be empty',
-                },
-            },
+            allowNull: true,
+            // validate: {
+            //     notNull: {
+            //         msg: 'Branch name cannot be null',
+            //     },
+            //     notEmpty: {
+            //         msg: 'Branch name cannot be empty',
+            //     },
+            // },
         },
         ifscCode: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'IFSC code cannot be null',
-                },
-                notEmpty: {
-                    msg: 'IFSC code cannot be empty',
-                },
-            },
+            allowNull: true,
+            // validate: {
+            //     notNull: {
+            //         msg: 'IFSC code cannot be null',
+            //     },
+            //     notEmpty: {
+            //         msg: 'IFSC code cannot be empty',
+            //     },
+            // },
         },
         aadhaarNumber: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'Aadhaar number cannot be null',
-                },
-                notEmpty: {
-                    msg: 'Aadhaar number cannot be empty',
-                },
-                isInt: {
-                    msg: 'Aadhaar number must be an integer',
-                },
-            },
+            allowNull: true,
+            // validate: {
+            //     notNull: {
+            //         msg: 'Aadhaar number cannot be null',
+            //     },
+            //     notEmpty: {
+            //         msg: 'Aadhaar number cannot be empty',
+            //     },
+            //     isInt: {
+            //         msg: 'Aadhaar number must be an integer',
+            //     },
+            // },
         },
         panNumber: {
             type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: 'PAN number cannot be null',
-                },
-                notEmpty: {
-                    msg: 'PAN number cannot be empty',
-                },
-            },
+            allowNull: true,
+            // validate: {
+            //     notNull: {
+            //         msg: 'PAN number cannot be null',
+            //     },
+            //     notEmpty: {
+            //         msg: 'PAN number cannot be empty',
+            //     },
+            // },
         },
         aadhaarPicFront: {
             type: DataTypes.STRING,
@@ -422,6 +455,11 @@ const Franchise = sequelize.define(
             type: DataTypes.STRING,
             allowNull: true,
         },
+        blocked:{
+            type: DataTypes.ENUM("blocked","unBlocked"),
+            allowNull: false,
+            defaultValue:"unBlocked"
+          },
         createdAt: {
           allowNull: false,
           type: DataTypes.DATE,

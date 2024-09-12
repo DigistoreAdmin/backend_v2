@@ -79,12 +79,10 @@ const registerStudent = async (req, res) => {
   } catch (error) {
     await transaction.rollback();
     console.log("error", error.message);
-    return res
-      .status(500)
-      .json({
-        status: "error",
-        message: "An error occurred while registering the student",
-      });
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while registering the student",
+    });
   }
 };
 
