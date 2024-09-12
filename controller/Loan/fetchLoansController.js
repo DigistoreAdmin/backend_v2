@@ -5,6 +5,8 @@ const defineHousingLoan = require("../../db/models/HousingLoan");
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");
 const Franchise = require("../../db/models/franchise");
+const definePersonalLoan = require("../../db/models/personalloan");
+const defineBusinessLoanUnsecuredNew = require("../../db/models/businessloanunsecurednew");
 
 const getLoanAgainstProperty = catchAsync(async (req, res, next) => {
   try {
@@ -185,6 +187,66 @@ const fetchHousingLoan = catchAsync(async (req, res, next) => {
   });
 });
 
+const getPersonalLoanDetails= catchAsync(async(req,res)=>{
+  try {
+    const {page ,pageLimit}=req.query
+    if (!page || !pageLimit) {
+      return res.status(400).json({ error: "page and pageSize are required" });
+    }
+  
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+  
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
 
-module.exports = { getLoanAgainstProperty, getBusinessLoanUnsecuredExisting,fetchHousingLoan};
+    const personalLoan =definePersonalLoan()
+    const Data= await personalLoan.findAndCountAll({
+      limit,offset
+    })
+    return res.json({
+      status: "success",
+      data: Data,
+      totalItems: Data.count,
+      totalPages: Math.ceil(Data.count / limit),
+      currentPage: pageNumber,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+})
+
+const getBusinessUnsecuredNewLoanDetails= catchAsync(async(req,res)=>{
+  try {
+    const {page ,pageLimit}=req.query
+    if (!page || !pageLimit) {
+      return res.status(400).json({ error: "page and pageSize are required" });
+    }
+  
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+  
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
+
+    const businessLoanunsecuredNew =defineBusinessLoanUnsecuredNew()
+    const Data= await businessLoanunsecuredNew.findAndCountAll({
+      limit,offset
+    })
+    return res.json({
+      status: "success",
+      data: Data,
+      totalItems: Data.count,
+      totalPages: Math.ceil(Data.count / limit),
+      currentPage: pageNumber,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+})
+
+
+module.exports = { getLoanAgainstProperty, getBusinessLoanUnsecuredExisting,fetchHousingLoan,getPersonalLoanDetails,getBusinessUnsecuredNewLoanDetails};
 
