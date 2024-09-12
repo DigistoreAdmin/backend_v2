@@ -1,10 +1,12 @@
 const express = require('express')
 const { verifyToken, verifyRefreshToken } = require('../utils/token')
-const { getPancardDetails,fetchPassport,fetchKswift,fetchStaffs, } = require('../controller/fetchServicesController')
+const { getPancardDetails, fetchPassport, fetchKswift, fetchStaffs, getBusBookings,
+  getFssaiRegistrations, getFssaiLicence, getGstRegistrations, getGstFilings
+} = require('../controller/fetchServicesController')
 
 const route = express.Router()
 
-route.get('/getPancardDetails', verifyToken,verifyRefreshToken,getPancardDetails)
+route.get('/getPancardDetails', verifyToken, verifyRefreshToken, getPancardDetails)
 
 route
   .route("/fetchPassport")
@@ -12,5 +14,10 @@ route
 
 route.route("/fetchKswift").get(verifyToken, verifyRefreshToken, fetchKswift);
 route.route("/fetchStaffs").get(verifyToken, verifyRefreshToken, fetchStaffs);
+route.route("/getBusBooking").get(verifyToken, verifyRefreshToken, getBusBookings)
+route.route("/getFssaiRegistrations").get(verifyToken, verifyRefreshToken, getFssaiRegistrations)
+route.route("/getFssaiLicence").get(verifyToken, verifyRefreshToken, getFssaiLicence)
+route.route("/getGstRegistrations").get(verifyToken, verifyRefreshToken, getGstRegistrations)
+route.route("/getGstFilings").get(verifyToken, verifyRefreshToken, getGstFilings)
 
 module.exports = route;
