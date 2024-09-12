@@ -23,35 +23,31 @@ const udyamRoute = require("../route/udyamRoute");
 const passportRoute = require("../route/passportRoute");
 const kswiftRoute = require("../route/kswiftRoute");
 const vehicleLoanRoute = require("../route/Loan/vehicleLoanRouter");
-const businessLoanExistingRoute = require('../route/Loan/businessLoanExistingRouter')
+const businessLoanExistingRoute = require("../route/Loan/businessLoanExistingRouter");
 const cibilReportRoute = require("../route/Loan/cibilReportRouter");
-const forgotPasswordRoute = require('../route/forgotPasswordRoute')
-const fssaiLicenceRoute = require("../route/fssaiLicenceRoute")
-const fssaiRegistrationRoute = require('../route/fssaiRegistrationRoute')
-const staffRoute = require("../route/staffRoute")
-const busBookingRoute = require("../route/busRoutes")
-const pancardRoute = require('../route/pancardRoute')
-const loanAgainstPropertyRoute = require('../route/Loan/LoanAgainstPropertyRouter')
-const houseLoanRoute = require('../route/Loan/HousingLoanRouter')
-const gstFilingRoute = require('../route/gstFilingRoute')
-const gstRegistrationRoute = require('../route/gstRegistrationRoutes')
+const forgotPasswordRoute = require("../route/forgotPasswordRoute");
+const fssaiLicenceRoute = require("../route/fssaiLicenceRoute");
+const fssaiRegistrationRoute = require("../route/fssaiRegistrationRoute");
+const staffRoute = require("../route/staffRoute");
+const busBookingRoute = require("../route/busRoutes");
+const pancardRoute = require("../route/pancardRoute");
+const loanAgainstPropertyRoute = require("../route/Loan/LoanAgainstPropertyRouter");
+const houseLoanRoute = require("../route/Loan/HousingLoanRouter");
+const gstFilingRoute = require("../route/gstFilingRoute");
+const gstRegistrationRoute = require("../route/gstRegistrationRoutes");
 const financialStatementRoute = require("../route/financialStatementRoute");
 const companyFormationRoute = require("../route/companyFormationRoute");
 const personalLoanRoute = require("../route/Loan/personalLoanRouter");
-const getPancardRoute = require('../route/getPancardRoute')
-const businessLoanNewSecuredRoute=require('../route/Loan/businessLoanNewSecuredRouter')
-const businessLoanNewUnsecured =require('../route/Loan/businessLoanNewUnsecuredRouter')
-const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanUnsecuredExistingRouter')
-const collegeTeamRoute = require('../route/collegeTeamRoute')
-const staffUpdateRouter = require('../route/staffUpdateRouter')
+const getPancardRoute = require("../route/getPancardRoute");
+const businessLoanNewSecuredRoute = require("../route/Loan/businessLoanNewSecuredRouter");
+const businessLoanNewUnsecured = require("../route/Loan/businessLoanNewUnsecuredRouter");
+const BusinessLoanUnsecuredExistingRouter = require("../route/Loan/BusinessLoanUnsecuredExistingRouter");
+const collegeTeamRoute = require("../route/collegeTeamRoute");
+const staffUpdateRouter = require("../route/staffUpdateRouter");
 const partnerShipDeedPreperationRoute = require("../route/partnerShipDeedPreperationRoute");
-
-
-
-
-
+const fetchLoanRouter = require("../route/Loan/fetchLoanRouter");
+const fetchServicesRouter = require("../route/fetchServicesRouter");
 const router = express.Router();
-
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);
@@ -77,30 +73,33 @@ router.use("/v1/passport", passportRoute);
 router.use("/v1/kswift", kswiftRoute);
 router.use("/v1/staff", staffRoute);
 router.use("/v1/vehicleLoanRoute", vehicleLoanRoute);
-router.use("/v1/loan", businessLoanExistingRoute)
+router.use("/v1/loan", businessLoanExistingRoute);
 router.use("/v1/bus", busBookingRoute);
 router.use("/v1/cibilReportRoute", cibilReportRoute);
-router.use("/v1/pancard", pancardRoute)
-router.use("/v1/loan", loanAgainstPropertyRoute)
-router.use("/v1/forgotPassword",forgotPasswordRoute)
-router.use("/v1/fssai",fssaiLicenceRoute)
-router.use("/v1/fssai",fssaiRegistrationRoute)
-router.use('/v1/gst/', gstFilingRoute)
-router.use("/v1/gst", gstRegistrationRoute)
-router.use("/v1/financialStatementRoute",financialStatementRoute)
-router.use("/v1/companyFormationRoute",companyFormationRoute)
-router.use("/v1/personalLoanRoute",personalLoanRoute)
-router.use("/v1/getPancard", getPancardRoute)
-router.use("/v1/businessLoanNewSecured", businessLoanNewSecuredRoute)
-router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured)
-router.use("/v1/BusinessLoanUnsecuredExisting", BusinessLoanUnsecuredExistingRouter)
-router.use("/v1/students", collegeTeamRoute)
-router.use("/v1/staffUpdateRouter", staffUpdateRouter)
-router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute);
-
-
-
-
-
+router.use("/v1/pancard", pancardRoute);
+router.use("/v1/loan", loanAgainstPropertyRoute);
+router.use("/v1/forgotPassword", forgotPasswordRoute);
+router.use("/v1/fssai", fssaiLicenceRoute);
+router.use("/v1/fssai", fssaiRegistrationRoute);
+router.use("/v1/gst/", gstFilingRoute);
+router.use("/v1/gst", gstRegistrationRoute);
+router.use("/v1/financialStatementRoute", financialStatementRoute);
+router.use("/v1/companyFormationRoute", companyFormationRoute);
+router.use("/v1/personalLoanRoute", personalLoanRoute);
+router.use("/v1/getPancard", getPancardRoute);
+router.use("/v1/businessLoanNewSecured", businessLoanNewSecuredRoute);
+router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured);
+router.use(
+  "/v1/BusinessLoanUnsecuredExisting",
+  BusinessLoanUnsecuredExistingRouter
+);
+router.use("/v1/students", collegeTeamRoute);
+router.use("/v1/staffUpdateRouter", staffUpdateRouter);
+router.use(
+  "/v1/partnerShipDeedPreperationRoute",
+  partnerShipDeedPreperationRoute
+);
+router.use("/v1/fetchLoanRouter", fetchLoanRouter);
+router.use("/v1/fetchServicesRouter", fetchServicesRouter);
 
 module.exports = router;
