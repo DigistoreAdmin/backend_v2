@@ -6,11 +6,11 @@ const route = express.Router()
 
 route.get('/getPancardDetails', verifyToken,verifyRefreshToken,getPancardDetails)
 
-router
+route
   .route("/fetchPassport")
   .get(verifyToken, verifyRefreshToken, fetchPassport);
 
-router.route("/fetchKswift").get(verifyToken, verifyRefreshToken, fetchKswift);
-router.route("/fetchStaffs").get(verifyToken, verifyRefreshToken, fetchStaffs);
+route.route("/fetchKswift").get(verifyToken, verifyRefreshToken, fetchKswift);
+route.route("/fetchStaffs").get(verifyToken, verifyRefreshToken, fetchStaffs);
 
-module.exports = router;
+module.exports = route;

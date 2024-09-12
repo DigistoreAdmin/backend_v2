@@ -8,9 +8,9 @@ const route = express.Router()
 route.get('/getLoanAgainstProperty', verifyToken,verifyRefreshToken,getLoanAgainstProperty)
 route.get('/getBusinessLoanUnsecuredExisting', verifyToken,verifyRefreshToken,getBusinessLoanUnsecuredExisting)
 
-router
+route
   .route("/fetchHousingLoan")
   .get(verifyToken, verifyRefreshToken, fetchHousingLoan);
 
-module.exports = router;
+module.exports = route;
 
