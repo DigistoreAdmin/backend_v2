@@ -1,4 +1,4 @@
-const express = require("express");
+const express = require('express');
 
 const authRouter = require("../route/authRoute");
 const projectRouter = require("../route/projectRoute");
@@ -47,7 +47,10 @@ const staffUpdateRouter = require("../route/staffUpdateRouter");
 const partnerShipDeedPreperationRoute = require("../route/partnerShipDeedPreperationRoute");
 const fetchLoanRouter = require("../route/Loan/fetchLoanRouter");
 const fetchServicesRouter = require("../route/fetchServicesRouter");
+const franchiseBlockRoute = require("../route/blockRoutes")
+
 const router = express.Router();
+
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);
@@ -89,17 +92,15 @@ router.use("/v1/personalLoanRoute", personalLoanRoute);
 router.use("/v1/getPancard", getPancardRoute);
 router.use("/v1/businessLoanNewSecured", businessLoanNewSecuredRoute);
 router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured);
-router.use(
-  "/v1/BusinessLoanUnsecuredExisting",
-  BusinessLoanUnsecuredExistingRouter
-);
+router.use("/v1/BusinessLoanUnsecuredExisting",BusinessLoanUnsecuredExistingRouter);
 router.use("/v1/students", collegeTeamRoute);
 router.use("/v1/staffUpdateRouter", staffUpdateRouter);
-router.use(
-  "/v1/partnerShipDeedPreperationRoute",
-  partnerShipDeedPreperationRoute
-);
+router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute);
 router.use("/v1/fetchLoanRouter", fetchLoanRouter);
 router.use("/v1/fetchServicesRouter", fetchServicesRouter);
+router.use("/v1/franchiseBlock", franchiseBlockRoute)
+
+
+
 
 module.exports = router;

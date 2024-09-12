@@ -17,7 +17,7 @@ const user = sequelize.define(
             type: DataTypes.INTEGER,
         },
         userType: {
-            type: DataTypes.ENUM('admin','distributor','franchise','student'),
+            type: DataTypes.ENUM('admin','distributor','franchise','student','staff'),
             allowNull: false,
             validate: {
                 notNull: {
@@ -72,6 +72,11 @@ const user = sequelize.define(
                 },
             },
         },
+        blocked:{
+            type: DataTypes.ENUM("blocked","unBlocked"),
+            allowNull: false,
+            defaultValue:"unBlocked"
+          },
         createdAt: {
             allowNull: false,
             type: DataTypes.DATE,

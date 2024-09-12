@@ -185,7 +185,22 @@ const createUsedVehicleLoan = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { createUsedVehicleLoan };
+const getAllUsedVehicleLoans = catchAsync(async (req, res, next) => {
+  
+  const usedVehicleData = usedVehicleLoan();
+  const vehicleLoans = await usedVehicleData.findAll();
 
+  if (!vehicleLoans || vehicleLoans.length === 0) {
+    return res.status(404).json({
+      status: "Not Found",
+      message: "No vehicle loans found",
+    });
+  }
 
- 
+  return res.status(200).json({
+    status: "Success",
+    data: vehicleLoans,
+  });
+});
+
+module.exports = { createUsedVehicleLoan, getAllUsedVehicleLoans };
