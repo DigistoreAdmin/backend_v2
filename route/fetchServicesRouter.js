@@ -1,12 +1,10 @@
-const {
-  fetchPassport,
-  fetchKswift,
-  fetchStaffs,
-} = require("../controller/fetchServicesController");
+const express = require('express')
+const { verifyToken, verifyRefreshToken } = require('../utils/token')
+const { getPancardDetails,fetchPassport,fetchKswift,fetchStaffs, } = require('../controller/fetchServicesController')
 
-const { verifyToken, verifyRefreshToken } = require("../utils/token");
+const route = express.Router()
 
-const router = require("express").Router();
+route.get('/getPancardDetails', verifyToken,verifyRefreshToken,getPancardDetails)
 
 router
   .route("/fetchPassport")
