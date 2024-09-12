@@ -43,9 +43,9 @@ const BusinessLoanUnsecuredExistingRouter = require('../route/Loan/BusinessLoanU
 const collegeTeamRoute = require('../route/collegeTeamRoute')
 const staffUpdateRouter = require('../route/staffUpdateRouter')
 const partnerShipDeedPreperationRoute = require("../route/partnerShipDeedPreperationRoute");
+const BlockRoute = require("../route/blockRoutes")
 const fetchLoanRouter = require("../route/Loan/fetchLoanRouter");
 const fetchServicesRouter = require("../route/fetchServicesRouter");
-const franchiseBlockRoute = require("../route/blockRoutes")
 
 const router = express.Router();
 
@@ -93,11 +93,9 @@ router.use("/v1/BusinessLoanUnsecuredExisting", BusinessLoanUnsecuredExistingRou
 router.use("/v1/students", collegeTeamRoute)
 router.use("/v1/staffUpdateRouter", staffUpdateRouter)
 router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute);
+router.use("/v1/updateAccess", BlockRoute)
 router.use("/v1/fetchLoanRouter", fetchLoanRouter);
 router.use("/v1/fetchServicesRouter", fetchServicesRouter);
-router.use("/v1/franchiseBlock", franchiseBlockRoute)
-
-
 
 
 module.exports = router;
