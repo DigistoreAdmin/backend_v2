@@ -5,6 +5,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const kswift = require("../db/models/kswift");
 const defineStaffsDetails = require("../db/models/staffs");
+const trainBooking = require("../db/models/trainbooking")
 
 const getPancardDetails = async (req, res) => {
   try {
@@ -204,4 +205,38 @@ const fetchStaffs = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { fetchPassport, fetchKswift, fetchStaffs,getPancardDetails };
+
+const fetchTrainBookingDetails = catchAsync(async(req,res)=>{
+    
+        try {
+              const {page,pageLimit} = req.query
+    
+              if (!page || !pageLimit) {
+                return res.status(400).json({ error: "page and pageSize are required" });
+              }
+            
+              const pageNumber = parseInt(page, 10);
+              const pageLimitNumber = parseInt(pageLimit, 10);
+            
+              const limit = pageLimitNumber;
+              const offset = (pageNumber - 1) * limit;
+    
+            // const personalLoan=definePersonalLoan() 
+    
+            const Data= await trainBooking.findAndCountAll({limit,offset})
+    
+            return res.json({
+                status: "success",
+                data: Data,
+                totalItems: Data.count,
+                totalPages: Math.ceil(Data.count / limit),
+                currentPage: pageNumber,
+              });
+    
+          } catch (error) {
+            console.error("Error:", error);
+            return next(new AppError(error.message, 500));
+          }  
+})
+
+module.exports = { fetchPassport, fetchKswift, fetchStaffs,getPancardDetails,fetchTrainBookingDetails };
