@@ -17,4 +17,9 @@ router
   .route("/usedVehicleLoan")
   .post(verifyToken, verifyRefreshToken, createUsedVehicleLoan);
 
+  router
+  .route("/usedVehicleLoan")
+  .get(verifyToken, verifyRefreshToken, getAllUsedVehicleLoans);
+
+
 module.exports = router;

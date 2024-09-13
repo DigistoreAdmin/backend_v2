@@ -2,6 +2,8 @@ const loanAgainstProperty = require("../../db/models/loanAgainstProperty");
 const defineBusinessLoanUnscuredExisting = require("../../db/models/BusinessLoanUnsecuredExisting");
 const defineHousingLoan = require("../../db/models/HousingLoan");
 const defineBusinessLoanNewSecured = require("../../db/models/businessLoanNewSecured");
+const newVehicleLoan = require("../../db/models/newvehicleloan");
+const usedVehicleLoan = require("../../db/models/vehicleloanused");
 
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");
@@ -186,24 +188,24 @@ const fetchHousingLoan = catchAsync(async (req, res, next) => {
   });
 });
 
-
-const getPersonalLoanDetails= catchAsync(async(req,res)=>{
+const getPersonalLoanDetails = catchAsync(async (req, res) => {
   try {
-    const {page ,pageLimit}=req.query
+    const { page, pageLimit } = req.query;
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
     }
-  
+
     const pageNumber = parseInt(page, 10);
     const pageLimitNumber = parseInt(pageLimit, 10);
-  
+
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
-    const personalLoan =definePersonalLoan()
-    const Data= await personalLoan.findAndCountAll({
-      limit,offset
-    })
+    const personalLoan = definePersonalLoan();
+    const Data = await personalLoan.findAndCountAll({
+      limit,
+      offset,
+    });
     return res.json({
       status: "success",
       data: Data,
@@ -215,25 +217,26 @@ const getPersonalLoanDetails= catchAsync(async(req,res)=>{
     console.error("Error:", error);
     return next(new AppError(error.message, 500));
   }
-})
+});
 
-const getBusinessUnsecuredNewLoanDetails= catchAsync(async(req,res)=>{
+const getBusinessUnsecuredNewLoanDetails = catchAsync(async (req, res) => {
   try {
-    const {page ,pageLimit}=req.query
+    const { page, pageLimit } = req.query;
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
     }
-  
+
     const pageNumber = parseInt(page, 10);
     const pageLimitNumber = parseInt(pageLimit, 10);
-  
+
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
-    const businessLoanunsecuredNew =defineBusinessLoanUnsecuredNew()
-    const Data= await businessLoanunsecuredNew.findAndCountAll({
-      limit,offset
-    })
+    const businessLoanunsecuredNew = defineBusinessLoanUnsecuredNew();
+    const Data = await businessLoanunsecuredNew.findAndCountAll({
+      limit,
+      offset,
+    });
     return res.json({
       status: "success",
       data: Data,
@@ -245,9 +248,7 @@ const getBusinessUnsecuredNewLoanDetails= catchAsync(async(req,res)=>{
     console.error("Error:", error);
     return next(new AppError(error.message, 500));
   }
-})
-
-
+});
 
 const fetchBusinessLoanNewSecured = catchAsync(async (req, res, next) => {
   const { page, pageLimit } = req.query;
@@ -301,4 +302,85 @@ const fetchBusinessLoanNewSecured = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { getLoanAgainstProperty, getBusinessLoanUnsecuredExisting,fetchHousingLoan,fetchBusinessLoanNewSecured,getPersonalLoanDetails,getBusinessUnsecuredNewLoanDetails};
+const getAllNewVehicleLoans = catchAsync(async (req, res, next) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+
+  const maxLimit = 100;
+  if (limit > maxLimit) limit = maxLimit;
+
+  const offset = (page - 1) * limit;
+
+  const newVehicleData = newVehicleLoan();
+  const vehicleLoans = await newVehicleData.findAll({
+    limit: limit,
+    offset: offset,
+  });
+
+  const totalCount = await newVehicleData.count();
+
+  if (!vehicleLoans || vehicleLoans.length === 0) {
+    return res.status(404).json({
+      status: "Not Found",
+      message: "No vehicle loans found",
+    });
+  }
+
+  return res.status(200).json({
+    status: "Success",
+    data: vehicleLoans,
+    pagination: {
+      page: page,
+      limit: limit,
+      totalCount: totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+    },
+  });
+});
+
+const getAllUsedVehicleLoans = catchAsync(async (req, res, next) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+
+  const maxLimit = 100;
+  if (limit > maxLimit) limit = maxLimit;
+
+  const offset = (page - 1) * limit;
+
+  const usedVehicleData = usedVehicleLoan();
+  const vehicleLoans = await usedVehicleData.findAll({
+    limit: limit,
+    offset: offset,
+  });
+
+  const totalCount = await usedVehicleData.count();
+
+  if (!vehicleLoans || vehicleLoans.length === 0) {
+    return res.status(404).json({
+      status: "Not Found",
+      message: "No vehicle loans found",
+    });
+  }
+
+  return res.status(200).json({
+    status: "Success",
+    data: vehicleLoans,
+    pagination: {
+      page: page,
+      limit: limit,
+      totalCount: totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+    },
+  });
+});
+
+module.exports = {
+  getAllUsedVehicleLoans,
+  getAllNewVehicleLoans,
+  getLoanAgainstProperty,
+  getBusinessLoanUnsecuredExisting,
+  fetchHousingLoan,
+  fetchBusinessLoanNewSecured,
+  getPersonalLoanDetails,
+  getBusinessUnsecuredNewLoanDetails,
+};
