@@ -8,6 +8,7 @@ const AppError = require("../../utils/appError");
 const Franchise = require("../../db/models/franchise");
 const definePersonalLoan = require("../../db/models/personalloan");
 const defineBusinessLoanUnsecuredNew = require("../../db/models/businessloanunsecurednew");
+const businessLoanExistingDetails = require("../../db/models/businessloanexisting")
 
 const getLoanAgainstProperty = catchAsync(async (req, res, next) => {
   try {
@@ -187,22 +188,22 @@ const fetchHousingLoan = catchAsync(async (req, res, next) => {
 });
 
 
-const getPersonalLoanDetails= catchAsync(async(req,res)=>{
+const getPersonalLoanDetails = catchAsync(async (req, res) => {
   try {
-    const {page ,pageLimit}=req.query
+    const { page, pageLimit } = req.query
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
     }
-  
+
     const pageNumber = parseInt(page, 10);
     const pageLimitNumber = parseInt(pageLimit, 10);
-  
+
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
-    const personalLoan =definePersonalLoan()
-    const Data= await personalLoan.findAndCountAll({
-      limit,offset
+    const personalLoan = definePersonalLoan()
+    const Data = await personalLoan.findAndCountAll({
+      limit, offset
     })
     return res.json({
       status: "success",
@@ -217,22 +218,22 @@ const getPersonalLoanDetails= catchAsync(async(req,res)=>{
   }
 })
 
-const getBusinessUnsecuredNewLoanDetails= catchAsync(async(req,res)=>{
+const getBusinessUnsecuredNewLoanDetails = catchAsync(async (req, res) => {
   try {
-    const {page ,pageLimit}=req.query
+    const { page, pageLimit } = req.query
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
     }
-  
+
     const pageNumber = parseInt(page, 10);
     const pageLimitNumber = parseInt(pageLimit, 10);
-  
+
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
-    const businessLoanunsecuredNew =defineBusinessLoanUnsecuredNew()
-    const Data= await businessLoanunsecuredNew.findAndCountAll({
-      limit,offset
+    const businessLoanunsecuredNew = defineBusinessLoanUnsecuredNew()
+    const Data = await businessLoanunsecuredNew.findAndCountAll({
+      limit, offset
     })
     return res.json({
       status: "success",
@@ -301,4 +302,35 @@ const fetchBusinessLoanNewSecured = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = { getLoanAgainstProperty, getBusinessLoanUnsecuredExisting,fetchHousingLoan,fetchBusinessLoanNewSecured,getPersonalLoanDetails,getBusinessUnsecuredNewLoanDetails};
+const getBusinessLoanExisting = catchAsync(async (req, res, next) => {
+  const { page, pageLimit } = req.query;
+
+  if (!page || !pageLimit) {
+    return res
+      .status(400)
+      .json({ error: "page and pageLimit query parameters are required" });
+  }
+
+  const pageNumber = parseInt(page, 10);
+  const pageLimitNumber = parseInt(pageLimit, 10);
+
+  const limit = pageLimitNumber;
+  const offset = (pageNumber - 1) * limit;
+
+  const businessLoanExistingTable = businessLoanExistingDetails()
+  const businessLoanExistingFullDetails = await businessLoanExistingTable.findAndCountAll({
+    limit,
+    offset
+  })
+  if (!businessLoanExistingFullDetails) {
+    return next(new AppError("Data not found", 404));
+  }
+  res.status(200).json({
+    data: businessLoanExistingFullDetails.rows,
+    totalPages: Math.ceil(businessLoanExistingFullDetails.count / limit),
+    totalItems: businessLoanExistingFullDetails.count,
+    currentPage: pageNumber,
+  });
+})
+
+module.exports = { getLoanAgainstProperty, getBusinessLoanUnsecuredExisting, fetchHousingLoan, fetchBusinessLoanNewSecured, getPersonalLoanDetails, getBusinessUnsecuredNewLoanDetails, getBusinessLoanExisting };
