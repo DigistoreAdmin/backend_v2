@@ -10,6 +10,7 @@ const {
   getPersonalLoanDetails,
   getBusinessUnsecuredNewLoanDetails,
   getAllNewVehicleLoans,
+  getAllUsedVehicleLoans,
 } = require("../../controller/Loan/fetchLoansController");
 
 const route = express.Router();
@@ -45,5 +46,9 @@ route
 router
   .route("/newVehicleLoan")
   .get(verifyToken, verifyRefreshToken, getAllNewVehicleLoans);
+
+router
+  .route("/usedVehicleLoan")
+  .get(verifyToken, verifyRefreshToken, getAllUsedVehicleLoans);
 
 module.exports = route;

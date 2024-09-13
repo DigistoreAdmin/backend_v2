@@ -19,5 +19,9 @@ router
   .route("/usedVehicleLoan")
   .get(verifyToken, verifyRefreshToken, getAllUsedVehicleLoans);
 
+  router
+  .route("/usedVehicleLoan")
+  .get(verifyToken, verifyRefreshToken, getAllUsedVehicleLoans);
+
 
 module.exports = router;
