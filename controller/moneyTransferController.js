@@ -79,6 +79,7 @@ const moneyTransferVerify = catchAsync(async (req, res, next) => {
     const moneyTransferDetailsModel = defineMoneyTransferDetails();
 
     const { search, filter, page, pageLimit, sort } = req.query;
+    console.log("filter...", filter);
 
     if (!page || !pageLimit) {
       return res.status(400).json({ success: false, message: "Invalid page or pageLimit" });
@@ -115,13 +116,17 @@ const moneyTransferVerify = catchAsync(async (req, res, next) => {
 
     if (filter) {
       const filters = JSON.parse(filter);
-      if (filters.transactionType) {
+      console.log(filters);
+    
+      if (Array.isArray(filters.transactionType) && filters.transactionType.length > 0) {
         where.transactionType = filters.transactionType;
       }
-      if (filters.status) {
+    
+      if (Array.isArray(filters.status) && filters.status.length > 0) {
         where.status = filters.status;
       }
     }
+    
 
     // Always sort by the specified field in descending order
     const order = sort ? [[sort, 'DESC']] : [['createdAt', 'DESC']];  // Default to 'createdAt' descending
