@@ -11,6 +11,7 @@ const fssaiLicences = require("../db/models/fssailicence");
 const gstRegistrationDetails = require("../db/models/gstregistration");
 const gstFilings = require("../db/models/gstfiling");
 const incomeTaxFilingDetails = require("../db/models/incometax");
+const partnerShipDeedTable = require("../db/models/partnershipdeedpreperation");
 
 const getPancardDetails = async (req, res) => {
   try {
@@ -380,7 +381,7 @@ const getIncomeTaxFilings = catchAsync(async (req, res, next) => {
 
   const limit = pageLimitNumber;
   const offset = (pageNumber - 1) * limit;
-  
+
   const incomeTaxTable = incomeTaxFilingDetails();
   const incomeTaxFilingDetail = await incomeTaxTable.findAndCountAll({
     limit,
@@ -403,7 +404,54 @@ const getIncomeTaxFilings = catchAsync(async (req, res, next) => {
   });
 });
 
+const getPartnerShipDeedPreparation = catchAsync(async (req, res, next) => {
+
+  let { page = 1, pageLimit = 10 } = req.query;
+  const pageNumber = parseInt(page, 10);
+  const pageLimitNumber = parseInt(pageLimit, 10);
+
+  if (
+    isNaN(pageNumber) ||
+    pageNumber <= 0 ||
+    isNaN(pageLimitNumber) ||
+    pageLimitNumber <= 0
+  ) {
+    return res.status(400).json({
+      status: "fail",
+      message: "page and pageLimit query parameters must be positive numbers",
+    });
+  }
+
+  const limit = pageLimitNumber;
+  const offset = (pageNumber - 1) * limit;
+
+  const partnershipDeedPreparations =
+    await partnerShipDeedTable.findAndCountAll({
+      limit,
+      offset,
+    });
+
+  if (
+    !partnershipDeedPreparations ||
+    partnershipDeedPreparations.rows.length === 0
+  ) {
+    return next(new AppError("No partnership deed preparations found", 404));
+  }
+
+  const totalPages = Math.ceil(partnershipDeedPreparations.count / limit);
+
+  res.status(200).json({
+    status: "success",
+    currentPage: pageNumber,
+    totalPages,
+    totalItems: partnershipDeedPreparations.count,
+    results: partnershipDeedPreparations.rows.length,
+    data: partnershipDeedPreparations.rows,
+  });
+});
+
 module.exports = {
+  getPartnerShipDeedPreparation,
   getIncomeTaxFilings,
   fetchPassport,
   fetchKswift,
