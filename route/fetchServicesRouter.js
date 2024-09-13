@@ -12,6 +12,7 @@ const {
   getGstFilings,
   getIncomeTaxFilings,
   getPartnerShipDeedPreparation,
+  getPackingLicences,
 } = require("../controller/fetchServicesController");
 
 const route = express.Router();
@@ -50,5 +51,8 @@ route
 route
   .route("/getPartnerShipDeedPreparation")
   .get(verifyToken, verifyRefreshToken, getPartnerShipDeedPreparation);
+route
+  .route("/getPackingLicences")
+  .get(verifyToken, verifyRefreshToken, getPackingLicences);
 
 module.exports = route;

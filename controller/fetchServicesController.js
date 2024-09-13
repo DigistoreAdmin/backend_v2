@@ -12,6 +12,7 @@ const gstRegistrationDetails = require("../db/models/gstregistration");
 const gstFilings = require("../db/models/gstfiling");
 const incomeTaxFilingDetails = require("../db/models/incometax");
 const partnerShipDeedTable = require("../db/models/partnershipdeedpreperation");
+const packingLicence = require("../db/models/packinglicences");
 
 const getPancardDetails = async (req, res) => {
   try {
@@ -405,7 +406,6 @@ const getIncomeTaxFilings = catchAsync(async (req, res, next) => {
 });
 
 const getPartnerShipDeedPreparation = catchAsync(async (req, res, next) => {
-
   let { page = 1, pageLimit = 10 } = req.query;
   const pageNumber = parseInt(page, 10);
   const pageLimitNumber = parseInt(pageLimit, 10);
@@ -450,7 +450,50 @@ const getPartnerShipDeedPreparation = catchAsync(async (req, res, next) => {
   });
 });
 
+const getPackingLicences = catchAsync(async (req, res, next) => {
+  let { page = 1, pageLimit = 10 } = req.query;
+
+  const pageNumber = parseInt(page, 10);
+  const pageLimitNumber = parseInt(pageLimit, 10);
+
+  if (
+    isNaN(pageNumber) ||
+    pageNumber <= 0 ||
+    isNaN(pageLimitNumber) ||
+    pageLimitNumber <= 0
+  ) {
+    return res.status(400).json({
+      status: "fail",
+      message: "page and pageLimit query parameters must be positive numbers",
+    });
+  }
+
+  const limit = pageLimitNumber;
+  const offset = (pageNumber - 1) * limit;
+
+  const packingLicenceDetails = await packingLicence.findAndCountAll({
+    limit,
+    offset,
+  });
+
+  if (!packingLicenceDetails || packingLicenceDetails.rows.length === 0) {
+    return next(new AppError("No packing licences found", 404));
+  }
+
+  const totalPages = Math.ceil(packingLicenceDetails.count / limit);
+
+  res.status(200).json({
+    status: "success",
+    currentPage: pageNumber,
+    totalPages,
+    totalItems: packingLicenceDetails.count,
+    results: packingLicenceDetails.rows.length,
+    data: packingLicenceDetails.rows,
+  });
+});
+
 module.exports = {
+  getPackingLicences,
   getPartnerShipDeedPreparation,
   getIncomeTaxFilings,
   fetchPassport,
