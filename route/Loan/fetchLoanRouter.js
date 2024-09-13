@@ -43,11 +43,11 @@ route
   .route("/fetchBusinessLoanNewSecured")
   .get(verifyToken, verifyRefreshToken, fetchBusinessLoanNewSecured);
 
-router
+route
   .route("/newVehicleLoan")
   .get(verifyToken, verifyRefreshToken, getAllNewVehicleLoans);
 
-router
+route
   .route("/usedVehicleLoan")
   .get(verifyToken, verifyRefreshToken, getAllUsedVehicleLoans);
 
