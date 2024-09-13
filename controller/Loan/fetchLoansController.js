@@ -3,6 +3,7 @@ const defineBusinessLoanUnscuredExisting = require("../../db/models/BusinessLoan
 const defineHousingLoan = require("../../db/models/HousingLoan");
 const defineBusinessLoanNewSecured = require("../../db/models/businessLoanNewSecured");
 const newVehicleLoan = require("../../db/models/newvehicleloan");
+const usedVehicleLoan = require("../../db/models/vehicleloanused");
 
 const catchAsync = require("../../utils/catchAsync");
 const AppError = require("../../utils/appError");
@@ -337,7 +338,44 @@ const getAllNewVehicleLoans = catchAsync(async (req, res, next) => {
   });
 });
 
+const getAllUsedVehicleLoans = catchAsync(async (req, res, next) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+
+  const maxLimit = 100;
+  if (limit > maxLimit) limit = maxLimit;
+
+  const offset = (page - 1) * limit;
+
+  const usedVehicleData = usedVehicleLoan();
+  const vehicleLoans = await usedVehicleData.findAll({
+    limit: limit,
+    offset: offset,
+  });
+
+  const totalCount = await usedVehicleData.count();
+
+  if (!vehicleLoans || vehicleLoans.length === 0) {
+    return res.status(404).json({
+      status: "Not Found",
+      message: "No vehicle loans found",
+    });
+  }
+
+  return res.status(200).json({
+    status: "Success",
+    data: vehicleLoans,
+    pagination: {
+      page: page,
+      limit: limit,
+      totalCount: totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+    },
+  });
+});
+
 module.exports = {
+  getAllUsedVehicleLoans,
   getAllNewVehicleLoans,
   getLoanAgainstProperty,
   getBusinessLoanUnsecuredExisting,
