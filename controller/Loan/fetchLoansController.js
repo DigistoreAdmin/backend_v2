@@ -153,27 +153,8 @@ const fetchHousingLoan = catchAsync(async (req, res, next) => {
   const limit = pageLimitNumber;
   const offset = (pageNumber - 1) * limit;
 
-  const user = req.user;
-  if (!user) {
-    return next(new AppError("User not found", 401));
-  }
-  const franchise = await Franchise.findOne({
-    where: { email: user.email },
-  });
-
-  if (!franchise) {
-    return next(new AppError("Franchise not found", 404));
-  }
-
-  if (!franchise.franchiseUniqueId) {
-    return next(new AppError("Missing unique id for the franchise", 400));
-  }
-
-  const where = { uniqueId: franchise.franchiseUniqueId };
-
   const HousingLoan = await defineHousingLoan();
   const getHousingLoan = await HousingLoan.findAndCountAll({
-    where,
     limit,
     offset,
   });
@@ -190,11 +171,9 @@ const fetchHousingLoan = catchAsync(async (req, res, next) => {
 });
 
 
-
 const getPersonalLoanDetails = catchAsync(async (req, res) => {
   try {
     const { page, pageLimit } = req.query
-
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
     }
@@ -205,11 +184,12 @@ const getPersonalLoanDetails = catchAsync(async (req, res) => {
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
-    const personalLoan = definePersonalLoan()
-    const Data = await personalLoan.findAndCountAll({
-      limit, offset
-    })
 
+    const personalLoan = definePersonalLoan();
+    const Data = await personalLoan.findAndCountAll({
+      limit,
+      offset,
+    });
     return res.json({
       status: "success",
       data: Data,
@@ -226,7 +206,7 @@ const getPersonalLoanDetails = catchAsync(async (req, res) => {
 const getBusinessUnsecuredNewLoanDetails = catchAsync(async (req, res) => {
   try {
 
-    const { page, pageLimit } = req.query
+    const { page, pageLimit } = req.query;
 
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
@@ -238,10 +218,12 @@ const getBusinessUnsecuredNewLoanDetails = catchAsync(async (req, res) => {
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
-    const businessLoanunsecuredNew = defineBusinessLoanUnsecuredNew()
+
+    const businessLoanunsecuredNew = defineBusinessLoanUnsecuredNew();
     const Data = await businessLoanunsecuredNew.findAndCountAll({
-      limit, offset
-    })
+      limit,
+      offset,
+    });
 
     return res.json({
       status: "success",
@@ -271,31 +253,13 @@ const fetchBusinessLoanNewSecured = catchAsync(async (req, res, next) => {
   const limit = pageLimitNumber;
   const offset = (pageNumber - 1) * limit;
 
-  const user = req.user;
-  if (!user) {
-    return next(new AppError("User not found", 401));
-  }
-  const franchise = await Franchise.findOne({
-    where: { email: user.email },
-  });
-
-  if (!franchise) {
-    return next(new AppError("Franchise not found", 404));
-  }
-
-  if (!franchise.franchiseUniqueId) {
-    return next(new AppError("Missing unique id for the franchise", 400));
-  }
-
-  const where = { uniqueId: franchise.franchiseUniqueId };
-
   const BusinessLoanNewSecured = await defineBusinessLoanNewSecured();
   const getBusinessLoanNewSecured =
     await BusinessLoanNewSecured.findAndCountAll({
-      where,
       limit,
       offset,
     });
+    
   if (!getBusinessLoanNewSecured) {
     return next(new AppError("Data not found", 404));
   }

@@ -60,6 +60,7 @@ const getPancardDetails = async (req, res) => {
       return res.status(404).json({ message: "Franchise not found" });
     }
 
+
     const PancardUser = panCardUsers();
 
     const data = await PancardUser.findAndCountAll({
@@ -98,6 +99,7 @@ const fetchPassport = catchAsync(async (req, res, next) => {
 
   const limit = pageLimitNumber;
   const offset = (pageNumber - 1) * limit;
+
 
   const user = req.user;
   if (!user) {
@@ -150,6 +152,7 @@ const fetchKswift = catchAsync(async (req, res, next) => {
   const limit = pageLimitNumber;
   const offset = (pageNumber - 1) * limit;
 
+
   const user = req.user;
   if (!user) {
     return next(new AppError("User not found", 401));
@@ -185,6 +188,7 @@ const fetchKswift = catchAsync(async (req, res, next) => {
   });
 });
 
+
 const fetchStaffs = catchAsync(async (req, res, next) => {
   const { page, pageLimit } = req.query;
 
@@ -214,6 +218,96 @@ const fetchStaffs = catchAsync(async (req, res, next) => {
     data: getStaff.rows,
     totalPages: Math.ceil(getStaff.count / limit),
     totalItems: getStaff.count,
+    currentPage: pageNumber,
+  });
+});
+
+const getBusBookings = catchAsync(async (req, res, next) => {
+  const { page, pageLimit } = req.query;
+
+  if (!page || !pageLimit) {
+    return res
+      .status(400)
+      .json({ error: "page and pageLimit query parameters are required" });
+  }
+
+  const pageNumber = parseInt(page, 10);
+  const pageLimitNumber = parseInt(pageLimit, 10);
+
+  const limit = pageLimitNumber;
+  const offset = (pageNumber - 1) * limit;
+
+  const busBookings = await BusBooking.findAndCountAll({
+    limit,
+    offset,
+  });
+  if (!busBookings) {
+    return next(new AppError("Data not found", 404));
+  }
+  res.status(200).json({
+    data: busBookings.rows,
+    totalPages: Math.ceil(busBookings.count / limit),
+    totalItems: busBookings.count,
+    currentPage: pageNumber,
+  });
+});
+
+const getFssaiRegistrations = catchAsync(async (req, res, next) => {
+  const { page, pageLimit } = req.query;
+
+  if (!page || !pageLimit) {
+    return res
+      .status(400)
+      .json({ error: "page and pageLimit query parameters are required" });
+  }
+
+  const pageNumber = parseInt(page, 10);
+  const pageLimitNumber = parseInt(pageLimit, 10);
+
+  const limit = pageLimitNumber;
+  const offset = (pageNumber - 1) * limit;
+
+  const fssaiRegistration = await fssaiRegistrations.findAndCountAll({
+    limit,
+    offset,
+  });
+  if (!fssaiRegistration) {
+    return next(new AppError("Data not found", 404));
+  }
+  res.status(200).json({
+    data: fssaiRegistration.rows,
+    totalPages: Math.ceil(fssaiRegistration.count / limit),
+    totalItems: fssaiRegistration.count,
+    currentPage: pageNumber,
+  });
+});
+
+const getFssaiLicence = catchAsync(async (req, res, next) => {
+  const { page, pageLimit } = req.query;
+
+  if (!page || !pageLimit) {
+    return res
+      .status(400)
+      .json({ error: "page and pageLimit query parameters are required" });
+  }
+
+  const pageNumber = parseInt(page, 10);
+  const pageLimitNumber = parseInt(pageLimit, 10);
+
+  const limit = pageLimitNumber;
+  const offset = (pageNumber - 1) * limit;
+
+  const fssaiLicenceDetails = await fssaiLicences.findAndCountAll({
+    limit,
+    offset,
+  });
+  if (!fssaiLicenceDetails) {
+    return next(new AppError("Data not found", 404));
+  }
+  res.status(200).json({
+    data: fssaiLicenceDetails.rows,
+    totalPages: Math.ceil(fssaiLicenceDetails.count / limit),
+    totalItems: fssaiLicenceDetails.count,
     currentPage: pageNumber,
   });
 });
@@ -484,6 +578,7 @@ const getFssaiLicence = catchAsync(async (req, res, next) => {
   });
 });
 
+
 const getGstRegistrations = catchAsync(async (req, res, next) => {
   const { page, pageLimit } = req.query;
 
@@ -543,6 +638,7 @@ const getGstFilings = catchAsync(async (req, res, next) => {
     currentPage: pageNumber,
   });
 });
+
 
 const getIncomeTaxFilings = catchAsync(async (req, res, next) => {
   let { page = 1, pageLimit = 10 } = req.query;
