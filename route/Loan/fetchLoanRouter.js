@@ -52,7 +52,7 @@ route
   .route("/getBusinessLoanExisting")
   .get(verifyToken, verifyRefreshToken, getBusinessLoanExisting);
 
-route  
+route
   .route("/newVehicleLoan")
   .get(verifyToken, verifyRefreshToken, getAllNewVehicleLoans);
 
