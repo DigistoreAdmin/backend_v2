@@ -127,6 +127,20 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    const enumValues = await queryInterface.sequelize.query(`
+      SELECT enumlabel FROM pg_enum WHERE enumtypid = (
+        SELECT oid FROM pg_type WHERE typname = 'enum_staffs_userType'
+      )
+    `);
+
+    const existingValues = enumValues[0].map((row) => row.enumlabel);
+
+    if (!existingValues.includes('staff')) {
+      await queryInterface.sequelize.query(`
+        ALTER TYPE "enum_staffs_userType" ADD VALUE 'staff';
+      `);
+    }
   },
 
   down: async (queryInterface, Sequelize) => {

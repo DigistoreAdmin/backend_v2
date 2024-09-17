@@ -17,10 +17,15 @@ module.exports = {
         ALTER TYPE "enum_user_userType" ADD VALUE 'student';
       `);
     }
+    if (!existingValues.includes('staff')) {
+      await queryInterface.sequelize.query(`
+        ALTER TYPE "enum_user_userType" ADD VALUE 'staff';
+      `);
+    }
 
     // Change the column to use the updated ENUM values
     await queryInterface.changeColumn('user', 'userType', {
-      type: Sequelize.ENUM('admin', 'distributor', 'franchise', 'student'),
+      type: Sequelize.ENUM('admin', 'distributor', 'franchise', 'student','staff'),
       allowNull: false,
       validate: {
         notNull: {

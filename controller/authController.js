@@ -15,6 +15,7 @@ const transationHistories = require("../db/models/transationhistory");
 const User = require("../db/models/user");
 const { generateOTP, sendOTP } = require("../utils/otpUtils");
 const student = require("../db/models/student");
+const defineStaffsDetails = require("../db/models/staffs");
 
 const senndOtp = catchAsync(async (req, res, next) => {
   try {
@@ -256,6 +257,41 @@ const login = catchAsync(async (req, res, next) => {
       }
       const { accessToken, refreshToken } = await Tokens.generateTokens({
         email: existingUser.email,
+        userType: data.userType,
+      });
+      const { password, ...sanitizedDataValues } = existingUser.dataValues;
+
+      return res
+        .cookie("accessToken", accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV,
+          sameSite: "None",
+          maxAge: accessTokenExpiresIn,
+        })
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV,
+          sameSite: "None",
+          maxAge: refreshTokenExpiresIn,
+        })
+        .status(200)
+        .json({
+          message: "Login success student",
+          data: sanitizedDataValues,
+        });
+    }
+    case "staff": {
+      let existingUser;
+      const staffs = defineStaffsDetails();
+      existingUser = await staffs.findOne({
+        where: { phoneNumber: phoneNumber },
+      });
+
+      if (!existingUser) {
+        return next(new AppError("phoneNumber not exist", 401));
+      }
+      const { accessToken, refreshToken } = await Tokens.generateTokens({
+        email: existingUser.emailId,
         userType: data.userType,
       });
       const { password, ...sanitizedDataValues } = existingUser.dataValues;
