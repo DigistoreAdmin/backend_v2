@@ -79,7 +79,6 @@ const moneyTransferVerify = catchAsync(async (req, res, next) => {
     const moneyTransferDetailsModel = defineMoneyTransferDetails();
 
     const { search, filter, page, pageLimit, sort } = req.query;
-    console.log("filter...", filter);
 
     if (!page || !pageLimit) {
       return res.status(400).json({ success: false, message: "Invalid page or pageLimit" });
@@ -139,10 +138,9 @@ const moneyTransferVerify = catchAsync(async (req, res, next) => {
     });
 
     if (datas.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No money transfer details found"
-      });
+      return res
+        .status(200)
+        .json({ message: "No transactions found", datas: datas.rows });
     }
 
     return res.status(200).json({
