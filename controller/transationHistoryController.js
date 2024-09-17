@@ -6,7 +6,6 @@ const Franchise = require("../db/models/franchise");
 
 const transationHistoryAdmin = catchAsync(async (req, res, next) => {
   try {
-
     const { sort, filter, search, page, pageLimit } = req.query;
 
     if (!page || !pageLimit) {
@@ -115,7 +114,9 @@ const transationHistoryAdmin = catchAsync(async (req, res, next) => {
     });
 
     if (data.rows.length === 0) {
-      return res.status(404).json({ message: "Page not found" });
+      return res
+        .status(200)
+        .json({ message: "No transactions found", data: data.rows });
     }
 
     return res.status(200).json({
@@ -241,7 +242,9 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
     });
 
     if (data.rows.length === 0) {
-      return res.status(404).json({ message: "Page not found" });
+      return res
+        .status(200)
+        .json({ message: "No transactions found", data: data.rows });
     }
 
     return res.status(200).json({
