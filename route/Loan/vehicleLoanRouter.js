@@ -3,7 +3,7 @@ const {
 } = require("../../controller/Loan/vehicleLoanNewController");
 
 const {
-  createUsedVehicleLoan,
+  createUsedVehicleLoan
 } = require("../../controller/Loan/vehicleLoanUsedController");
 
 const { verifyToken, verifyRefreshToken } = require("../../utils/token");
@@ -17,9 +17,6 @@ router
   .route("/usedVehicleLoan")
   .post(verifyToken, verifyRefreshToken, createUsedVehicleLoan);
 
-  router
-  .route("/usedVehicleLoan")
-  .get(verifyToken, verifyRefreshToken, getAllUsedVehicleLoans);
 
 
 module.exports = router;
