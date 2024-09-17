@@ -5,6 +5,10 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const kswift = require("../db/models/kswift");
 const defineStaffsDetails = require("../db/models/staffs");
+const trainBooking = require("../db/models/trainbooking")
+const udyamRegistrations = require("../db/models/udyamregistration");
+const financialstatements = require("../db/models/financialstatements");
+const companyFormations = require("../db/models/companyformation")
 const BusBooking = require("../db/models/busbooking");
 const fssaiRegistrations = require("../db/models/fssairegistration");
 const fssaiLicences = require("../db/models/fssailicence");
@@ -13,6 +17,7 @@ const gstFilings = require("../db/models/gstfiling");
 const incomeTaxFilingDetails = require("../db/models/incometax");
 const partnerShipDeedTable = require("../db/models/partnershipdeedpreperation");
 const packingLicence = require("../db/models/packinglicences");
+
 
 const getPancardDetails = async (req, res) => {
   try {
@@ -212,6 +217,182 @@ const fetchStaffs = catchAsync(async (req, res, next) => {
     currentPage: pageNumber,
   });
 });
+
+
+
+const fetchTrainBookingDetails = catchAsync(async(req,res)=>{
+    
+        try {
+              const {page,pageLimit} = req.query
+    
+              if (!page || !pageLimit) {
+                return res.status(400).json({ error: "page and pageSize are required" });
+              }
+            
+              const pageNumber = parseInt(page, 10);
+              const pageLimitNumber = parseInt(pageLimit, 10);
+            
+              const limit = pageLimitNumber;
+              const offset = (pageNumber - 1) * limit;
+    
+    
+            const Data= await trainBooking.findAndCountAll({limit,offset})
+
+            if (Data.count === 0) {
+              return res
+                .status(404)
+                .json({ succes: "false", message: "No data to display" });
+            }
+          
+            if (Data.rows.length === 0) {
+              return res
+                .status(404)
+                .json({ succes: "false", message: "No data to display" });
+            }
+    
+            return res.json({
+                status: "success",
+                data: Data,
+                totalItems: Data.count,
+                totalPages: Math.ceil(Data.count / limit),
+                currentPage: pageNumber,
+              });
+    
+          } catch (error) {
+            console.error("Error:", error);
+            return next(new AppError(error.message, 500));
+          }  
+})
+
+const fetchUdyamRegistrationDetails = catchAsync(async(req,res)=>{
+  try {
+    const {page,pageLimit} = req.query
+
+    if (!page || !pageLimit) {
+      return res.status(400).json({ error: "page and pageSize are required" });
+    }
+  
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+  
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
+
+
+  const Data= await udyamRegistrations.findAndCountAll({limit,offset})
+
+  if (Data.count === 0) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  if (Data.rows.length === 0) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  return res.json({
+      status: "success",
+      data: Data,
+      totalItems: Data.count,
+      totalPages: Math.ceil(Data.count / limit),
+      currentPage: pageNumber,
+    });
+
+} catch (error) {
+  console.error("Error:", error);
+  return next(new AppError(error.message, 500));
+}  
+})
+
+const fetchFinancialStatements = catchAsync(async(req,res)=>{
+  try {
+    const {page,pageLimit} = req.query
+
+    if (!page || !pageLimit) {
+      return res.status(400).json({ error: "page and pageSize are required" });
+    }
+  
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+  
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
+
+
+  const Data= await financialstatements.findAndCountAll({limit,offset})
+
+  if (Data.count === 0) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  if (Data.rows.length === 0) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  return res.json({
+      status: "success",
+      data: Data,
+      totalItems: Data.count,
+      totalPages: Math.ceil(Data.count / limit),
+      currentPage: pageNumber,
+    });
+
+} catch (error) {
+  console.error("Error:", error);
+  return next(new AppError(error.message, 500));
+}  
+})
+
+const fetchCompanyFormationDetails = catchAsync(async(req,res)=>{
+  try {
+    const {page,pageLimit} = req.query
+
+    if (!page || !pageLimit) {
+      return res.status(400).json({ error: "page and pageSize are required" });
+    }
+  
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+  
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
+
+
+  const Data= await companyFormations.findAndCountAll({limit,offset})
+
+  if (Data.count === 0) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  if (Data.rows.length === 0) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  return res.json({
+      status: "success",
+      data: Data,
+      totalItems: Data.count,
+      totalPages: Math.ceil(Data.count / limit),
+      currentPage: pageNumber,
+    });
+
+} catch (error) {
+  console.error("Error:", error);
+  return next(new AppError(error.message, 500));
+}  
+})
+
 
 const getBusBookings = catchAsync(async (req, res, next) => {
   const { page, pageLimit } = req.query;
@@ -506,3 +687,4 @@ module.exports = {
   getGstRegistrations,
   getGstFilings,
 };
+

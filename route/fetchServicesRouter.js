@@ -15,6 +15,7 @@ const {
   getPackingLicences,
 } = require("../controller/fetchServicesController");
 
+
 const route = express.Router();
 
 route.get(
@@ -54,5 +55,10 @@ route
 route
   .route("/getPackingLicences")
   .get(verifyToken, verifyRefreshToken, getPackingLicences);
+
+route.route("/getTrainBooking").get(verifyToken, verifyRefreshToken,fetchTrainBookingDetails);
+route.route("/getUdyamRegistration").get(verifyToken, verifyRefreshToken,fetchUdyamRegistrationDetails);
+route.route("/getFinancialStatements").get(verifyToken, verifyRefreshToken,fetchFinancialStatements);
+route.route("/getCompanyFormationDetails").get(verifyToken, verifyRefreshToken,fetchCompanyFormationDetails);
 
 module.exports = route;
