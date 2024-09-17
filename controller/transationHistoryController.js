@@ -6,8 +6,6 @@ const Franchise = require("../db/models/franchise");
 
 const transationHistoryAdmin = catchAsync(async (req, res, next) => {
   try {
-    console.log("req.query: ", req.query);
-
     const { sort, filter, search, page, pageLimit } = req.query;
 
     if (!page || !pageLimit) {
@@ -73,22 +71,33 @@ const transationHistoryAdmin = catchAsync(async (req, res, next) => {
       }
     }
 
-    if (filterValue?.field) {
+    if (filterValue?.filterBy !== "" && filterValue?.field !== "") {
       where[Op.and] = where[Op.and] || [];
-      if (filterValue.field === "service") {
+
+      if (filterValue?.field === "service") {
         where[Op.and].push({
-          service: { [Op.iLike]: `%${filterValue.filterBy}%` },
+          service: {
+            [Op.or]: filterValue.filterBy.map((value) => ({
+              [Op.iLike]: `%${value}%`,
+            })),
+          },
         });
       }
-      if (filterValue.field === "status") {
+
+      if (filterValue?.field === "status") {
         where[Op.and].push({
-          status: { [Op.eq]: filterValue.filterBy },
+          status: {
+            [Op.or]: filterValue.filterBy.map((value) => ({
+              [Op.eq]: value,
+            })),
+          },
         });
       }
     }
 
-    let order = [];
+    let order = [["createdAt", "DESC"]];
     const sortOrder = sort ? JSON.parse(sort) : [];
+
     if (sortOrder.field && sortOrder.order) {
       order = [[sortOrder.field, sortOrder.order]];
     }
@@ -105,7 +114,9 @@ const transationHistoryAdmin = catchAsync(async (req, res, next) => {
     });
 
     if (data.rows.length === 0) {
-      return res.status(404).json({ message: "Page not found" });
+      return res
+        .status(200)
+        .json({ message: "No transactions found", data: data.rows });
     }
 
     return res.status(200).json({
@@ -123,8 +134,6 @@ const transationHistoryAdmin = catchAsync(async (req, res, next) => {
 const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
   try {
     const user = req.user;
-
-    console.log("req.query: ", req.query);
 
     const { search, filter, sort, page, pageLimit } = req.query;
 
@@ -193,23 +202,34 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
     }
 
     //filtering
-    if (filterValue?.field) {
+    if (filterValue?.filterBy !== "" && filterValue?.field !== "") {
       where[Op.and] = where[Op.and] || [];
-      if (filterValue.field === "service") {
+
+      if (filterValue?.field === "service") {
         where[Op.and].push({
-          service: { [Op.iLike]: `%${filterValue.filterBy}%` },
+          service: {
+            [Op.or]: filterValue.filterBy.map((value) => ({
+              [Op.iLike]: `%${value}%`,
+            })),
+          },
         });
       }
-      if (filterValue.field === "status") {
+
+      if (filterValue?.field === "status") {
         where[Op.and].push({
-          status: { [Op.eq]: filterValue.filterBy },
+          status: {
+            [Op.or]: filterValue.filterBy.map((value) => ({
+              [Op.eq]: value,
+            })),
+          },
         });
       }
     }
 
     //sorting based on feild value and order
-    let order = [];
+    let order = [["createdAt", "DESC"]];
     const sortOrder = sort ? JSON.parse(sort) : [];
+
     if (sortOrder.field && sortOrder.order) {
       order = [[sortOrder.field, sortOrder.order]];
     }
@@ -222,7 +242,9 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
     });
 
     if (data.rows.length === 0) {
-      return res.status(404).json({ message: "Page not found" });
+      return res
+        .status(200)
+        .json({ message: "No transactions found", data: data.rows });
     }
 
     return res.status(200).json({

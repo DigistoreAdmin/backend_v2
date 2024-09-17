@@ -115,13 +115,17 @@ const moneyTransferVerify = catchAsync(async (req, res, next) => {
 
     if (filter) {
       const filters = JSON.parse(filter);
-      if (filters.transactionType) {
+      console.log(filters);
+    
+      if (Array.isArray(filters.transactionType) && filters.transactionType.length > 0) {
         where.transactionType = filters.transactionType;
       }
-      if (filters.status) {
+    
+      if (Array.isArray(filters.status) && filters.status.length > 0) {
         where.status = filters.status;
       }
     }
+    
 
     // Always sort by the specified field in descending order
     const order = sort ? [[sort, 'DESC']] : [['createdAt', 'DESC']];  // Default to 'createdAt' descending
@@ -134,10 +138,9 @@ const moneyTransferVerify = catchAsync(async (req, res, next) => {
     });
 
     if (datas.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No money transfer details found"
-      });
+      return res
+        .status(200)
+        .json({ message: "No transactions found", datas: datas.rows });
     }
 
     return res.status(200).json({

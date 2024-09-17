@@ -27,6 +27,12 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
     if (filters.phoneNumber) {
       where.phoneNumber = filters.phoneNumber;
     }
+    if(filters.panCenter){
+      where.panCenter= filters.panCenter;
+    }
+    if(filters.blocked){
+      where.blocked = filters.blocked;
+    }
   }
 
   const phoneNumber = parseFloat(search);
