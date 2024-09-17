@@ -13,6 +13,10 @@ const {
   getIncomeTaxFilings,
   getPartnerShipDeedPreparation,
   getPackingLicences,
+  fetchTrainBookingDetails,
+  fetchUdyamRegistrationDetails,
+  fetchFinancialStatements,
+  fetchCompanyFormationDetails
 } = require("../controller/fetchServicesController");
 
 

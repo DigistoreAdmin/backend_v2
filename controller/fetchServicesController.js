@@ -488,96 +488,6 @@ const fetchCompanyFormationDetails = catchAsync(async(req,res)=>{
 })
 
 
-const getBusBookings = catchAsync(async (req, res, next) => {
-  const { page, pageLimit } = req.query;
-
-  if (!page || !pageLimit) {
-    return res
-      .status(400)
-      .json({ error: "page and pageLimit query parameters are required" });
-  }
-
-  const pageNumber = parseInt(page, 10);
-  const pageLimitNumber = parseInt(pageLimit, 10);
-
-  const limit = pageLimitNumber;
-  const offset = (pageNumber - 1) * limit;
-
-  const busBookings = await BusBooking.findAndCountAll({
-    limit,
-    offset,
-  });
-  if (!busBookings) {
-    return next(new AppError("Data not found", 404));
-  }
-  res.status(200).json({
-    data: busBookings.rows,
-    totalPages: Math.ceil(busBookings.count / limit),
-    totalItems: busBookings.count,
-    currentPage: pageNumber,
-  });
-});
-
-const getFssaiRegistrations = catchAsync(async (req, res, next) => {
-  const { page, pageLimit } = req.query;
-
-  if (!page || !pageLimit) {
-    return res
-      .status(400)
-      .json({ error: "page and pageLimit query parameters are required" });
-  }
-
-  const pageNumber = parseInt(page, 10);
-  const pageLimitNumber = parseInt(pageLimit, 10);
-
-  const limit = pageLimitNumber;
-  const offset = (pageNumber - 1) * limit;
-
-  const fssaiRegistration = await fssaiRegistrations.findAndCountAll({
-    limit,
-    offset,
-  });
-  if (!fssaiRegistration) {
-    return next(new AppError("Data not found", 404));
-  }
-  res.status(200).json({
-    data: fssaiRegistration.rows,
-    totalPages: Math.ceil(fssaiRegistration.count / limit),
-    totalItems: fssaiRegistration.count,
-    currentPage: pageNumber,
-  });
-});
-
-const getFssaiLicence = catchAsync(async (req, res, next) => {
-  const { page, pageLimit } = req.query;
-
-  if (!page || !pageLimit) {
-    return res
-      .status(400)
-      .json({ error: "page and pageLimit query parameters are required" });
-  }
-
-  const pageNumber = parseInt(page, 10);
-  const pageLimitNumber = parseInt(pageLimit, 10);
-
-  const limit = pageLimitNumber;
-  const offset = (pageNumber - 1) * limit;
-
-  const fssaiLicenceDetails = await fssaiLicences.findAndCountAll({
-    limit,
-    offset,
-  });
-  if (!fssaiLicenceDetails) {
-    return next(new AppError("Data not found", 404));
-  }
-  res.status(200).json({
-    data: fssaiLicenceDetails.rows,
-    totalPages: Math.ceil(fssaiLicenceDetails.count / limit),
-    totalItems: fssaiLicenceDetails.count,
-    currentPage: pageNumber,
-  });
-});
-
 
 const getGstRegistrations = catchAsync(async (req, res, next) => {
   const { page, pageLimit } = req.query;
@@ -782,5 +692,9 @@ module.exports = {
   getFssaiLicence,
   getGstRegistrations,
   getGstFilings,
+  fetchTrainBookingDetails,
+  fetchUdyamRegistrationDetails,
+  fetchFinancialStatements,
+  fetchCompanyFormationDetails
 };
 
