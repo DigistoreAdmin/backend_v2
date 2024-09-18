@@ -34,7 +34,6 @@ route
   .get(verifyToken, verifyRefreshToken, fetchPassport);
 
 route.route("/fetchKswift").get(verifyToken, verifyRefreshToken, fetchKswift);
-route.route("/fetchStaffs").get(verifyToken, verifyRefreshToken, fetchStaffs);
 route
   .route("/getBusBooking")
   .get(verifyToken, verifyRefreshToken, getBusBookings);
