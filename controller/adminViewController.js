@@ -27,10 +27,10 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
     if (filters.phoneNumber) {
       where.phoneNumber = filters.phoneNumber;
     }
-    if(filters.panCenter){
-      where.panCenter= filters.panCenter;
+    if (filters.panCenter) {
+      where.panCenter = filters.panCenter;
     }
-    if(filters.blocked){
+    if (filters.blocked) {
       where.blocked = filters.blocked;
     }
   }
@@ -92,122 +92,5 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
   }
 });
 
-const updateStaffDetails = catchAsync(async (req, res, next) => {
-  try {
-    const {
-      userType,
-      employeeId,
-      firstName,
-      lastName,
-      emailId,
-      phoneNumber,
-      dateOfBirth,
-      gender,
-      addressLine1,
-      addressLine2,
-      city,
-      district,
-      state,
-      pinCode,
-      bank,
-      accountNumber,
-      ifscCode,
-      accountHolderName,
-      dateOfJoin,
-      bloodGroup,
-      employment,
-      employmentType,
-      districtOfOperation,
-      reportingManager,
-      emergencyContact,
-      isTrainingRequired,
-      totalTrainingDays,
-      employmentStartDate,
-      laptop,
-      idCard,
-      sim,
-      vistingCard,
-      posterOrBroucher,
-      other,
-      phone,
-      remarks,
-    } = req.body;
 
-    const staffs = defineStaffsDetails();
-
-    const findStaff = await staffs.findOne({
-      where: { employeeId },
-    });
-
-    if (!findStaff) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Staff not found" });
-    }
-
-    const updatedStaff = await staffs.update(
-      {
-      userType,
-      employeeId,
-      firstName,
-      lastName,
-      emailId,
-      phoneNumber,
-      dateOfBirth,
-      gender,
-      addressLine1,
-      addressLine2,
-      city,
-      district,
-      state,
-      pinCode,
-      bank,
-      accountNumber,
-      ifscCode,
-      accountHolderName,
-      dateOfJoin,
-      bloodGroup,
-      employment,
-      employmentType,
-      districtOfOperation,
-      reportingManager,
-      emergencyContact,
-      isTrainingRequired,
-      totalTrainingDays,
-      employmentStartDate,
-      laptop,
-      idCard,
-      sim,
-      vistingCard,
-      posterOrBroucher,
-      other,
-      phone,
-      remarks,
-      },
-      {
-        where: { employeeId },
-      }
-    );
-
-    if(!updatedStaff){
-      return res
-       .status(400)
-       .json({ success: false, message: "Failed to update staff" });
-    }
-
-    const updatedStaffs = await staffs.findOne({
-      where: { employeeId },
-    });
-
-    return res
-      .status(200)
-      .json({ success: true, message: "Updated staff", staffs: updatedStaffs });
-  } catch (error) {
-    console.log("Error:", error);
-    return next(new AppError(error.message, 500));
-  }
-});
-
-
-
-module.exports = { getAllFranchises, updateStaffDetails };
+module.exports = { getAllFranchises };
