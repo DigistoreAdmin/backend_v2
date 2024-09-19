@@ -3,6 +3,6 @@ const { verifyToken, verifyRefreshToken } = require("../utils/token");
 
 const router = require("express").Router();
 
-router.route('/adminView').get(verifyToken, verifyRefreshToken, getAllFranchises)
+router.route('/getAllFranchise').get(verifyToken, verifyRefreshToken, getAllFranchises)
 
 module.exports = router

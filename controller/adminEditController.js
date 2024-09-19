@@ -8,27 +8,36 @@ const catchAsync = require("../utils/catchAsync");
 const { Op } = require("sequelize");
 
 const deleteFranchise = catchAsync(async (req, res, next) => {
+    const transaction = await sequelize.transaction();
+
     try {
         const { uniqueId } = req.body;
 
-        const franchise = await Franchise.findOne({ where: { franchiseUniqueId: uniqueId } });
-        let phoneNumber = null
+        const franchise = await Franchise.findOne({ where: { franchiseUniqueId: uniqueId }, transaction });
+        let phoneNumber = null;
         if (franchise) {
-            phoneNumber = franchise.franchiseUniqueId.slice(3)
+            phoneNumber = franchise.franchiseUniqueId.slice(3);
         }
-        const user = await User.findOne({ where: { phoneNumber } });
-        const wallet = await wallets.findOne({ where: { uniqueId } });
 
-        if (franchise) await franchise.destroy({ force: true })
-        if (user) await user.destroy({ force: true });
-        if (wallet) await wallet.destroy({ force: true });
+        const user = await User.findOne({ where: { phoneNumber }, transaction });
+        const wallet = await wallets.findOne({ where: { uniqueId }, transaction });
+
+        if (franchise) await franchise.destroy({ force: true, transaction });
+        if (user) await user.destroy({ force: true, transaction });
+        if (wallet) await wallet.destroy({ force: true, transaction });
+
+        await transaction.commit();
 
         return res.status(200).json({ message: 'Franchise details deleted successfully' });
     } catch (error) {
-        console.log("Error:", error);
+        await transaction.rollback();
+
+        console.error("Error:", error);
         return next(new AppError("Failed to delete Franchise!", 500));
     }
 });
+
+
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {
     try {
