@@ -2,6 +2,7 @@ const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
 const sequelize = require("../config/database");
 const defineStaffsDetails = require("../db/models/staffs");
+const otpStorage = require("../utils/otpStorage");
 const AppError = require("../utils/appError");
 
 const createStaffs = catchAsync(async (req, res, next) => {
@@ -11,7 +12,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     firstName,
     lastName,
     emailId,
-    phoneNumber,
+    mobileNumber,
     dateOfBirth,
     gender,
     addressLine1,
@@ -47,12 +48,12 @@ const createStaffs = catchAsync(async (req, res, next) => {
   const transaction = await sequelize.transaction();
 
   try {
-    const mobileNumber = await user.findOne({
-      where: { phoneNumber },
+    const numberExist = await user.findOne({
+      where: { phoneNumber: mobileNumber },
       transaction,
     });
 
-    if (mobileNumber) {
+    if (numberExist) {
       await transaction.rollback();
       return res
         .status(400)
@@ -72,7 +73,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     }
 
     const data = await user.create(
-      { userType, password, phoneNumber, email: emailId },
+      { userType, password, phoneNumber: mobileNumber, email: emailId },
       { transaction }
     );
 
@@ -86,7 +87,6 @@ const createStaffs = catchAsync(async (req, res, next) => {
     const staffs = defineStaffsDetails(employmentType, isTrainingRequired);
 
     const employeeId = "";
-
     const newStaff = await staffs.create(
       {
         employeeId,
@@ -95,7 +95,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
         firstName,
         lastName,
         emailId,
-        phoneNumber,
+        phoneNumber: mobileNumber,
         dateOfBirth,
         gender,
         addressLine1,
