@@ -53,6 +53,10 @@ const transationHistories = sequelize.define(
       allowNull: false,
       defaultValue:0.00
     },
+    type: {
+      type: DataTypes.ENUM('debit', 'credit'),
+      allowNull:true
+    },
     deletedAt: {
       type: DataTypes.DATE,
     },
