@@ -1,5 +1,8 @@
 const catchAsync = require("../utils/catchAsync");
 const cibilReports = require("../db/models/cibilreport");
+const BusBooking = require("../db/models/busbooking");
+const trainBooking = require("../db/models/trainbooking");
+
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
@@ -60,7 +63,6 @@ const loanStatus = catchAsync(async (req, res) => {
     }
 
     if (status === "approve" || status === "reject") {
-
       const uploadFile = async (file) => {
         if (file) {
           try {
@@ -84,12 +86,8 @@ const loanStatus = catchAsync(async (req, res) => {
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
         report,
       });
-
-    } 
-    else {
-
+    } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
@@ -99,4 +97,102 @@ const loanStatus = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { loanStatus };
+const trainStatus = catchAsync(async (req, res, next) => {
+  try {
+    const { email, phoneNumber, status } = req.body;
+
+    const findPerson = await trainBooking.findOne({
+      where: { email: email, phoneNumber: phoneNumber },
+    });
+
+    if (!findPerson) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    console.log("object", findPerson);
+
+    const updateStatus = await trainBooking.update(
+      {
+        status,
+      },
+      {
+        where: {
+          email: findPerson.email,
+          phoneNumber: findPerson.phoneNumber,
+        },
+      }
+    );
+
+    if (!updateStatus) {
+      return res.status(400).json({ message: "Failed to update status" });
+    }
+
+    const updatedPerson = await trainBooking.findOne({
+      where: {
+        email: findPerson.email,
+        phoneNumber: findPerson.phoneNumber,
+      },
+    });
+
+    res.status(200).json({
+      message: "Status updated successfully",
+      updateStatus: updatedPerson,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "An error occured", error: error.message });
+  }
+});
+
+const busStatus = catchAsync(async (req, res, next) => {
+  try {
+    const { email, phoneNumber, status } = req.body;
+
+    const findPerson = await BusBooking.findOne({
+      where: { email: email, phoneNumber: phoneNumber },
+    });
+
+    if (!findPerson) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    console.log("object", findPerson);
+
+    const updateStatus = await BusBooking.update(
+      {
+        status,
+      },
+      {
+        where: {
+          email: findPerson.email,
+          phoneNumber: findPerson.phoneNumber,
+        },
+      }
+    );
+
+    if (!updateStatus) {
+      return res.status(400).json({ message: "Failed to update status" });
+    }
+
+    const updatedPerson = await BusBooking.findOne({
+      where: {
+        email: findPerson.email,
+        phoneNumber: findPerson.phoneNumber,
+      },
+    });
+
+    res.status(200).json({
+      message: "Status updated successfully",
+      updateStatus: updatedPerson,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "An error occured", error: error.message });
+  }
+});
+
+module.exports = { loanStatus, trainStatus, busStatus };
