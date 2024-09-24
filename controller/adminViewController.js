@@ -298,3 +298,4 @@ const getAllStaff = catchAsync(async (req, res, next) => {
 });
 
 module.exports = { getAllFranchises, updateStaffDetails, getAllStaff };
+
