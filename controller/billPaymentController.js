@@ -121,6 +121,7 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
           userType: user.userType,
           service: serr,
           status: "success",
+          typeOfTransation:"debit",
           amount: amount,
           franchiseCommission: franciseCommissionAmount,
           adminCommission: adminCommissionAmount,

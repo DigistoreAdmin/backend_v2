@@ -48,11 +48,12 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
 
   if (amount > walletData.balance) {
     return next(new AppError("you don't have enough money in you wallet", 401));
-  } else if (amount > livePayBalance.data.bal) {
-    return next(
-      new AppError("Contact administrator if facing Problem again", 401)
-    );
-  }
+  } 
+  // else if (amount > livePayBalance.data.bal) {
+  //   return next(
+  //     new AppError("Contact administrator if facing Problem again", 401)
+  //   );
+  // }
 
   const random12DigitNumber = generateRandomNumber();
   let DSP = `DSP${random12DigitNumber}${Data.id}`;
@@ -106,6 +107,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       service: serr,
       status: "success",
       amount: amount,
+      typeOfTransation:"debit",
       franchiseCommission: franciseCommissionAmount,
       adminCommission: adminCommissionAmount,
       walletBalance: newBalance,
