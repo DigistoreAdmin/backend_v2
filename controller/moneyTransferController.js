@@ -207,6 +207,7 @@ const updatemoneyTransfer = catchAsync(async (req, res, next) => {
       console.log("trd", body.transactionId);
       const transatinH = await transationHistories.create(
         {
+          typeOfTransation: "credit",
           transactionId: body.transactionId,
           uniqueId: data.uniqueId,
           userName: data.userName,
