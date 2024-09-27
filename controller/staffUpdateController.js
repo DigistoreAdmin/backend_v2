@@ -1,8 +1,12 @@
 const catchAsync = require("../utils/catchAsync");
 const cibilReports = require("../db/models/cibilreport");
+const definePancardUser = require("../db/models/pancard");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
+const {
+  AuthRegistrationsCredentialListMappingListInstance,
+} = require("twilio/lib/rest/api/v2010/account/sip/domain/authTypes/authTypeRegistrations/authRegistrationsCredentialListMapping");
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -60,7 +64,6 @@ const loanStatus = catchAsync(async (req, res) => {
     }
 
     if (status === "approve" || status === "reject") {
-
       const uploadFile = async (file) => {
         if (file) {
           try {
@@ -84,12 +87,8 @@ const loanStatus = catchAsync(async (req, res) => {
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
         report,
       });
-
-    } 
-    else {
-
+    } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
@@ -99,4 +98,63 @@ const loanStatus = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { loanStatus };
+const updatePanDetails = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, status, acknowledgementNumber, reason, ePan } =
+      req.body;
+    console.log("req.body: ", req.body);
+    const acknowledgementFile = req?.files?.acknowledgementFile;
+
+    if (!mobileNumber) {
+      return res.status(400).json({ message: "Mobile number is required" });
+    }
+
+    const pancardUser = definePancardUser();
+
+    const report = await pancardUser.findOne({
+      where: { mobileNumber: mobileNumber },
+    });
+
+    if (!report) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    const finalStatus = status === "completed" ? "completed" : "inProgress";
+
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          throw new Error("File upload failed");
+        }
+      }
+      return null;
+    };
+
+    const acknowledgementFileUrl = await uploadFile(acknowledgementFile);
+
+    report.status = finalStatus;
+    report.acknowledgementFile =
+      acknowledgementFileUrl || report.acknowledgementFile;
+    report.acknowledgementNumber =
+      acknowledgementNumber || report.acknowledgementNumber;
+    report.reason = reason || report.reason;
+    report.ePan = ePan || report.ePan;
+
+    await report.save();
+
+    return res.status(200).json({
+      message: `success`,
+      report,
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+
+module.exports = { loanStatus, updatePanDetails };
