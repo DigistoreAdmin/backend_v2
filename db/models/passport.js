@@ -19,7 +19,7 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed", "onHold", "reject"),
         defaultValue: "inQueue",
       },
       assignedId: {
@@ -340,6 +340,22 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
       oldPassportCopy: {
         type: DataTypes.STRING,
         allowNull: isRenewal,
+      },
+      passportAppointmentDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      username: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      passportFile: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
