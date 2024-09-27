@@ -223,6 +223,21 @@ const getAllStaff = catchAsync(async (req, res, next) => {
     if (filters.phoneNumber) {
       where.phoneNumber = filters.phoneNumber;
     }
+    if (filters.gender) {
+      where.gender = filters.gender;
+    }
+    if (filters.employment) {
+      where.employment = filters.employment;
+    }
+    if (filters.employmentType) {
+      where.employmentType = filters.employmentType;
+    }
+    if (filters.district) {
+      where.district = filters.district;
+    }
+    if (filters.bloodGroup) {
+      where.bloodGroup = { [Op.iLike]: `${filters.bloodGroup.trim()}%` }; // Using Sequelize's iLike operator with wildcard
+    }
   }
   console.log("where", where);
   const phoneNumber = parseFloat(search);
