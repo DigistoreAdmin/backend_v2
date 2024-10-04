@@ -24,7 +24,8 @@ const busBooking = catchAsync(async (req, res, next) => {
         startDate,
         preference,
         passengerDetails,
-        status
+        status,
+        workId
     });
 
     if (!newUser) {

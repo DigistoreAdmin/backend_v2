@@ -40,13 +40,34 @@ module.exports = {
         type: Sequelize.STRING
       },
       status: {
-        type: Sequelize.ENUM("inQueue","inProgress","completed")
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed")
       },
       assignedOn: {
         type: Sequelize.DATE
       },
       completedOn: {
         type: Sequelize.DATE
+      },
+      workId: {
+        type: Sequelize.STRING
+      },
+      ticket: {
+        type: Sequelize.STRING
+      },
+      amount: {
+        type: Sequelize.INTEGER
+      },
+      serviceCharge: {
+        type: Sequelize.INTEGER
+      },
+      commissionToFranchise: {
+        type: Sequelize.INTEGER
+      },
+      commissionToHO: {
+        type: Sequelize.INTEGER
+      },
+      totalAmount: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
