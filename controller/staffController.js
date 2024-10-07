@@ -2,7 +2,6 @@ const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
 const sequelize = require("../config/database");
 const defineStaffsDetails = require("../db/models/staffs");
-const otpStorage = require("../utils/otpStorage");
 const AppError = require("../utils/appError");
 
 const createStaffs = catchAsync(async (req, res, next) => {
@@ -11,8 +10,8 @@ const createStaffs = catchAsync(async (req, res, next) => {
     password,
     firstName,
     lastName,
-    emailId,
-    mobileNumber,
+    email,
+    phoneNumber,
     dateOfBirth,
     gender,
     addressLine1,
@@ -24,7 +23,8 @@ const createStaffs = catchAsync(async (req, res, next) => {
     bank,
     accountNumber,
     ifscCode,
-    accountHolderName,
+    accountName,
+    branchName,
     dateOfJoin,
     bloodGroup,
     employment,
@@ -42,6 +42,13 @@ const createStaffs = catchAsync(async (req, res, next) => {
     posterOrBroucher,
     other,
     phone,
+    laptopDetails,
+    phoneDetails,
+    idCardDetails,
+    vistingCardDetails,
+    posterOrBroucherDetails,
+    simDetails,
+    otherDetails,
     remarks,
   } = req.body;
 
@@ -49,7 +56,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
 
   try {
     const numberExist = await user.findOne({
-      where: { phoneNumber: mobileNumber },
+      where: { phoneNumber: phoneNumber },
       transaction,
     });
 
@@ -61,7 +68,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     }
 
     const mail = await user.findOne({
-      where: { email: emailId },
+      where: { email: email },
       transaction,
     });
 
@@ -73,7 +80,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     }
 
     const data = await user.create(
-      { userType, password, phoneNumber: mobileNumber, email: emailId },
+      { userType, password, phoneNumber, email },
       { transaction }
     );
 
@@ -84,7 +91,16 @@ const createStaffs = catchAsync(async (req, res, next) => {
         .json({ success: false, message: "Failed to create user" });
     }
 
-    const staffs = defineStaffsDetails(employmentType, isTrainingRequired);
+    const staffs = defineStaffsDetails(
+      employmentType,
+      isTrainingRequired,
+      laptop,
+      idCard,
+      vistingCard,
+      posterOrBroucher,
+      sim,
+      other
+    );
 
     const employeeId = "";
     const newStaff = await staffs.create(
@@ -94,8 +110,8 @@ const createStaffs = catchAsync(async (req, res, next) => {
         password: data.password,
         firstName,
         lastName,
-        emailId,
-        phoneNumber: mobileNumber,
+        email,
+        phoneNumber,
         dateOfBirth,
         gender,
         addressLine1,
@@ -106,8 +122,9 @@ const createStaffs = catchAsync(async (req, res, next) => {
         pinCode,
         bank,
         accountNumber,
+        branchName,
         ifscCode,
-        accountHolderName,
+        accountName,
         dateOfJoin,
         emergencyContact,
         isTrainingRequired,
@@ -123,8 +140,15 @@ const createStaffs = catchAsync(async (req, res, next) => {
         vistingCard,
         posterOrBroucher,
         sim,
-        other,
         phone,
+        other,
+        laptopDetails,
+        idCardDetails,
+        vistingCardDetails,
+        posterOrBroucherDetails,
+        simDetails,
+        phoneDetails,
+        otherDetails,
         remarks,
       },
       { transaction }
@@ -137,7 +161,6 @@ const createStaffs = catchAsync(async (req, res, next) => {
         .json({ success: false, message: "Failed to create new staff" });
     }
 
-    delete otpStorage[mobileNumber];
     await transaction.commit();
 
     return res.status(201).json({
