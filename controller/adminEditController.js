@@ -176,13 +176,7 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
         ifscCode,
         aadhaarNumber,
         panNumber,
-        referredBy,
-        referredFranchiseName,
-        referredFranchiseCode,
-        onBoardedBy,
-        onBoardedPersonId,
-        onBoardedPersonName,
-        userPlan,
+        
       } = req.body;
   
       const franchise = await Franchise.findOne({
@@ -235,13 +229,7 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
           ifscCode,
           aadhaarNumber: hashAadhaar,
           panNumber: hashPan,
-          referredBy,
-          referredFranchiseName,
-          referredFranchiseCode,
-          onBoardedBy,
-          onBoardedPersonId,
-          onBoardedPersonName,
-          userPlan,
+          
         },
         {
           where: { franchiseUniqueId },
