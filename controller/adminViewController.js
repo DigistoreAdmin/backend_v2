@@ -91,6 +91,19 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
   }
 });
 
+const getFranchise = catchAsync(async (req, res) => {
+  const { franchiseUniqueId } = req.query;
+  const Data = await Franchise.findOne({where: {franchiseUniqueId} });
+
+  if(!Data) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  return res.status(200).json({ succes: "success", data: Data });
+});
+
 const updateStaffDetails = catchAsync(async (req, res, next) => {
   try {
     const {
@@ -297,5 +310,9 @@ const getAllStaff = catchAsync(async (req, res, next) => {
   }
 });
 
-module.exports = { getAllFranchises, updateStaffDetails, getAllStaff };
-
+module.exports = {
+  getAllFranchises,
+  getFranchise,
+  updateStaffDetails,
+  getAllStaff,
+};
