@@ -3,6 +3,7 @@ const cibilReports = require("../db/models/cibilreport");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
+const gstRegistrationDetails = require("../db/models/gstregistration");
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -48,19 +49,18 @@ const loanStatus = catchAsync(async (req, res) => {
 
     const cibilReportDetail = cibilReports();
 
-    const report = await cibilReportDetail.findOne({
+    const data = await cibilReportDetail.findOne({
       where: {
         customerName: customerName,
         mobileNumber: mobileNumber,
       },
     });
 
-    if (!report) {
+    if (!data) {
       return res.status(404).json({ message: "Record not found" });
     }
 
     if (status === "approve" || status === "reject") {
-
       const uploadFile = async (file) => {
         if (file) {
           try {
@@ -74,22 +74,18 @@ const loanStatus = catchAsync(async (req, res) => {
 
       const cibilReportUrl = await uploadFile(cibilReport);
 
-      report.status = status;
-      report.cibilReport = cibilReportUrl;
-      report.cibilScore = cibilScore;
+      data.status = status;
+      data.cibilReport = cibilReportUrl;
+      data.cibilScore = cibilScore;
 
-      await report.save();
+      await data.save();
 
       res.status(200).json({
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
-        report,
+        data,
       });
-
-    } 
-    else {
-
+    } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
@@ -99,4 +95,69 @@ const loanStatus = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { loanStatus };
+const updateGstDetails = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, status, applicationReferenceNumber, id } = req.body;
+    const gstDocument = req?.files?.gstDocument;
+
+    if (!mobileNumber) {
+      return res.status(400).json({ message: "Mobile number is required" });
+    }
+
+    const gstDetails = gstRegistrationDetails();
+
+    const data = await gstDetails.findOne({
+      where: { customerMobile: mobileNumber, id: id },
+    });
+
+    if (!data) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    const finalStatus = status === "completed" ? "completed" : "inProgress";
+
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          throw new Error("File upload failed");
+        }
+      }
+      return null;
+    };
+
+    const gstDocumentUrl = await uploadFile(gstDocument);
+
+    let totalAmount = 1500;
+    let commissionToHeadOffice = 1000;
+    let commissionToFranchise = 500;
+
+    data.status = finalStatus;
+    data.gstDocument = gstDocumentUrl || data.gstDocument;
+    data.applicationReferenceNumber =
+      applicationReferenceNumber || data.applicationReferenceNumber;
+
+    data.totalAmount = totalAmount || data.totalAmount;
+    data.commissionToHeadOffice =
+      commissionToHeadOffice || data.commissionToHeadOffice;
+
+    data.commissionToFranchise =
+      commissionToFranchise || data.commissionToFranchise;
+
+    await data.save();
+
+    return res.status(200).json({
+      message: `success`,
+      data,
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+
+module.exports = { loanStatus, updateGstDetails };
