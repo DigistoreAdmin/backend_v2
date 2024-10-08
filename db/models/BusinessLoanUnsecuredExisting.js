@@ -135,6 +135,46 @@ const defineBusinessLoanUnscuredExisting = (cibil) => {
           },
         },
       },
+      loanStatus: {
+        type: DataTypes.JSONB,
+        allowNull: true
+      },
+      rejectReason: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      bankDetails: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      loanGivenByBank: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+      doneBy: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      serviceCharge: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      commissionToFranchise: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      commissionToHO: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      otherPayments: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      otherDocumentsByStaff: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       status: {
         type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
         allowNull: false,
