@@ -73,7 +73,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       assignedId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       assignedOn: {
         type: Sequelize.DATE,

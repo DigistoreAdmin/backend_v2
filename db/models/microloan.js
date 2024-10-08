@@ -142,13 +142,8 @@ const microLoans = sequelize.define(
       allowNull: true,
     },
     assignedId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: true,
-      validate: {
-        isInt: {
-          msg: "Assigned ID must be an integer",
-        },
-      },
     },
     assignedOn: {
       type: DataTypes.DATE,
