@@ -198,3 +198,4 @@ const medicalInsuranceCreate = catchAsync(async (req, res, next) => {
 
 module.exports = { medicalInsuranceCreate };
 
+
