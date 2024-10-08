@@ -35,14 +35,6 @@ const defineStaffsDetails = (
         type: DataTypes.ENUM("staff"),
         defaultValue: "staff",
         allowNull: false,
-        validate: {
-          notNull: {
-            msg: "userType cannot be null",
-          },
-          notEmpty: {
-            msg: "userType cannot be empty",
-          },
-        },
       },
       password: {
         type: DataTypes.STRING,

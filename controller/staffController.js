@@ -6,7 +6,6 @@ const AppError = require("../utils/appError");
 
 const createStaffs = catchAsync(async (req, res, next) => {
   const {
-    userType,
     password,
     firstName,
     lastName,
@@ -80,7 +79,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     }
 
     const data = await user.create(
-      { userType, password, phoneNumber, email },
+      { userType: "staff", password, phoneNumber, email },
       { transaction }
     );
 
@@ -105,8 +104,8 @@ const createStaffs = catchAsync(async (req, res, next) => {
     const employeeId = "";
     const newStaff = await staffs.create(
       {
+        userType: "staff",
         employeeId,
-        userType,
         password: data.password,
         firstName,
         lastName,
