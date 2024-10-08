@@ -49,6 +49,7 @@ const fetchServicesRouter = require("../route/fetchServicesRouter");
 const adminEditRoute = require("../route/adminEditRoute");
 const contactRoute = require("../route/contactRoute");
 const medicalInsuranceRoute = require("../route/medicalInsuranceRoute");
+const microLoanRoute = require("../route/Loan/microLoanRoute");
 
 const router = express.Router();
 
@@ -107,5 +108,6 @@ router.use("/v1/fetchServicesRouter", fetchServicesRouter);
 router.use("/v1/adminEditRoute", adminEditRoute);
 router.use("/v1/contactRoute", contactRoute);
 router.use("/v1/medicalRoute", medicalInsuranceRoute);
+router.use("/v1/microLoanRoute", microLoanRoute);
 
 module.exports = router;
