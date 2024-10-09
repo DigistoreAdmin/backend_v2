@@ -17,6 +17,7 @@ const gstFilings = require("../db/models/gstfiling");
 const incomeTaxFilingDetails = require("../db/models/incometax");
 const partnerShipDeedTable = require("../db/models/partnershipdeedpreperation");
 const packingLicence = require("../db/models/packinglicences");
+const defineVehicleInsurance = require("../db/models/vehicleInsurance")
 
 
 const getPancardDetails = async (req, res) => {
@@ -596,6 +597,47 @@ const getPackingLicences = catchAsync(async (req, res, next) => {
   });
 });
 
+const getVehicleInsurance = catchAsync(async (req,res,next) => {
+
+  try{
+  const { page, pageLimit } = req.query;
+
+  if(!page || !pageLimit){
+    return res
+    .status(400)
+    .json({ error: "page and pageLimit query parameters are required"})
+  }
+
+  const pageNumber = parseInt(page, 10)
+  const pageLimitNumber = parseInt(pageLimit, 10)
+
+  const limit = pageLimitNumber
+  const offset = (pageNumber - 1) * limit
+
+  const vehicleInsurance = await defineVehicleInsurance()
+  const getInsurance = await vehicleInsurance.findAndCountAll({
+    limit,
+    offset,
+  })
+
+  if(!getInsurance) {
+    return next(new AppError("Data not found", 404))
+  }
+
+  res.status(200).json({
+    data: getInsurance.rows,
+    totalPages: Math.ceil(getInsurance.count / limit),
+    totalItems: getInsurance.count,
+    currentPage: pageNumber,
+    currentPage: pageNumber,
+  })
+  }
+  catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }  
+} )
+
 module.exports = {
   getPackingLicences,
   getPartnerShipDeedPreparation,
@@ -611,6 +653,7 @@ module.exports = {
   fetchTrainBookingDetails,
   fetchUdyamRegistrationDetails,
   fetchFinancialStatements,
-  fetchCompanyFormationDetails
+  fetchCompanyFormationDetails,
+  getVehicleInsurance,
 };
 

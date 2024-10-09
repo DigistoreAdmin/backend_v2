@@ -1,7 +1,8 @@
 "use strict";
 const bcrypt = require("bcrypt");
-const { DataTypes } = require("sequelize");
+const { DataTypes} = require("sequelize");
 const sequelize = require("../../config/database");
+
 
 const incomeTaxFilingDetails = (
   typeofTransaction,

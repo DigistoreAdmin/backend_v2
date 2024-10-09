@@ -1,8 +1,9 @@
 const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 const cibilReports = require("../db/models/cibilreport");
+
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
-const AppError = require("../utils/appError");
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -60,7 +61,6 @@ const loanStatus = catchAsync(async (req, res) => {
     }
 
     if (status === "approve" || status === "reject") {
-
       const uploadFile = async (file) => {
         if (file) {
           try {
@@ -84,12 +84,8 @@ const loanStatus = catchAsync(async (req, res) => {
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
         report,
       });
-
-    } 
-    else {
-
+    } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
@@ -99,4 +95,5 @@ const loanStatus = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { loanStatus };
+
+module.exports = { loanStatus};
