@@ -1,7 +1,14 @@
 "use strict";
 const bcrypt = require("bcrypt");
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 const sequelize = require("../../config/database");
+
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
 
 const incomeTaxFilingDetails = (
   typeofTransaction,
@@ -251,6 +258,30 @@ const incomeTaxFilingDetails = (
         type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
         defaultValue: "inQueue",
       },
+      workId: {
+        type: DataTypes.STRING,
+        allowNull:false,
+      },
+      computationFile: {
+        type: DataTypes.STRING,
+        allowNull:true,
+      },
+      incomeTaxAcknowledgement: {
+        type: DataTypes.STRING,
+        allowNull:true,
+      },
+      franchiseCommission: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      HOCommission: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      totalAmount: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
@@ -267,6 +298,28 @@ const incomeTaxFilingDetails = (
       paranoid: true,
       freezeTableName: true,
       modelName: "incomeTax",
+      hooks: {
+        beforeValidate: async (loan) => {
+          const currentDate = getCurrentDate();
+          const code = "ITR";
+          const lastIncomeTax = await incomeTaxFiling.findOne({
+            where: {
+              workId: {
+                [Op.like]: `${currentDate}${code}%`,
+              },
+            },
+            order: [["createdAt", "DESC"]],
+          });
+
+          let newIncrement = "001";
+          if (lastIncomeTax) {
+            const lastIncrement = parseInt(lastIncomeTax.workId.slice(-3));
+            newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+          }
+
+          loan.workId = `${currentDate}${code}${newIncrement}`;
+        },
+      },
     }
   );
 
