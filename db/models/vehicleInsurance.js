@@ -167,23 +167,35 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
         type: DataTypes.ENUM("GIBIL", "ownCode"),
         allowNull: true,
       },
-      amount: {
+      commissionToFranchise: {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
-      franchiseCommission: {
+      commissionToHeadOffice: {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
-      HOCommission: {
+      odPremiumAmount: {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
-      serviceCharge: {
+      tpPremiumAmount:{
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
-      totalAmount: {
+      odPoint: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      tpPoint: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      paCoverPoint: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      paCoverAmount: {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },

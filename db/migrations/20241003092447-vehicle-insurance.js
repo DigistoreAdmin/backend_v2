@@ -97,19 +97,28 @@ module.exports = {
       throughWhom: {
         type: Sequelize.ENUM("GIBIL", "ownCode"),
       },
-      amount: {
+      commissionToFranchise: {
         type: Sequelize.DECIMAL,
       },
-      franchiseCommission: {
+      commissionToHeadOffice: {
         type: Sequelize.DECIMAL,
       },
-      HOCommission: {
+      odPremiumAmount: {
         type: Sequelize.DECIMAL,
       },
-      serviceCharge: {
+      tpPremiumAmount:{
         type: Sequelize.DECIMAL,
       },
-      totalAmount: {
+      odPoint: {
+        type: Sequelize.DECIMAL,
+      },
+      tpPoint: {
+        type: Sequelize.DECIMAL,
+      },
+      paCoverPoint: {
+        type: Sequelize.DECIMAL,
+      },
+      paCoverAmount: {
         type: Sequelize.DECIMAL,
       },
       createdAt: {
