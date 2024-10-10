@@ -47,6 +47,7 @@ const BlockRoute = require("../route/blockRoutes")
 const fetchLoanRouter = require("../route/Loan/fetchLoanRouter");
 const fetchServicesRouter = require("../route/fetchServicesRouter");
 const adminEditRoute = require("../route/adminEditRoute")
+const contactRoute = require("../route/contactRoute")
 
 const router = express.Router();
 
@@ -97,5 +98,6 @@ router.use("/v1/updateAccess", BlockRoute)
 router.use("/v1/fetchLoanRouter", fetchLoanRouter);
 router.use("/v1/fetchServicesRouter", fetchServicesRouter);
 router.use("/v1/adminEditRoute", adminEditRoute)
+router.use("/v1/contactRoute", contactRoute)
 
 module.exports = router;
