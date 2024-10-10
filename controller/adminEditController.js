@@ -8,6 +8,7 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { Op, where } = require("sequelize");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto")
 
 const deleteFranchise = catchAsync(async (req, res, next) => {
     const transaction = await sequelize.transaction();
@@ -158,10 +159,85 @@ const updateStaffDetails = catchAsync(async (req, res, next) => {
 });
 
 const updateFranchiseDetails = catchAsync(async (req, res, next) => {
-    try {
-  
-      const {
-        franchiseUniqueId,
+  try {
+    const {
+      franchiseUniqueId,
+      userType,
+      ownerName,
+      franchiseName,
+      businessType,
+      gender,
+      dateOfBirth,
+      franchiseAddressLine1,
+      franchiseAddressLine2,
+      state,
+      district,
+      pinCode,
+      postOffice,
+      panchayath,
+      ward,
+      digitalElements,
+      panCenter,
+      accountNumber,
+      accountName,
+      bank,
+      branchName,
+      ifscCode,
+      aadhaarNumber,
+      panNumber,
+      referredBy,
+      referredFranchiseName,
+      referredFranchiseCode,
+      onBoardedBy,
+      onBoardedPersonId,
+      onBoardedPersonName,
+      userPlan,
+    } = req.body;
+
+    const franchise = await Franchise.findOne({
+      where: { franchiseUniqueId },
+    });
+
+    if (!franchise) {
+      return res.status(404).json({
+        success: false,
+        message: "Franchise not found",
+      });
+    }
+
+    const algorithm = "aes-192-cbc"; // AES-192-CBC encryption algorithm
+    const secret = process.env.FRANCHISE_SECRET_KEY; // Secret key from environment variables
+    const key = crypto.scryptSync(secret, "salt", 24); // Derive a 24-byte key
+
+    const encryptData = (data) => {
+      const iv = crypto.randomBytes(16); // Generate a random 16-byte IV
+      const cipher = crypto.createCipheriv(algorithm, key, iv); // Create cipher instance
+
+      // Encrypt the data
+      let encrypted = cipher.update(data, "utf8", "hex");
+      encrypted += cipher.final("hex");
+
+      // Return IV and encrypted data, separated by a colon
+      return iv.toString("hex") + ":" + encrypted;
+    };
+
+    let hashPan;
+    panNumber && typeof panNumber === "string"
+      ? (hashPan = encryptData(panNumber))
+      : panNumber;
+
+    let hashAadhaar;
+    aadhaarNumber && typeof aadhaarNumber === "string"
+      ? (hashAadhaar = encryptData(aadhaarNumber.toString()))
+      : aadhaarNumber;
+
+    let hashAccountN;
+    accountNumber && typeof accountNumber === "string"
+      ? (hashAccountN = encryptData(accountNumber.toString()))
+      : accountNumber;
+
+    const updatedFranchise = await Franchise.update(
+      {
         userType,
         ownerName,
         franchiseName,
@@ -178,13 +254,13 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
         ward,
         digitalElements,
         panCenter,
-        accountNumber,
+        accountNumber: hashAccountN,
         accountName,
         bank,
         branchName,
         ifscCode,
-        aadhaarNumber,
-        panNumber,
+        aadhaarNumber: hashAadhaar,
+        panNumber: hashPan,
         referredBy,
         referredFranchiseName,
         referredFranchiseCode,
@@ -192,90 +268,33 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
         onBoardedPersonId,
         onBoardedPersonName,
         userPlan,
-      } = req.body;
-  
-      const franchise = await Franchise.findOne({
+      },
+      {
         where: { franchiseUniqueId },
-      });
-  
-      if (!franchise) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Franchise not found" });
       }
-  
-      let hashPan;
-      panNumber && typeof panNumber === "string"
-        ? (hashPan = await bcrypt.hash(panNumber, 8))
-        : panNumber;
-  
-      let hashAadhaar;
-      aadhaarNumber && typeof aadhaarNumber === "string"
-        ? (hashAadhaar = await bcrypt.hash(aadhaarNumber.toString(), 8))
-        : aadhaarNumber;
-      console.log("Hash", hashAadhaar);
-      let hashAccountN;
-      accountNumber && typeof accountNumber === "string"
-        ? (hashAccountN = await bcrypt.hash(accountNumber.toString(), 8))
-        : accountName;
-  console.log("object",req.body)
-      const updatedFranchise = await Franchise.update(
-        {
-          userType,
-          ownerName,
-          franchiseName,
-          businessType,
-          gender,
-          dateOfBirth,
-          franchiseAddressLine1,
-          franchiseAddressLine2,
-          state,
-          district,
-          pinCode,
-          postOffice,
-          panchayath,
-          ward,
-          digitalElements,
-          panCenter,
-          accountNumber: hashAccountN,
-          accountName,
-          bank,
-          branchName,
-          ifscCode,
-          aadhaarNumber: hashAadhaar,
-          panNumber: hashPan,
-          referredBy,
-          referredFranchiseName,
-          referredFranchiseCode,
-          onBoardedBy,
-          onBoardedPersonId,
-          onBoardedPersonName,
-          userPlan,
-        },
-        {
-          where: { franchiseUniqueId },
-        }
-      );
-  
-      if (!updatedFranchise) {
-        throw new AppError("Failed to update the franchise", 400);
-      }
-  
-      const updatedFranchises = await Franchise.findOne({
-        where: { franchiseUniqueId },
-      });
-  
-      return res.status(200).json({
-        success: true,
-        message: "Franchise details updated",
-        updatedFranchises,
-      });
+    );
 
-    } catch (error) {
-      console.error("Error:", error);
-      return next(new AppError(error.message, 500));
+    if (!updatedFranchise) {
+      throw new AppError("Failed to update the franchise", 400);
     }
-  });
+
+    const updatedFranchiseDetails = await Franchise.findOne({
+      where: { franchiseUniqueId },
+    });
+
+    updatedFranchiseDetails.password = "";
+
+    return res.status(200).json({
+      success: true,
+      message: "Franchise details updated",
+      updatedFranchise: updatedFranchiseDetails,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+});
+
 
   const updateWallet = catchAsync(async (req, res, next) => {
     try {
