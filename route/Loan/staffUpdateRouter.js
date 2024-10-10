@@ -4,6 +4,6 @@ const router = require('express').Router()
 
 const { updateLoan } = require("../../controller/Loan/staffUpdateController")
 
-router.route('/updateLoan').post(verifyToken, verifyRefreshToken, updateLoan)
+router.route('/updateLoan').put(verifyToken, verifyRefreshToken, updateLoan)
 
 module.exports = router

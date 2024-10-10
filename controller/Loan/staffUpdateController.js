@@ -78,7 +78,6 @@ const updateLoan = catchAsync(async (req, res, next) => {
         console.log('loanType: ', loanType);
         switch (loanType) {
             case "businessLoanExisting":
-                console.log("Hi");
                 tableName = businessLoanExistingDetails()
                 break
             case "businessLoanNewSecured":
@@ -110,7 +109,6 @@ const updateLoan = catchAsync(async (req, res, next) => {
         }
 
         console.log("tableName: ", tableName);
-
 
         let dataToBeUpdated = await tableName.findOne({
             where: { mobileNumber: phoneNumber }
@@ -148,11 +146,8 @@ const updateLoan = catchAsync(async (req, res, next) => {
         });
 
         await dataToBeUpdated.save();
-        console.log(dataToBeUpdated);
 
         res.status(200).json({ message: `${loanType} updated successfully`, data: dataToBeUpdated });
-
-
 
     } catch (error) {
         console.error(`Error in updating ${loanType}:`, error);
