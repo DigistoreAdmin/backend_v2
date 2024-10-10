@@ -3,6 +3,7 @@ const cibilReports = require("../db/models/cibilreport");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
+const definePassportDetails = require("../db/models/passport");
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -60,7 +61,6 @@ const loanStatus = catchAsync(async (req, res) => {
     }
 
     if (status === "approve" || status === "reject") {
-
       const uploadFile = async (file) => {
         if (file) {
           try {
@@ -84,12 +84,8 @@ const loanStatus = catchAsync(async (req, res) => {
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
         report,
       });
-
-    } 
-    else {
-
+    } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
@@ -99,4 +95,72 @@ const loanStatus = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { loanStatus };
+const passportUpdate = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, passportAppointmentDate, username, password } =
+      req.body;
+    const { passportFile } = req.files;
+
+    // if (!req.files) {
+    //   throw new AppError("Files not uploaded", 400);
+    // }
+
+    console.log("body:", req.body);
+    console.log("files:", req.files);
+
+    // Check for required fields
+    if (!mobileNumber) {
+      return res
+        .status(404)
+        .json({ message: "Missing required field: mobileNumber" });
+    }
+
+    // Define passport model
+    const passportDetails = definePassportDetails();
+
+    // Find the passport record by mobile number
+    const passportRecord = await passportDetails.findOne({
+      where: { mobileNumber },
+    });
+
+    if (!passportRecord) {
+      return res.status(404).json({ message: "Passport record not found" });
+    }
+
+    // Helper function to upload files (similar to loanStatus)
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          return null;
+        }
+      }
+    };
+
+    const passportFileUrl = await uploadFile(passportFile);
+
+    passportAppointmentDate
+      ? (passportRecord.passportAppointmentDate = passportAppointmentDate)
+      : null;
+
+    username ? (passportRecord.username = username) : null;
+    password ? (passportRecord.password = password) : null;
+    passportFileUrl ? (passportRecord.passportFile = passportFileUrl) : null;
+
+    await passportRecord.save();
+
+    res.status(200).json({
+      message: "Passport details updated successfully",
+      passportRecord,
+    });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+
+module.exports = { loanStatus, passportUpdate };
