@@ -209,8 +209,23 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
         type: DataTypes.STRING,
         allowNull: allowsNew,
       },
-
-      // Fields specific to 'minor' PAN
+    acknowledgementNumber:{
+      type: DataTypes.INTEGER,
+      allowNull:true
+    },
+    acknowledgementFile:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    reason:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    ePan:{
+      type: DataTypes.ENUM("received","notReceived"),
+      allowNull:true
+    },
+     // Fields specific to 'minor' PAN
       representativeName: {
         type: DataTypes.STRING,
         allowNull: allow,

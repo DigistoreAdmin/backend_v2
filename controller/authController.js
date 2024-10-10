@@ -16,6 +16,7 @@ const User = require("../db/models/user");
 const { generateOTP, sendOTP } = require("../utils/otpUtils");
 const student = require("../db/models/student");
 const defineStaffsDetails = require("../db/models/staffs");
+const crypto=require('crypto')
 
 const senndOtp = catchAsync(async (req, res, next) => {
   try {
@@ -123,6 +124,33 @@ const login = catchAsync(async (req, res, next) => {
         userType: data.userType,
       });
 
+      
+      const algorithm = "aes-192-cbc";  // AES-192-CBC encryption algorithm
+      const secret = process.env.FRANCHISE_SECRET_KEY;  // Secret key from environment variables
+      const key = crypto.scryptSync(secret, 'salt', 24);  // Derive a 24-byte key
+
+      const decryptData = (encryptedData) => {
+        try {
+          // Ensure the encrypted data has the expected format with ':'
+          if (!encryptedData || !encryptedData.includes(':')) {
+            console.error('Invalid encrypted data format', encryptedData);
+            return null;  // Return null or some default if the format is wrong
+          }
+
+          const [ivHex, encryptedText] = encryptedData.split(':');
+          const iv = Buffer.from(ivHex, 'hex');
+          const decipher = crypto.createDecipheriv(algorithm, key, iv);
+          let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+          decrypted += decipher.final('utf8');
+          return decrypted;
+
+        } catch (error) {
+          console.error('Decryption error:', error);
+          return null;  // Return null if decryption fails
+        }
+      };
+
+
       const {
         password: userPassword,
         accountNumber,
@@ -135,6 +163,13 @@ const login = catchAsync(async (req, res, next) => {
         bankPassbookPic,
         ...sanitizedDataValues
       } = existingUser.dataValues;
+
+      
+      const decryptedPanNumber = panNumber ? decryptData(panNumber) : null;
+      const decryptedAccountNumber = accountNumber ? decryptData(accountNumber) : null;
+      const decryptedAadhaarNumber = aadhaarNumber ? decryptData(aadhaarNumber) : null;
+
+      const newData = { ...sanitizedDataValues, panNumber: decryptedPanNumber, accountNumber: decryptedAccountNumber, aadhaarNumber: decryptedAadhaarNumber };
 
       return res
         .cookie("accessToken", accessToken, {
@@ -152,7 +187,7 @@ const login = catchAsync(async (req, res, next) => {
         .status(200)
         .json({
           message: "Login success franchise",
-          data: sanitizedDataValues,
+          data: newData,
         });
 
       // .status(200)
