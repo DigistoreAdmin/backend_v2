@@ -1,4 +1,7 @@
 'use strict';
+
+const { services } = require('azure-storage');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -25,7 +28,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       cibil: {
-        type: Sequelize.ENUM("approved","noCibil")
+        type: Sequelize.ENUM("approved", "noCibil")
       },
       cibilScore: {
         type: Sequelize.INTEGER
@@ -92,6 +95,43 @@ module.exports = {
       },
       completedOn: {
         type: Sequelize.DATE
+      },
+      loanStatus: {
+        type: Sequelize.JSONB,
+        defaultValue: {
+          documentSubmittedToBank: false,
+          bankVerified: false,
+          bankApprovalOrReject: false,
+          loanDispersed: false,
+          commissionCredited: false
+        },
+      },
+      rejectReason: {
+        type: Sequelize.STRING
+      },
+      bankDetails: {
+        type: Sequelize.STRING
+      },
+      loanGivenByBank: {
+        type: Sequelize.BIGINT
+      },
+      doneBy: {
+        type: Sequelize.STRING
+      },
+      serviceCharge: {
+        type: Sequelize.INTEGER
+      },
+      commissionToFranchise: {
+        type: Sequelize.INTEGER
+      },
+      commissionToHO: {
+        type: Sequelize.INTEGER
+      },
+      otherPayments: {
+        type: Sequelize.STRING
+      },
+      otherDocumentsByStaff: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
