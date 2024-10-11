@@ -1,27 +1,42 @@
-'use strict';
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../../config/database');
+"use strict";
+const { Model, DataTypes ,Op} = require("sequelize");
+const sequelize = require("../../config/database");
+
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
 
 const gstRegistrationDetails = (typeOfBusiness) => {
-
-  const proprietaryAndPartnershipNullVal = ["proprietary", "partnership"].includes(typeOfBusiness) ? false : true;
-  const PartnershipAndCompanypNullVal = ["partnership", "company"].includes(typeOfBusiness) ? false : true;
+  const proprietaryAndPartnershipNullVal = [
+    "proprietary",
+    "partnership",
+  ].includes(typeOfBusiness)
+    ? false
+    : true;
+  const PartnershipAndCompanypNullVal = ["partnership", "company"].includes(
+    typeOfBusiness
+  )
+    ? false
+    : true;
   const proprietaryNullVal = typeOfBusiness === "proprietary" ? false : true;
   const partnershipNullVal = typeOfBusiness === "partnership" ? false : true;
   const companyNullVal = typeOfBusiness === "company" ? false : true;
 
   const gstRegistration = sequelize.define(
-    'gstRegistrations',
+    "gstRegistrations",
     {
       uniqueId: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Unique ID cannot be null',
+            msg: "Unique ID cannot be null",
           },
           notEmpty: {
-            msg: 'Unique ID cannot be empty',
+            msg: "Unique ID cannot be empty",
           },
         },
       },
@@ -31,15 +46,24 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
+      workId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      status: {
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        allowNull: false,
+        defaultValue: "inQueue",
+      },
       customerName: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Customer name cannot be null',
+            msg: "Customer name cannot be null",
           },
           notEmpty: {
-            msg: 'Customer name cannot be empty',
+            msg: "Customer name cannot be empty",
           },
         },
       },
@@ -48,13 +72,13 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Customer email cannot be null',
+            msg: "Customer email cannot be null",
           },
           notEmpty: {
-            msg: 'Customer email cannot be empty',
+            msg: "Customer email cannot be empty",
           },
           isEmail: {
-            msg: 'Invalid email address',
+            msg: "Invalid email address",
           },
           is: {
             args: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -67,17 +91,17 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Customer mobile number cannot be null',
+            msg: "Customer mobile number cannot be null",
           },
           notEmpty: {
-            msg: 'Customer mobile number cannot be empty',
+            msg: "Customer mobile number cannot be empty",
           },
           isNumeric: {
-            msg: 'Customer mobile number must contain only numbers',
+            msg: "Customer mobile number must contain only numbers",
           },
           len: {
             args: [10, 15],
-            msg: 'Customer mobile number must be between 10 and 15 digits',
+            msg: "Customer mobile number must be between 10 and 15 digits",
           },
         },
       },
@@ -86,22 +110,38 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Business name cannot be null',
+            msg: "Business name cannot be null",
           },
           notEmpty: {
-            msg: 'Business name cannot be empty',
+            msg: "Business name cannot be empty",
           },
         },
+      },
+      applicationReferenceNumber: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      commissionToHeadOffice: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      commissionToFranchise: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      totalAmount: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
       },
       businessAddressLine1: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Business address line 1 cannot be null',
+            msg: "Business address line 1 cannot be null",
           },
           notEmpty: {
-            msg: 'Business address line 1 cannot be empty',
+            msg: "Business address line 1 cannot be empty",
           },
         },
       },
@@ -114,30 +154,30 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Pin code cannot be null',
+            msg: "Pin code cannot be null",
           },
           notEmpty: {
-            msg: 'Pin code cannot be empty',
+            msg: "Pin code cannot be empty",
           },
           isNumeric: {
-            msg: 'Pin code must be numeric',
+            msg: "Pin code must be numeric",
           },
           len: {
             args: [6, 6],
-            msg: 'Pin code must be exactly 6 digits',
+            msg: "Pin code must be exactly 6 digits",
           },
         },
       },
       building: {
-        type: DataTypes.ENUM('owned', 'rent/leased'),
+        type: DataTypes.ENUM("owned", "rent/leased"),
         allowNull: false,
-        defaultValue: 'owned',
+        defaultValue: "owned",
         validate: {
           notNull: {
-            msg: 'Building type cannot be null',
+            msg: "Building type cannot be null",
           },
           notEmpty: {
-            msg: 'Building type cannot be empty',
+            msg: "Building type cannot be empty",
           },
         },
       },
@@ -146,16 +186,16 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Shop latitude cannot be null',
+            msg: "Shop latitude cannot be null",
           },
           notEmpty: {
-            msg: 'Shop latitude cannot be empty',
+            msg: "Shop latitude cannot be empty",
           },
           isDecimal: {
-            msg: 'Shop latitude must be a decimal number',
+            msg: "Shop latitude must be a decimal number",
           },
           isFloat: {
-            msg: 'Shop latitude must be a valid float number',
+            msg: "Shop latitude must be a valid float number",
           },
         },
       },
@@ -164,28 +204,28 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Shop longitude cannot be null',
+            msg: "Shop longitude cannot be null",
           },
           notEmpty: {
-            msg: 'Shop longitude cannot be empty',
+            msg: "Shop longitude cannot be empty",
           },
           isDecimal: {
-            msg: 'Shop longitude must be a decimal number',
+            msg: "Shop longitude must be a decimal number",
           },
           isFloat: {
-            msg: 'Shop longitude must be a valid float number',
+            msg: "Shop longitude must be a valid float number",
           },
         },
       },
       typeOfBusiness: {
-        type: DataTypes.ENUM('proprietary', 'partnership', 'company'),
+        type: DataTypes.ENUM("proprietary", "partnership", "company"),
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Business type cannot be null',
+            msg: "Business type cannot be null",
           },
           notEmpty: {
-            msg: 'Business type cannot be empty',
+            msg: "Business type cannot be empty",
           },
         },
       },
@@ -194,16 +234,20 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: proprietaryNullVal,
         validate: {
           isUrl: {
-            msg: 'Pan card image must be a valid URL',
+            msg: "Pan card image must be a valid URL",
           },
         },
+      },
+      gstDocument: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       aadhaarFront: {
         type: DataTypes.STRING,
         allowNull: proprietaryNullVal,
         validate: {
           isUrl: {
-            msg: 'Aadhaar front image must be a valid URL',
+            msg: "Aadhaar front image must be a valid URL",
           },
         },
       },
@@ -212,7 +256,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: proprietaryNullVal,
         validate: {
           isUrl: {
-            msg: 'Aadhaar back image must be a valid URL',
+            msg: "Aadhaar back image must be a valid URL",
           },
         },
       },
@@ -221,7 +265,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: proprietaryNullVal,
         validate: {
           isUrl: {
-            msg: 'Building tax receipt must be a valid URL',
+            msg: "Building tax receipt must be a valid URL",
           },
         },
       },
@@ -230,7 +274,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: true,
         validate: {
           isUrl: {
-            msg: 'Rent agreement must be a valid URL',
+            msg: "Rent agreement must be a valid URL",
           },
         },
       },
@@ -239,7 +283,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: proprietaryNullVal,
         validate: {
           isUrl: {
-            msg: 'Passport size photo must be a valid URL',
+            msg: "Passport size photo must be a valid URL",
           },
         },
       },
@@ -248,7 +292,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: proprietaryAndPartnershipNullVal,
         validate: {
           isUrl: {
-            msg: 'Bank details must be a valid URL',
+            msg: "Bank details must be a valid URL",
           },
         },
       },
@@ -257,7 +301,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: true,
         validate: {
           isUrl: {
-            msg: 'Land tax receipt must be a valid URL',
+            msg: "Land tax receipt must be a valid URL",
           },
         },
       },
@@ -275,7 +319,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: proprietaryNullVal,
         validate: {
           isDecimal: {
-            msg: 'Residence latitude must be a decimal number',
+            msg: "Residence latitude must be a decimal number",
           },
         },
       },
@@ -284,7 +328,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: proprietaryNullVal,
         validate: {
           isDecimal: {
-            msg: 'Residence longitude must be a decimal number',
+            msg: "Residence longitude must be a decimal number",
           },
         },
       },
@@ -293,11 +337,11 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: partnershipNullVal,
         validate: {
           isInt: {
-            msg: 'Number of partners must be an integer',
+            msg: "Number of partners must be an integer",
           },
           min: {
             args: [1],
-            msg: 'Number of partners must be at least 1',
+            msg: "Number of partners must be at least 1",
           },
         },
       },
@@ -314,49 +358,70 @@ const gstRegistrationDetails = (typeOfBusiness) => {
 
             // Check if the value is an array and not empty
             if (!Array.isArray(value) || value.length === 0) {
-              throw new Error('Partners details must be a non-empty array');
+              throw new Error("Partners details must be a non-empty array");
             }
 
             // Validate each item in the array
             value.forEach((partner) => {
               const {
-                panCard, photo, aadhaarFront, aadhaarBack, addressLine1, pincode, latitude, longitude
+                panCard,
+                photo,
+                aadhaarFront,
+                aadhaarBack,
+                addressLine1,
+                pincode,
+                latitude,
+                longitude,
               } = partner;
 
               // Check photo, panCard, aadhaarFront, aadhaarBack URLs
               const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
-              if (!urlRegex.test(photo) || !urlRegex.test(aadhaarFront) || !urlRegex.test(aadhaarBack) || !urlRegex.test(panCard)) {
-                throw new Error('Photo, Pancard, Aadhaar Front, and Aadhaar Back must be valid URLs');
+              if (
+                !urlRegex.test(photo) ||
+                !urlRegex.test(aadhaarFront) ||
+                !urlRegex.test(aadhaarBack) ||
+                !urlRegex.test(panCard)
+              ) {
+                throw new Error(
+                  "Photo, Pancard, Aadhaar Front, and Aadhaar Back must be valid URLs"
+                );
               }
 
               // Check address (non-empty string)
-              if (typeof addressLine1 !== 'string' || addressLine1.trim() === '') {
-                throw new Error('Address must be a non-empty string');
+              if (
+                typeof addressLine1 !== "string" ||
+                addressLine1.trim() === ""
+              ) {
+                throw new Error("Address must be a non-empty string");
               }
 
               // Check pincode (valid format)
               const pincodeRegex = /^\d{6}$/; // Adjust this regex if your pincode format is different
               if (!pincodeRegex.test(pincode)) {
-                throw new Error('Pincode must be a 6-digit number');
+                throw new Error("Pincode must be a 6-digit number");
               }
 
               // Check latitude and longitude (valid decimal numbers)
               const decimalRegex = /^-?\d+(\.\d+)?$/;
-              if (!decimalRegex.test(latitude) || !decimalRegex.test(longitude)) {
-                throw new Error('Latitude and Longitude must be valid decimal numbers');
+              if (
+                !decimalRegex.test(latitude) ||
+                !decimalRegex.test(longitude)
+              ) {
+                throw new Error(
+                  "Latitude and Longitude must be valid decimal numbers"
+                );
               }
             });
           },
         },
       },
 
-
       partnershipDeed: {
         type: DataTypes.STRING,
         allowNull: partnershipNullVal,
         validate: {
           isUrl: {
-            msg: 'Partnership deed must be a valid URL',
+            msg: "Partnership deed must be a valid URL",
           },
         },
       },
@@ -365,7 +430,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: true,
         validate: {
           isUrl: {
-            msg: 'No objection certificate must be a valid URL',
+            msg: "No objection certificate must be a valid URL",
           },
         },
       },
@@ -374,7 +439,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: PartnershipAndCompanypNullVal,
         validate: {
           isUrl: {
-            msg: 'Property tax receipt must be a valid URL',
+            msg: "Property tax receipt must be a valid URL",
           },
         },
       },
@@ -383,11 +448,11 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: companyNullVal,
         validate: {
           isInt: {
-            msg: 'Number of directors must be an integer',
+            msg: "Number of directors must be an integer",
           },
           min: {
             args: [1],
-            msg: 'Number of directors must be at least 1',
+            msg: "Number of directors must be at least 1",
           },
         },
       },
@@ -404,33 +469,65 @@ const gstRegistrationDetails = (typeOfBusiness) => {
 
             // Check if the value is an array and not empty
             if (!Array.isArray(value) || value.length === 0) {
-              throw new Error('Directors details must be a non-empty array');
+              throw new Error("Directors details must be a non-empty array");
             }
 
             // Validate each item in the array
             value.forEach((director) => {
-              const { panCard, photo, aadhaarBack, aadhaarFront, addressLine1, latitude, longitude, pin } = director;
-              if (!panCard || !photo || !addressLine1 || !latitude || !longitude || !pin || !aadhaarBack || !aadhaarFront) {
-                throw new Error('Direcors fields are missing');
+              const {
+                panCard,
+                photo,
+                aadhaarBack,
+                aadhaarFront,
+                addressLine1,
+                latitude,
+                longitude,
+                pin,
+              } = director;
+              if (
+                !panCard ||
+                !photo ||
+                !addressLine1 ||
+                !latitude ||
+                !longitude ||
+                !pin ||
+                !aadhaarBack ||
+                !aadhaarFront
+              ) {
+                throw new Error("Direcors fields are missing");
               }
 
               // Check photo and panCard URLs
               const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
-              if (!urlRegex.test(photo) || !urlRegex.test(panCard) || !urlRegex.test(aadhaarBack) || !urlRegex.test(aadhaarFront)) {
-                throw new Error('Photo ,aadhaarBack,aadhaarFront, PAN Card must be valid URLs');
+              if (
+                !urlRegex.test(photo) ||
+                !urlRegex.test(panCard) ||
+                !urlRegex.test(aadhaarBack) ||
+                !urlRegex.test(aadhaarFront)
+              ) {
+                throw new Error(
+                  "Photo ,aadhaarBack,aadhaarFront, PAN Card must be valid URLs"
+                );
               }
 
               // Check address (non-empty string)
-              if (typeof addressLine1 !== 'string' || addressLine1.trim() === '') {
-                throw new Error('Address must be a non-empty string');
+              if (
+                typeof addressLine1 !== "string" ||
+                addressLine1.trim() === ""
+              ) {
+                throw new Error("Address must be a non-empty string");
               }
-              console.log(latitude,longitude);
+              console.log(latitude, longitude);
               // Check latitude and longitude (valid decimal numbers)
               const decimalRegex = /^-?\d+(\.\d+)?$/;
-              if (!decimalRegex.test(latitude) || !decimalRegex.test(longitude)) {
-                throw new Error('Latitude and Longitude must be valid decimal numbers');
+              if (
+                !decimalRegex.test(latitude) ||
+                !decimalRegex.test(longitude)
+              ) {
+                throw new Error(
+                  "Latitude and Longitude must be valid decimal numbers"
+                );
               }
-
             });
           },
         },
@@ -440,7 +537,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: companyNullVal,
         validate: {
           isUrl: {
-            msg: 'Incorporation certificate must be a valid URL',
+            msg: "Incorporation certificate must be a valid URL",
           },
         },
       },
@@ -462,12 +559,33 @@ const gstRegistrationDetails = (typeOfBusiness) => {
     {
       paranoid: true,
       freezeTableName: true,
-      modelName: 'gstRegistrations',
-    },
+      modelName: "gstRegistrations",
+      hooks: {
+        beforeValidate: async (gst) => {
+          const currentDate = getCurrentDate();
+          const code = "GST";
+          const lastGst = await gstRegistration.findOne({
+            where: {
+              workId: {
+                [Op.like]: `${currentDate}${code}%`,
+              },
+            },
+            order: [["createdAt", "DESC"]],
+          });
 
+          let newIncrement = "001";
+          if (lastGst) {
+            const lastIncrement = parseInt(lastGst.workId.slice(-3));
+            newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+          }
+
+          gst.workId = `${currentDate}${code}${newIncrement}`;
+        },
+      },
+    }
   );
 
   return gstRegistration;
-}
+};
 
 module.exports = gstRegistrationDetails;
