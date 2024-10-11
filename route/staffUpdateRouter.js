@@ -10,7 +10,6 @@ const {
 } = require("../controller/staffUpdateController");
 
 
-
 const { verifyRefreshToken, verifyToken } = require("../utils/token");
 
 const router = express.Router();
@@ -48,4 +47,5 @@ router
 
 
   module.exports = router;
+
 

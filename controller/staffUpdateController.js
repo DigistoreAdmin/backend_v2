@@ -1,5 +1,8 @@
 const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 const cibilReports = require("../db/models/cibilreport");
+const azureStorage = require("azure-storage");
+const intoStream = require("into-stream");
 const definePancardUser = require("../db/models/pancard");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
@@ -126,6 +129,7 @@ const passportUpdate = catchAsync(async (req, res) => {
       return res
         .status(404)
         .json({ message: "Missing required field: mobileNumber" });
+
     }
 
     // Define passport model
@@ -176,6 +180,7 @@ const passportUpdate = catchAsync(async (req, res) => {
       .json({ message: "An error occurred", error: error.message });
   }
 });
+
 
 const updateInsuranceDetails = catchAsync(async (req, res) => {
   try {
@@ -503,4 +508,5 @@ const updatePanDetails = catchAsync(async (req, res) => {
 
 
 module.exports = { loanStatus, updatePanDetails, passportUpdate, updateInsuranceDetails };
+
 
