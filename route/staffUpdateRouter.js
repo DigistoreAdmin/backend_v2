@@ -1,10 +1,12 @@
 const express = require("express");
 
+
 const {
   loanStatus,
   updatePanDetails,
   passportUpdate,
-  updateBusBooking
+  updateBusBooking,
+  trainBookingUpdate
 } = require("../controller/staffUpdateController");
 
 
@@ -30,6 +32,8 @@ router
   .route("/passportUpdate")
   .put(verifyToken, verifyRefreshToken, passportUpdate);
 
+  router.route("/updateTrainBooking").put(verifyToken, verifyRefreshToken, trainBookingUpdate);  
 
-module.exports = router;
+
+  module.exports = router;
 

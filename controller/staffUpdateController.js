@@ -4,10 +4,13 @@ const definePancardUser = require("../db/models/pancard");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
+const trainBooking = require("../db/models/trainbooking");
+const { Op } = require("sequelize");
 const {
   AuthRegistrationsCredentialListMappingListInstance,
 } = require("twilio/lib/rest/api/v2010/account/sip/domain/authTypes/authTypeRegistrations/authRegistrationsCredentialListMapping");
 const definePassportDetails = require("../db/models/passport");
+
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -93,6 +96,7 @@ const loanStatus = catchAsync(async (req, res) => {
       });
     } else {
       res.status(400).json({ message: "Invalid status value" });
+
     }
   } catch (error) {
     console.log(error);
@@ -135,6 +139,7 @@ const passportUpdate = catchAsync(async (req, res) => {
 
     if (!passportRecord) {
       return res.status(404).json({ message: "Passport record not found" });
+
     }
 
     // Helper function to upload files (similar to loanStatus)
@@ -174,6 +179,14 @@ const passportUpdate = catchAsync(async (req, res) => {
 });
 
 
+const trainBookingUpdate = catchAsync(async (req, res) => {
+  try {
+    let status="inProgress"
+    const {
+      id,
+      phoneNumber,
+      amount
+
 const updateBusBooking = catchAsync(async (req, res) => {
   try {
     let status = "inProgress"
@@ -181,9 +194,26 @@ const updateBusBooking = catchAsync(async (req, res) => {
       id,
       phoneNumber,
       amount,
+
     } = req.body;
     console.log("req.body: ", req.body);
     const ticket = req?.files?.ticket;
+
+
+    if (!phoneNumber || !id) {
+      return res.status(400).json({ message: "Phone number and ID is required" });
+    }
+
+    const trainBookingUser = trainBooking;
+
+    const Data = await trainBookingUser.findOne({
+      where: { phoneNumber: phoneNumber,id:id },
+    });
+
+    if (!Data) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
 
     if (!phoneNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
@@ -222,6 +252,7 @@ const updatePanDetails = catchAsync(async (req, res) => {
     const finalStatus = status === "completed" ? "completed" : "inProgress";
 
 
+
     const uploadFile = async (file) => {
       if (file) {
         try {
@@ -241,6 +272,14 @@ const updatePanDetails = catchAsync(async (req, res) => {
       .split("-")
       .reverse()
       .join("");
+    const count = await trainBookingUser.count({
+      where: {
+        workId: {
+          [Op.like]: `${currentDate}TTB%`,
+        },
+      },
+    });
+    const workId = `${currentDate}TTB${(count + 1)
     const count = await BusBooking.count({
       where: {
         workId: {
@@ -253,6 +292,37 @@ const updatePanDetails = catchAsync(async (req, res) => {
       .padStart(3, "0")}`;
 
     const ticketUrl = await uploadFile(ticket);
+    let serviceCharge=0
+    let commissionToFranchise=0
+    let commissionToHeadOffice=0
+    
+    if(amount>100){
+      serviceCharge=100
+      commissionToFranchise=30
+      commissionToHeadOffice=70
+    }else{
+      serviceCharge=50
+      commissionToFranchise=20
+      commissionToHeadOffice=30
+    }
+   
+    let totalAmount=(parseInt(amount) + serviceCharge)
+
+    Data.workId = workId || Data.workId;
+    Data.status="completed"
+    Data.ticket = ticketUrl || Data.ticket;
+    Data.amount=amount || Data.amount
+    Data.serviceCharge=serviceCharge || Data.serviceCharge
+    Data.commissionToFranchise=commissionToFranchise || Data.commissionToFranchise
+    Data.commissionToHeadOffice=commissionToHeadOffice || Data.commissionToHeadOffice
+    Data.totalAmount=totalAmount || Data.totalAmount
+   
+
+    await Data.save();
+
+    return res.status(200).json({
+      message: `success`,
+      Data,
 
     let serviceCharge = 0
     let commissionToFranchise = 0
@@ -309,6 +379,7 @@ const updatePanDetails = catchAsync(async (req, res) => {
       .json({ message: "An error occurred", error: error.message });
   }
 });
+
 
 
 module.exports = { loanStatus, updatePanDetails, passportUpdate };
