@@ -69,6 +69,43 @@ module.exports = {
       completedOn:{
         type: Sequelize.DATE
       },
+      loanStatus: {
+        type: Sequelize.JSONB,
+        defaultValue: {
+          documentSubmittedToBank: false,
+          bankVerified: false,
+          bankApprovalOrReject: false,
+          loanDispersed: false,
+          commissionCredited: false
+        },
+      },
+      rejectReason: {
+        type: Sequelize.STRING
+      },
+      bankDetails: {
+        type: Sequelize.STRING
+      },
+      loanGivenByBank: {
+        type: Sequelize.BIGINT
+      },
+      doneBy: {
+        type: Sequelize.STRING
+      },
+      serviceCharge: {
+        type: Sequelize.INTEGER
+      },
+      commissionToFranchise: {
+        type: Sequelize.INTEGER
+      },
+      commissionToHO: {
+        type: Sequelize.INTEGER
+      },
+      otherPayments: {
+        type: Sequelize.STRING
+      },
+      otherDocumentsByStaff: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
