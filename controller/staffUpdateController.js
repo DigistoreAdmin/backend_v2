@@ -1,8 +1,13 @@
 const catchAsync = require("../utils/catchAsync");
 const cibilReports = require("../db/models/cibilreport");
+const definePancardUser = require("../db/models/pancard");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
+const {
+  AuthRegistrationsCredentialListMappingListInstance,
+} = require("twilio/lib/rest/api/v2010/account/sip/domain/authTypes/authTypeRegistrations/authRegistrationsCredentialListMapping");
+const definePassportDetails = require("../db/models/passport");
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -63,7 +68,6 @@ const loanStatus = catchAsync(async (req, res) => {
     }
 
     if (status === "approve" || status === "reject") {
-
       const uploadFile = async (file) => {
         if (file) {
           try {
@@ -87,12 +91,8 @@ const loanStatus = catchAsync(async (req, res) => {
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
         report,
       });
-
-    }
-    else {
-
+    } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
@@ -101,6 +101,78 @@ const loanStatus = catchAsync(async (req, res) => {
       .json({ message: "An error occurred", error: error.message });
   }
 });
+
+
+const passportUpdate = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, passportAppointmentDate, username, password } =
+      req.body;
+    const { passportFile } = req.files;
+
+
+    // if (!req.files) {
+    //   throw new AppError("Files not uploaded", 400);
+    // }
+
+    console.log("body:", req.body);
+    console.log("files:", req.files);
+
+    // Check for required fields
+    if (!mobileNumber) {
+      return res
+        .status(404)
+        .json({ message: "Missing required field: mobileNumber" });
+
+    }
+
+    // Define passport model
+    const passportDetails = definePassportDetails();
+
+    // Find the passport record by mobile number
+    const passportRecord = await passportDetails.findOne({
+      where: { mobileNumber },
+    });
+
+    if (!passportRecord) {
+      return res.status(404).json({ message: "Passport record not found" });
+    }
+
+    // Helper function to upload files (similar to loanStatus)
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          return null;
+        }
+      }
+    };
+
+    const passportFileUrl = await uploadFile(passportFile);
+
+    passportAppointmentDate
+      ? (passportRecord.passportAppointmentDate = passportAppointmentDate)
+      : null;
+
+    username ? (passportRecord.username = username) : null;
+    password ? (passportRecord.password = password) : null;
+    passportFileUrl ? (passportRecord.passportFile = passportFileUrl) : null;
+
+    await passportRecord.save();
+
+    res.status(200).json({
+      message: "Passport details updated successfully",
+      passportRecord,
+    });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+
 
 const updateBusBooking = catchAsync(async (req, res) => {
   try {
@@ -125,6 +197,31 @@ const updateBusBooking = catchAsync(async (req, res) => {
       return res.status(404).json({ message: "No data found" });
     }
 
+
+const updatePanDetails = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, status, acknowledgementNumber, reason, ePan } =
+      req.body;
+    console.log("req.body: ", req.body);
+    const acknowledgementFile = req?.files?.acknowledgementFile;
+
+    if (!mobileNumber) {
+      return res.status(400).json({ message: "Mobile number is required" });
+    }
+
+    const pancardUser = definePancardUser();
+
+    const report = await pancardUser.findOne({
+      where: { mobileNumber: mobileNumber },
+    });
+
+    if (!report) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    const finalStatus = status === "completed" ? "completed" : "inProgress";
+
+
     const uploadFile = async (file) => {
       if (file) {
         try {
@@ -136,6 +233,7 @@ const updateBusBooking = catchAsync(async (req, res) => {
       }
       return null;
     };
+
 
     const currentDate = new Date()
       .toISOString()
@@ -186,6 +284,23 @@ const updateBusBooking = catchAsync(async (req, res) => {
     return res.status(200).json({
       message: "success",
       data,
+
+    const acknowledgementFileUrl = await uploadFile(acknowledgementFile);
+
+    report.status = finalStatus;
+    report.acknowledgementFile =
+      acknowledgementFileUrl || report.acknowledgementFile;
+    report.acknowledgementNumber =
+      acknowledgementNumber || report.acknowledgementNumber;
+    report.reason = reason || report.reason;
+    report.ePan = ePan || report.ePan;
+
+    await report.save();
+
+    return res.status(200).json({
+      message: `success`,
+      report,
+
     });
   } catch (error) {
     console.error(error);
@@ -195,4 +310,6 @@ const updateBusBooking = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { loanStatus, updateBusBooking };
+
+module.exports = { loanStatus, updatePanDetails, passportUpdate };
+
