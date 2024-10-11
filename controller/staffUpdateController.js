@@ -126,7 +126,6 @@ const passportUpdate = catchAsync(async (req, res) => {
       return res
         .status(404)
         .json({ message: "Missing required field: mobileNumber" });
-
     }
 
     // Define passport model
@@ -177,6 +176,27 @@ const passportUpdate = catchAsync(async (req, res) => {
       .json({ message: "An error occurred", error: error.message });
   }
 });
+
+const updateInsuranceDetails = catchAsync(async (req, res) => {
+  try {
+    const {
+      mobileNumber,
+      id,
+      status,
+      companyName,
+      throughWhom,
+      odPremiumAmount,
+      tpPremiumAmount,
+      odPoint,
+      tpPoint,
+      isPaRequired,
+      paCoverPoint,
+      paCoverAmount,
+    } = req.body;
+
+    const policyDocument = req?.files?.policyDocument;
+
+    // Validate required fields
 
 const updateGstDetails = catchAsync(async (req, res) => {
   try {
@@ -241,9 +261,23 @@ const updatePanDetails = catchAsync(async (req, res) => {
     const acknowledgementFile = req?.files?.acknowledgementFile;
 
 
+
     if (!mobileNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
     }
+
+
+    const insurance = defineVehicleInsurance();
+    const data = await insurance.findOne({ where: { mobileNumber, id } });
+
+    if (!data) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    // Determine final status
+    const finalStatus = status === "completed" ? "completed" : "inProgress";
+
+    // Upload file and handle errors
 
     const gstDetails = gstRegistrationDetails();
 
@@ -265,7 +299,6 @@ const updatePanDetails = catchAsync(async (req, res) => {
 
     const finalStatus = status === "completed" ? "completed" : "inProgress";
 
-
     const uploadFile = async (file) => {
       if (file) {
         try {
@@ -277,6 +310,48 @@ const updatePanDetails = catchAsync(async (req, res) => {
       }
       return null;
     };
+
+    const acknowledgementFileUrl = await uploadFile(policyDocument);
+
+    // Calculate commission
+    let commission = 0;
+
+    if (isPaRequired === "true") {
+      commission += (paCoverAmount * paCoverPoint) / 100;
+    }
+
+    if (data.insuranceType === "thirdParty") {
+      commission += (tpPremiumAmount * tpPoint) / 100;
+    } else if (data.insuranceType === "standAlone") {
+      commission += (odPremiumAmount * odPoint) / 100;
+    } else if (
+      data.insuranceType === "bumberToBumber" ||
+      data.insuranceType === "fullCover"
+    ) {
+      commission +=
+        (odPremiumAmount * odPoint) / 100 + (tpPremiumAmount * tpPoint) / 100;
+    }
+
+    const commissionToFranchise = commission * 0.2;
+    const commissionToHeadOffice = commission * 0.8;
+
+    Object.assign(data, {
+      status: finalStatus,
+      companyName: companyName || data.companyName,
+      throughWhom: throughWhom || data.throughWhom,
+      commissionToFranchise:
+        commissionToFranchise || data.commissionToFranchise,
+      commissionToHeadOffice:
+        commissionToHeadOffice || data.commissionToHeadOffice,
+      acknowledgementFileUrl:
+        acknowledgementFileUrl || data.acknowledgementFileUrl,
+      odPremiumAmount: odPremiumAmount || data.odPremiumAmount,
+      tpPremiumAmount: tpPremiumAmount || data.tpPremiumAmount,
+      odPoint: odPoint || data.odPoint,
+      tpPoint: tpPoint || data.tpPoint,
+      paCoverPoint: paCoverPoint || data.paCoverPoint,
+      paCoverAmount: paCoverAmount || data.paCoverAmount,
+    });
 
 
     const gstDocumentUrl = await uploadFile(gstDocument);
@@ -379,10 +454,22 @@ const updatePanDetails = catchAsync(async (req, res) => {
     data.commissionToFranchise = commissionToFranchise || data.commissionToFranchise
     data.commissionToHO = commissionToHO || data.commissionToHO
     data.totalAmount = totalAmount || data.totalAmount
-
     await data.save();
 
     return res.status(200).json({
+      message: "Success",
+      data,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "An error occurred",
+      error: error.message,
+    });
+  }
+});
+
+
       message: `success`,
       data,
       message: "success",
@@ -415,4 +502,5 @@ const updatePanDetails = catchAsync(async (req, res) => {
 
 
 
-module.exports = { loanStatus, updatePanDetails, passportUpdate };
+module.exports = { loanStatus, updatePanDetails, passportUpdate, updateInsuranceDetails };
+
