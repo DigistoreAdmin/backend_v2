@@ -93,6 +93,19 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
   }
 });
 
+const getFranchise = catchAsync(async (req, res) => {
+  const { franchiseUniqueId } = req.query;
+  const Data = await Franchise.findOne({where: {franchiseUniqueId} });
+
+  if(!Data) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  return res.status(200).json({ succes: "success", data: Data });
+});
+
 const updateStaffDetails = catchAsync(async (req, res, next) => {
   try {
     const {
@@ -225,6 +238,21 @@ const getAllStaff = catchAsync(async (req, res, next) => {
     if (filters.phoneNumber) {
       where.phoneNumber = filters.phoneNumber;
     }
+    if (filters.gender) {
+      where.gender = filters.gender;
+    }
+    if (filters.employment) {
+      where.employment = filters.employment;
+    }
+    if (filters.employmentType) {
+      where.employmentType = filters.employmentType;
+    }
+    if (filters.district) {
+      where.district = filters.district;
+    }
+    if (filters.bloodGroup) {
+      where.bloodGroup = { [Op.iLike]: `${filters.bloodGroup.trim()}%` }; // Using Sequelize's iLike operator with wildcard
+    }
   }
   console.log("where", where);
   const phoneNumber = parseFloat(search);
@@ -284,5 +312,9 @@ const getAllStaff = catchAsync(async (req, res, next) => {
   }
 });
 
-module.exports = { getAllFranchises, updateStaffDetails, getAllStaff };
-
+module.exports = {
+  getAllFranchises,
+  getFranchise,
+  updateStaffDetails,
+  getAllStaff,
+};
