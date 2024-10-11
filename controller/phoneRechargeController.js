@@ -88,7 +88,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
 
     let newBalance =
       walletData.balance - response.data.amount + franciseCommissionAmount;
-
+      newBalance = Math.round(newBalance * 100) / 100;
     console.log("newBalance", newBalance);
 
     const updated = await Wallet.update(
@@ -103,7 +103,9 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       uniqueId: Data.franchiseUniqueId,
       userName: Data.franchiseName,
       userType: user.userType,
-      service: serr,
+      service: result.rechargeType,
+      customerNumber:phoneNumber,
+      serviceProvider:result.serviceProvider,
       status: "success",
       amount: amount,
       franchiseCommission: franciseCommissionAmount,
@@ -111,7 +113,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       walletBalance: newBalance,
     });
 
-    console.log("transatin History checking working fine", transatinH);
+    // console.log("transatin History checking working fine", transatinH);
 
     if (updated && transatinH) {
       return res
@@ -139,7 +141,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
 
     let newBalance =
       walletData.balance - response.data.amount + franciseCommissionAmount;
-
+      newBalance = Math.round(newBalance * 100) / 100;
     console.log("newBalance", newBalance);
 
     const updated = await Wallet.update(
@@ -154,7 +156,9 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       uniqueId: Data.franchiseUniqueId,
       userName: Data.franchiseName,
       userType: user.userType,
-      service: serr,
+      service: result.rechargeType,
+      customerNumber:phoneNumber,
+      serviceProvider:result.serviceProvider,
       status: "pending",
       amount: amount,
       franchiseCommission: franciseCommissionAmount,
@@ -165,27 +169,34 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
     if (updated && transatinH) {
       return res
         .status(200)
-        .json({ data: response.data, message: "recharge Processing" });
+        .json({ data: response.data, message: "Recharge Processing" });
     }
     } 
    else 
    {
     //
+    if (!response.data.rpid) {
+      return res
+        .status(400)
+        .json({ error: response.data, message: "Try Again Later" });
+    }
      const serr = `Mobile Recharge Number:${phoneNumber} sim:${result.serviceProvider}`;
     const transatinH = await transationHistory.create({
       transactionId: response.data.rpid,
       uniqueId: Data.franchiseUniqueId,
       userName: Data.franchiseName,
       userType: user.userType,
-      service: serr,
       status: "fail",
+      service: result.rechargeType,
+      customerNumber:phoneNumber,
+      serviceProvider:result.serviceProvider,
       amount: amount,
       walletBalance: walletData.balance,
     });
     if (transatinH) {
       return res
         .status(400)
-        .json({ error: response.data, message: "Operation failed" });
+        .json({ error: response.data, message: "Something Went Wrong" });
     }
   }
 });
@@ -215,7 +226,9 @@ const callBackUrl = catchAsync(async (req, res, next) => {
     console.log("uniqueId",data.uniqueId);
     // d = data.uniqueId
     const amount = await Wallet.findOne({ where: { uniqueId:data.uniqueId } })
-    let newBalance = AMOUNT + amount.balance - data.franchiseCommission
+    // let newBalance = AMOUNT + amount.balance - data.franchiseCommission
+    let newBalance = Number(AMOUNT) + Number(amount.balance) - Number(data.franchiseCommission);
+    newBalance = Math.round(newBalance * 100) / 100;
     const update = await transationHistory.update({ status:"fail", amount: AMOUNT,adminCommission: 0.00, franchiseCommission: 0.00, walletBalance: newBalance  },{where:{transactionId:TRANID}})
     console.log("121",update);
     console.log("newBalance",newBalance);

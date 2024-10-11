@@ -52,6 +52,7 @@ const getPancardDetails = async (req, res) => {
       where = { panType: pantype };
     }
 
+
     const PancardUser = panCardUsers();
 
     const data = await PancardUser.findAndCountAll({

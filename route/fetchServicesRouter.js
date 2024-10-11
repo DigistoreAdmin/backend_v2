@@ -4,6 +4,7 @@ const {
   getPancardDetails,
   fetchPassport,
   fetchKswift,
+  fetchStaffs,
   getBusBookings,
   getFssaiRegistrations,
   getFssaiLicence,

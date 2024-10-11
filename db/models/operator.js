@@ -28,9 +28,9 @@ const operators = sequelize.define(
       allowNull: false,
     },
     rechargeType: {
-      type: DataTypes.ENUM("prepaid", "postpaid","Dth","Electricity","Water","Fastag","Landline"),
+      type: DataTypes.ENUM("Prepaid", "Postpaid","Dth","Electricity","Water","Fastag","Landline"),
       allowNull: false,
-      defaultValue:"prepaid"
+      defaultValue:"Prepaid"
     },
     createdAt: {
       allowNull: false,
