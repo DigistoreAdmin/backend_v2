@@ -15,7 +15,7 @@ module.exports = {
         type:Sequelize.STRING,
       },
       status:{
-        type: Sequelize.ENUM('inQueue','inProgress','completed'),
+        type: Sequelize.ENUM('inQueue','inProgress','completed',"onHold","reject"),
         default:'inQueue',
       },
       assignedId:{
@@ -116,7 +116,22 @@ module.exports = {
       nriAddress: {
         type: Sequelize.STRING,
       },
-
+      acknowledgementNumber:{
+        type: Sequelize.INTEGER,
+        allowNull:true
+      },
+      acknowledgementFile:{
+        type: Sequelize.STRING,
+        allowNull:true
+      },
+      reason:{
+        type: Sequelize.STRING,
+        allowNull:true
+      },
+      ePan:{
+        type: Sequelize.ENUM("received","notReceived"),
+        allowNull:true
+      },
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,

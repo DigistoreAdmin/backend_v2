@@ -3,9 +3,26 @@ const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../../config/database");
 const bcrypt = require("bcrypt");
 
-const defineStaffsDetails = (employmentType, isTrainingRequired) => {
+const defineStaffsDetails = (
+  employmentType,
+  isTrainingRequired,
+  laptop,
+  idCard,
+  sim,
+  phone,
+  vistingCard,
+  posterOrBroucher,
+  other
+) => {
   const firstPart = "DSP";
   const type = employmentType === "fieldExecutive" ? false : true;
+  const laptopStatus = laptop !== "true";
+  const idCardStatus = idCard !== "true";
+  const simStatus = sim !== "true";
+  const phoneStatus = phone !== "true";
+  const vistingCardStatus = vistingCard !== "true";
+  const posterOrBroucherStatus = posterOrBroucher !== "true";
+  const otherStatus = other !== "true";
   const training = isTrainingRequired === "true" ? false : true;
   const staffDetails = sequelize.define(
     "staffs",
@@ -18,14 +35,6 @@ const defineStaffsDetails = (employmentType, isTrainingRequired) => {
         type: DataTypes.ENUM("staff"),
         defaultValue: "staff",
         allowNull: false,
-        validate: {
-          notNull: {
-            msg: "userType cannot be null",
-          },
-          notEmpty: {
-            msg: "userType cannot be empty",
-          },
-        },
       },
       password: {
         type: DataTypes.STRING,
@@ -67,7 +76,7 @@ const defineStaffsDetails = (employmentType, isTrainingRequired) => {
           },
         },
       },
-      emailId: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -289,6 +298,19 @@ const defineStaffsDetails = (employmentType, isTrainingRequired) => {
           },
         },
       },
+
+      branchName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "Branch name cannot be null",
+          },
+          notEmpty: {
+            msg: "Branch name cannot be empty",
+          },
+        },
+      },
       ifscCode: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -301,15 +323,15 @@ const defineStaffsDetails = (employmentType, isTrainingRequired) => {
           },
         },
       },
-      accountHolderName: {
+      accountName: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: "AccountHolderName cannot be null",
+            msg: "AccountName cannot be null",
           },
           notEmpty: {
-            msg: "AccountHolderName cannot be empty",
+            msg: "AccountName cannot be empty",
           },
         },
       },
@@ -326,36 +348,64 @@ const defineStaffsDetails = (employmentType, isTrainingRequired) => {
         },
       },
       laptop: {
-        type: DataTypes.STRING,
-        allowNull: null,
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
       },
       idCard: {
-        type: DataTypes.STRING,
-        allowNull: null,
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
       },
       sim: {
-        type: DataTypes.STRING,
-        allowNull: null,
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
       },
       phone: {
-        type: DataTypes.STRING,
-        allowNull: null,
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
       },
       vistingCard: {
-        type: DataTypes.STRING,
-        allowNull: null,
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
       },
       posterOrBroucher: {
-        type: DataTypes.STRING,
-        allowNull: null,
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
       },
       other: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
+      laptopDetails: {
         type: DataTypes.STRING,
-        allowNull: type,
+        allowNull: laptopStatus,
+      },
+      idCardDetails: {
+        type: DataTypes.STRING,
+        allowNull: idCardStatus,
+      },
+      phoneDetails: {
+        type: DataTypes.STRING,
+        allowNull: phoneStatus,
+      },
+      simDetails: {
+        type: DataTypes.STRING,
+        allowNull: simStatus,
+      },
+      vistingCardDetails: {
+        type: DataTypes.STRING,
+        allowNull: vistingCardStatus,
+      },
+      posterOrBroucherDetails: {
+        type: DataTypes.STRING,
+        allowNull: posterOrBroucherStatus,
+      },
+      otherDetails: {
+        type: DataTypes.STRING,
+        allowNull: otherStatus,
       },
       remarks: {
         type: DataTypes.STRING,
-        allowNull: type,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,
@@ -376,11 +426,6 @@ const defineStaffsDetails = (employmentType, isTrainingRequired) => {
       hooks: {
         beforeCreate: async (staff, options) => {
           const lastEmployee = await staffDetails.findOne({
-            where: {
-              district: staff.district,
-              employment: staff.employment,
-              employmentType: staff.employmentType,
-            },
             order: [["employeeId", "DESC"]],
           });
 
@@ -398,9 +443,7 @@ const defineStaffsDetails = (employmentType, isTrainingRequired) => {
           let newId;
           if (lastEmployee) {
             const lastId = lastEmployee.employeeId;
-
             const numberPart = parseInt(lastId.slice(-3), 10) + 1;
-
             newId = `${firstPart}${employmentCodes[staff.employment]}${
               employmentTypeCodes[staff.employmentType]
             }${String(numberPart).padStart(3, "0")}`;
