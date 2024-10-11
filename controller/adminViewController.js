@@ -11,6 +11,8 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
   const { sort, filter, search, page, pageLimit } = req.query;
   console.log(req.query);
   const order = sort ? [[sort, "DESC"]] : [];
+  //   console.log("Sort:", sort);
+  //   console.log("Order:", order);
   const where = {};
   if (filter) {
     const filters = JSON.parse(filter);

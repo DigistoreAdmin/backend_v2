@@ -51,6 +51,7 @@ const contactRoute = require("../route/contactRoute")
 
 const router = express.Router();
 
+
 router.use("/v1/auth", authRouter);
 router.use("/v1/projects", projectRouter);
 router.use("/v1/users", userRouter);

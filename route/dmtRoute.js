@@ -35,12 +35,12 @@ router.route("/DMTremitAPI").post(verifyToken,verifyRefreshToken,externalService
 router.route("/DMTneftAPI").post(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTneftAPI);
 
 router.route("/DMTaccountVerification").post(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTaccountVerification);
-router.route("/DMTcheckWalletBalanceAPI").get(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTcheckWalletBalanceAPI); ///issue in this 
+router.route("/DMTcheckWalletBalanceAPI").get(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTcheckWalletBalanceAPI);  
 router.route("/DMTtranscationStatusCheckAPI").post(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTtranscationStatusCheckAPI);
 
 router.route("/DMTfetchBankList").post(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTfetchBankList);
-router.route("/DMTcallBackUrl").post(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTcallBackUrl); ///issue in this 
-router.route("/DMTbankDownApi").get(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTbankDownApi); ///issue in this
+router.route("/DMTcallBackUrl").post(DMTcallBackUrl); ///issue in this 
+router.route("/DMTbankDownApi").get(verifyToken,verifyRefreshToken,externalServiceAuthMiddleware,DMTbankDownApi); 
 
 
 

@@ -269,6 +269,9 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
   if (body.amount < 100) {
     return next(new AppError("Minimum Transation Amount Is RS.100", 401));
   }
+  if (body.amount >= 5000) {
+    return next(new AppError("Maximum Transation Amount Is RS.5000", 401));
+  }
   const calculation = calculateTransactionShares(body.amount);
   console.log("calculation", calculation);
   console.log("calculation transactionAmounts", calculation.transactionAmounts);
@@ -312,26 +315,18 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
       )
     );
   }
-  //dmt balance
-  //bank down check
-  const logArray = [];
-  for (let index = 1; index <= calculation.count; index++) {
-    if (calculation.remainingAmount != null) {
-      AMT = index == calculation.count ? calculation.remainingAmount : 5000;
-    } else {
-      AMT = body.amount;
-    }
+
     const random12DigitNumber =  generateRandomNumber15();
     raNo = `10174${random12DigitNumber}`;
     console.log("rrrrrrrrrr", raNo);
-    try {
+    
       const response = await axios.post(
         "https://services.bankit.in:8443/DMR/transact/IMPS/v1/remit/?",
         {
           agentCode: ra,
           recipientId: body.recipientId,
           customerId: body.phoneNumber,
-          amount: AMT,
+          amount: body.amount,
           clientRefId: raNo,
         },
         {
@@ -347,55 +342,17 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
 
       const requestData = JSON.parse(response.config.data);
       console.log("response.amount ", requestData.amount);
+      const AMT = requestData.amount
       console.log("response.customerId", response.data.data.customerId);
 
-      response.data.errorMsg == "Success"
-        ? logArray.push({
-            dmtTransationId: response.data.data.clientRefId,
-            errorMsg: response.data.errorMsg,
-            amount: AMT,
-            customerId: response.data.data.customerId,
-            success: response.data.errorMsg === "Success", // Assuming "SUCCESS" is the success message
-          })
-        : logArray.push({
-            dmtTransationId: response.data.data.clientRefId,
-            errorMsg: response.data.errorMsg,
-            amount: AMT,
-            customerId: body.phoneNumber,
-            success: false,
-          });
-    } catch (error) {
-      console.error("Error:", error.message);
-    }
-  }
-  let successCount = 0;let failureCount = 0;let successAmount = 0;let failureAmount = 0;let successIds = [];let failureIds = [];
 
-  logArray.forEach((log) => {
-    if (log.success) {
-      successCount++;
-      successAmount += log.amount;
-      successIds.push(log.dmtTransationId);
-    } else {
-      failureCount++;
-      failureAmount += log.amount;
-      failureIds.push(log.dmtTransationId);
-    }
-  });
-  console.log("Success Count:", successCount);
-  console.log("Failure Count:", failureCount);
-  console.log("Total Success Amount:", successAmount);
-  console.log("Total Failure Amount:", failureAmount);
-  console.log(`Success Transaction IDs: ${successIds.join(", ")}`);
-  console.log(`Failure Transaction IDs: ${failureIds.join(", ")}`);
-
-  // if (response.data.errorMsg == Success && response.data.errorCode == "00" ) {
-
-  if (successAmount > 0 || failureAmount > 0) {
-    const cal = calculateTransactionShares(successAmount);
-    let newBalance = walletData.balance - successAmount - cal.serviceCharge + cal.totalFranchiseShare;
+  if (AMT > 0 && (response.data.errorMsg === "Success" && response.data.errorCode === "00") || response.data.errorMsg === "Pending") {
+    const cal = calculateTransactionShares(AMT);
+    let newBalance = walletData.balance - AMT - cal.serviceCharge + cal.totalFranchiseShare;
+    newBalance = Math.round(newBalance * 100) / 100;
 
     console.log("walletData.balance", walletData.balance);
-    console.log("successAmount", successAmount);
+    console.log("AMT", AMT);
     console.log("cal.serviceCharge", cal.serviceCharge);
     console.log("cal.totalFranchiseShare", cal.totalFranchiseShare);
     console.log("newBalance", newBalance);
@@ -403,29 +360,44 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
     const updated = await Wallet.update({ balance: newBalance },{ where: { uniqueId: Data.franchiseUniqueId } });
     console.log("updatedBalance", updated);
 
-    const random12DigitNumber = generateRandomNumber();
-    let DSP = `DSP${random12DigitNumber}${Data.id}`;
-    console.log("DSP", DSP);
-
-    const serr = `DMT coustomerNo.${body.phoneNumber} SuccessAmount:${successAmount} FailedAmount:${failureAmount} Total Amount try to send:${body.amount}`;
+   
+    const serr = `DMT coustomerNo.${body.phoneNumber} , Total Amount send:${AMT}`;
     // const serr = `DMT successA sim:${result.serviceProvider}`;
     const transatinH = await transationHistory.create({
-      transactionId: DSP,
+      transactionId: response.data.data.clientRefId,
       uniqueId: Data.franchiseUniqueId,
       userName: Data.franchiseName,
       userType: user.userType,
-      service: serr,
-      status: successAmount == 0 ? "fail" : "success",
-      amount: successAmount == 0 ? failureAmount : successAmount,
+      service: "DMT",
+      customerNumber:body.phoneNumber,
+      serviceProvider:"BANKIT",
+      status: response.data.errorMsg = "Success" ? "success": "pending",
+      amount: AMT,
       franchiseCommission: cal.totalFranchiseShare,
       adminCommission: cal.totalAdminShare,
       walletBalance: newBalance,
     });
     console.log("transatinH", transatinH);
-    return res.status(200).json({successAmount,failureAmount,successCount,failureCount,});
+    return res.status(200).json({AMT,message : "success"});
   } else {
-    console.log("fail");
-    new AppError("operation failed", 401);
+    const serr = `DMT coustomerNo.${body.phoneNumber} , Total Amount failed:${AMT}`;
+   
+    const transatinH = await transationHistory.create({
+      transactionId: response.data.data.clientRefId,
+      uniqueId: Data.franchiseUniqueId,
+      userName: Data.franchiseName,
+      userType: user.userType,
+      service: "DMT",
+      customerNumber:body.phoneNumber,
+      serviceProvider:"BANKIT",
+      status: "fail",
+      amount: AMT,
+      franchiseCommission: 0.00,
+      adminCommission: 0.00,
+      walletBalance: walletData.balance,
+    });
+    console.log("transatinH", transatinH);
+    return res.status(200).json({AMT,message :  "fail"});
   }
 });
 
@@ -565,12 +537,40 @@ const DMTfetchBankList = catchAsync(async (req, res, next) => {
 
 const DMTcallBackUrl = catchAsync(async (req, res, next) => {
   ///issue in this
+  const { ClientRefID,Status,BankRefNo} = req.query;
+
+  // Log all the parameters
+  console.log("ClientRefID:", ClientRefID);
+  console.log("Status:", Status);
+  console.log("BankRefNo:", BankRefNo);
+  
   const credentials = req.externalServiceData;
-  const body = req.body;
-  const response = await axios.post(
-    `https://xyz.com?ClientRefID=${body.ClientRefID}&Status=${body.Status}&BankRefNo=${body.BankRefNo}`
-  );
-  console.log("res", response);
+  const data = await transationHistory.findOne({ where: { transactionId:ClientRefID } });
+  console.log("data:", data);
+  console.log("data.status:", data.status);//
+
+  if (data.status == "pending" && Status == "Success") {
+    const update = await transationHistory.update({ status:"success" },{where:{transactionId:ClientRefID}})
+    console.log("121",update);
+    
+  }else if (data.status=="pending" && Status=="Failure") {
+    console.log("uniqueId",data.uniqueId);
+    // d = data.uniqueId
+    const amount = await Wallet.findOne({ where: { uniqueId:data.uniqueId } })
+    // let newBalance = data.amount + amount.balance - data.franchiseCommission
+    let newBalance = Number(data.amount) + Number(amount.balance) - Number(data.franchiseCommission);
+    newBalance = Math.round(newBalance * 100) / 100;
+    const update = await transationHistory.update({ status:"fail", amount: data.amount,adminCommission: 0.00, franchiseCommission: 0.00, walletBalance: newBalance  },{where:{transactionId:ClientRefID}})
+    console.log("121",update);
+    console.log("newBalance",newBalance);
+    
+    const updated = await Wallet.update(
+      { balance: newBalance },
+      { where: {uniqueId:data.uniqueId} }
+    );
+    console.log(updated);
+    
+  }
 });
 
 const DMTbankDownApi = catchAsync(async (req, res, next) => {

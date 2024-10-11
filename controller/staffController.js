@@ -54,12 +54,12 @@ const createStaffs = catchAsync(async (req, res, next) => {
   const transaction = await sequelize.transaction();
 
   try {
-    const numberExist = await user.findOne({
-      where: { phoneNumber: phoneNumber },
+    const mobileNumber = await user.findOne({
+      where: { phoneNumber },
       transaction,
     });
 
-    if (numberExist) {
+    if (mobileNumber) {
       await transaction.rollback();
       return res
         .status(400)
@@ -102,6 +102,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     );
 
     const employeeId = "";
+
     const newStaff = await staffs.create(
       {
         userType: "staff",

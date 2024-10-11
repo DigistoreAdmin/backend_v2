@@ -47,6 +47,8 @@ const fetchBill = catchAsync(async (req, res, next) => {
 const billPaymentRequest = catchAsync(async (req, res, next) => {
   const { fetchBillID, amount, SPKey, phoneNumber, accountNo } = req.body;
   const user = req.user;
+  console.log("fetchBillID",fetchBillID);
+  
 
   const Data = await Franchise.findOne({ where: { email: user.email } });
 
@@ -76,7 +78,10 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
   console.log("ra", random12DigitNumber);
 
   const response = await axios.get(
-    `https://www.livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=${amount}&SPKey=${SPKey}&APIRequestID=${random12DigitNumber}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=18.4099808,76.5834877&CustomerNumber=${phoneNumber}&Pincode=691536&FetchBillID=${fetchBillID}&Format=1&OutletID=12345`
+    fetchBillID != 0 
+    ? `https://www.livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=${amount}&SPKey=${SPKey}&APIRequestID=${random12DigitNumber}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=18.4099808,76.5834877&CustomerNumber=${phoneNumber}&Pincode=691536&FetchBillID=${fetchBillID}&Format=1&OutletID=12345`
+    : `https://www.livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=${amount}&SPKey=${SPKey}&APIRequestID=${random12DigitNumber}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=18.4099808,76.5834877&CustomerNumber=${phoneNumber}&Pincode=691536&Format=1`
+
   );
   console.log("res", response);
   if (
@@ -105,6 +110,7 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
   
       let newBalance =
         walletData.balance - response.data.amount + franciseCommissionAmount;
+        newBalance = Math.round(newBalance * 100) / 100;
         console.log("newBalance", newBalance);
         
         const updated = await Wallet.update(
@@ -115,11 +121,13 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
         const serr = `Recharge Number or Id:${phoneNumber} serviceProvider:${result.serviceProvider}`;
 
         const transatinH = await transationHistory.create({
-          transactionId: DSP,
+          transactionId: response.data.rpid,
           uniqueId: Data.franchiseUniqueId,
           userName: Data.franchiseName,
           userType: user.userType,
-          service: serr,
+          service: result.rechargeType,
+          customerNumber:accountNo,
+          serviceProvider:result.serviceProvider,
           status: "success",
           amount: amount,
           franchiseCommission: franciseCommissionAmount,
@@ -136,7 +144,15 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
     }else{
         // const franciseCommissionAmount = 0.00
         // const adminCommissionAmount = 0.00
+        const totalCommissionAmount =
+        result.commissionType === "percentage"
+          ? (response.data.amount * result.commission) / 100
+          : result.commission;
+  
+      console.log("toralCommittion", totalCommissionAmount);
+
       let newBalance = walletData.balance - response.data.amount
+      newBalance = Math.round(newBalance * 100) / 100;
       const updated = await Wallet.update(
         { balance: newBalance },
         { where: { uniqueId: Data.franchiseUniqueId } }
@@ -146,15 +162,17 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
       const serr = `Recharge Number or Id:${phoneNumber} serviceProvider:${result.serviceProvider}`;
 
       const transatinH = await transationHistory.create({
-        transactionId: DSP,
+        transactionId: response.data.rpid,
         uniqueId: Data.franchiseUniqueId,
         userName: Data.franchiseName,
         userType: user.userType,
-        service: serr,
+        service: result.rechargeType,
+        customerNumber:accountNo,
+        serviceProvider:result.serviceProvider,
         status: "success",
         amount: amount,
         // franchiseCommission: franciseCommissionAmount,
-        // adminCommission: adminCommissionAmount,
+        adminCommission: totalCommissionAmount,
         walletBalance: newBalance,
       });
   
@@ -167,13 +185,20 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
       //
 
   } else {
+    if (!response.data.rpid) {
+      return res
+        .status(400)
+        .json({ error: response.data, message: "Try Again Later" });
+    }
     const serr = `Recharge Number or Id:${phoneNumber} serviceProvider:${result.serviceProvider}`;
     const transatinH = await transationHistory.create({
-      transactionId: DSP,
+      transactionId: response.data.rpid,
       uniqueId: Data.franchiseUniqueId,
       userName: Data.franchiseName,
       userType: user.userType,
-      service: serr,
+      service: result.rechargeType,
+      customerNumber:accountNo,
+      serviceProvider:result.serviceProvider,
       status: "fail",
       amount: amount,
       // franchiseCommission: franciseCommissionAmount,
@@ -183,7 +208,7 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
     if (transatinH) {
       return res
       .status(400)
-      .json({ success: false, message: "Operation failed" });
+      .json({ success: false, message: response.data.msg });
     }
     
   }
