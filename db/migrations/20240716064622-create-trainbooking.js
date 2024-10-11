@@ -42,6 +42,27 @@ module.exports = {
       status: {
         type: Sequelize.ENUM("inQueue","inProgress","completed")
       },
+      workId:{
+        type: Sequelize.STRING
+      },
+      ticket:{
+        type: Sequelize.STRING
+      },
+      amount:{
+        type: Sequelize.INTEGER
+      },
+      serviceCharge:{
+        type: Sequelize.INTEGER
+      },
+      commissionToFranchise:{
+        type: Sequelize.INTEGER
+      },
+      commissionToHeadOffice:{
+        type: Sequelize.INTEGER
+      },
+      totalAmount:{
+        type: Sequelize.INTEGER
+      },
       assignedId: {
         type: Sequelize.STRING
       },

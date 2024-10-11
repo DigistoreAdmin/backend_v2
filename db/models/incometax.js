@@ -2,7 +2,6 @@
 const bcrypt = require("bcrypt");
 const { DataTypes, Op } = require("sequelize");
 const sequelize = require("../../config/database");
-
 const getCurrentDate = () => {
   const date = new Date();
   return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)

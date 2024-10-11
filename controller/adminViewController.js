@@ -6,32 +6,48 @@ const user = require("../db/models/user");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { Op } = require("sequelize");
+const crypto = require('crypto')
+
+
+const algorithm = "aes-192-cbc";  // AES-192-CBC encryption algorithm
+const secret = process.env.FRANCHISE_SECRET_KEY;  // Secret key from environment variables
+const key = crypto.scryptSync(secret, 'salt', 24);  // Derive a 24-byte key
+
+const decryptData = (encryptedData) => {
+  try {
+    // Ensure the encrypted data has the expected format with ':'
+    if (!encryptedData || !encryptedData.includes(':')) {
+      console.error('Invalid encrypted data format', encryptedData);
+      return null;  // Return null or some default if the format is wrong
+    }
+
+    const [ivHex, encryptedText] = encryptedData.split(':');
+    const iv = Buffer.from(ivHex, 'hex');
+    const decipher = crypto.createDecipheriv(algorithm, key, iv);
+    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+
+  } catch (error) {
+    console.error('Decryption error:', error);
+    return null;  // Return null if decryption fails
+  }
+};
 
 const getAllFranchises = catchAsync(async (req, res, next) => {
   const { sort, filter, search, page, pageLimit } = req.query;
-  console.log(req.query);
   const order = sort ? [[sort, "DESC"]] : [];
   const where = {};
+
   if (filter) {
     const filters = JSON.parse(filter);
-    if (filters.ownerName) {
-      where.ownerName = filters.ownerName;
-    }
-    if (filters.franchiseName) {
-      where.franchiseName = filters.franchiseName;
-    }
-    if (filters.userPlan) {
-      where.userPlan = filters.userPlan;
-    }
-    if (filters.phoneNumber) {
-      where.phoneNumber = filters.phoneNumber;
-    }
-    if (filters.panCenter) {
-      where.panCenter = filters.panCenter;
-    }
-    if (filters.blocked) {
-      where.blocked = filters.blocked;
-    }
+    // Apply filters to the query
+    if (filters.ownerName) where.ownerName = filters.ownerName;
+    if (filters.franchiseName) where.franchiseName = filters.franchiseName;
+    if (filters.userPlan) where.userPlan = filters.userPlan;
+    if (filters.phoneNumber) where.phoneNumber = filters.phoneNumber;
+    if (filters.panCenter) where.panCenter = filters.panCenter;
+    if (filters.blocked) where.blocked = filters.blocked;
   }
 
   const phoneNumber = parseFloat(search);
@@ -40,7 +56,6 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
     where[Op.or] = [
       { ownerName: { [Op.iLike]: `%${search}%` } },
       { franchiseName: { [Op.iLike]: `%${search}%` } },
-      //   { phoneNumber: { [Op.iLike]: `%${search}%` } },
     ];
     if (!isNaN(phoneNumber)) {
       where[Op.or].push({ phoneNumber: { [Op.eq]: phoneNumber } });
@@ -48,12 +63,11 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
   }
 
   if (!page || !pageLimit) {
-    return res.status(400).json({ error: "page and pageSize are required" });
+    return res.status(400).json({ error: "page and pageLimit are required" });
   }
 
   const pageNumber = parseInt(page, 10);
   const pageLimitNumber = parseInt(pageLimit, 10);
-
   const limit = pageLimitNumber;
   const offset = (pageNumber - 1) * limit;
 
@@ -64,23 +78,22 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
       limit,
       offset,
     });
-    if (data.count === 0) {
-      return res
-        .status(404)
-        .json({ succes: "false", message: "No data to display" });
+
+    if (data.count === 0 || data.rows.length === 0) {
+      return res.status(404).json({ success: "false", message: "No data to display" });
     }
+
+    // Decrypt sensitive fields
     data.rows.forEach((row) => {
-      row.password = "";
+      if (row.panNumber) row.panNumber = decryptData(row.panNumber);
+      if (row.accountNumber) row.accountNumber = decryptData(row.accountNumber);
+      if (row.aadhaarNumber) row.aadhaarNumber = decryptData(row.aadhaarNumber);
+      row.password = "";  // Clear out password field if exists
     });
-    if (data.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ succes: "false", message: "No data to display" });
-    }
 
     return res.json({
       status: "success",
-      data: data,
+      data: data.rows,
       totalItems: data.count,
       totalPages: Math.ceil(data.count / limit),
       currentPage: pageNumber,
@@ -89,6 +102,20 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
     console.error("Error:", error);
     return next(new AppError(error.message, 500));
   }
+});
+
+
+const getFranchise = catchAsync(async (req, res) => {
+  const { franchiseUniqueId } = req.query;
+  const Data = await Franchise.findOne({where: {franchiseUniqueId} });
+
+  if(!Data) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+
+  return res.status(200).json({ succes: "success", data: Data });
 });
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {
@@ -297,5 +324,9 @@ const getAllStaff = catchAsync(async (req, res, next) => {
   }
 });
 
-module.exports = { getAllFranchises, updateStaffDetails, getAllStaff };
-
+module.exports = {
+  getAllFranchises,
+  getFranchise,
+  updateStaffDetails,
+  getAllStaff,
+};
