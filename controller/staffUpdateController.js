@@ -4,6 +4,7 @@ const definePancardUser = require("../db/models/pancard");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
+const gstRegistrationDetails = require("../db/models/gstregistration");
 const trainBooking = require("../db/models/trainbooking");
 const { Op } = require("sequelize");
 const {
@@ -59,14 +60,14 @@ const loanStatus = catchAsync(async (req, res) => {
 
     const cibilReportDetail = cibilReports();
 
-    const report = await cibilReportDetail.findOne({
+    const data = await cibilReportDetail.findOne({
       where: {
         customerName: customerName,
         mobileNumber: mobileNumber,
       },
     });
 
-    if (!report) {
+    if (!data) {
       return res.status(404).json({ message: "Record not found" });
     }
 
@@ -84,19 +85,18 @@ const loanStatus = catchAsync(async (req, res) => {
 
       const cibilReportUrl = await uploadFile(cibilReport);
 
-      report.status = status;
-      report.cibilReport = cibilReportUrl;
-      report.cibilScore = cibilScore;
+      data.status = status;
+      data.cibilReport = cibilReportUrl;
+      data.cibilScore = cibilScore;
 
-      await report.save();
+      await data.save();
 
       res.status(200).json({
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
-        report,
+        data,
       });
     } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
@@ -178,6 +178,11 @@ const passportUpdate = catchAsync(async (req, res) => {
   }
 });
 
+const updateGstDetails = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, status, applicationReferenceNumber, id } = req.body;
+    const gstDocument = req?.files?.gstDocument;
+
 
 const trainBookingUpdate = catchAsync(async (req, res) => {
   try {
@@ -235,9 +240,18 @@ const updatePanDetails = catchAsync(async (req, res) => {
     console.log("req.body: ", req.body);
     const acknowledgementFile = req?.files?.acknowledgementFile;
 
+
     if (!mobileNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
     }
+
+    const gstDetails = gstRegistrationDetails();
+
+    const data = await gstDetails.findOne({
+      where: { customerMobile: mobileNumber, id: id },
+    });
+
+    if (!data) {
 
     const pancardUser = definePancardUser();
 
@@ -252,7 +266,6 @@ const updatePanDetails = catchAsync(async (req, res) => {
     const finalStatus = status === "completed" ? "completed" : "inProgress";
 
 
-
     const uploadFile = async (file) => {
       if (file) {
         try {
@@ -265,6 +278,24 @@ const updatePanDetails = catchAsync(async (req, res) => {
       return null;
     };
 
+
+    const gstDocumentUrl = await uploadFile(gstDocument);
+
+    let totalAmount = 1500;
+    let commissionToHeadOffice = 1000;
+    let commissionToFranchise = 500;
+
+    data.status = finalStatus;
+    data.gstDocument = gstDocumentUrl || data.gstDocument;
+    data.applicationReferenceNumber =
+      applicationReferenceNumber || data.applicationReferenceNumber;
+
+    data.totalAmount = totalAmount || data.totalAmount;
+    data.commissionToHeadOffice =
+      commissionToHeadOffice || data.commissionToHeadOffice;
+
+    data.commissionToFranchise =
+      commissionToFranchise || data.commissionToFranchise;
 
     const currentDate = new Date()
       .toISOString()
@@ -352,6 +383,8 @@ const updatePanDetails = catchAsync(async (req, res) => {
     await data.save();
 
     return res.status(200).json({
+      message: `success`,
+      data,
       message: "success",
       data,
 
@@ -383,4 +416,3 @@ const updatePanDetails = catchAsync(async (req, res) => {
 
 
 module.exports = { loanStatus, updatePanDetails, passportUpdate };
-
