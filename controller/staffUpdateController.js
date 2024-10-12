@@ -1,5 +1,6 @@
 const catchAsync = require("../utils/catchAsync");
 const cibilReports = require("../db/models/cibilreport");
+const gstRegistrationDetails = require("../db/models/gstregistration");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
@@ -198,4 +199,69 @@ const trainBookingUpdate = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { loanStatus,trainBookingUpdate };
+const updateGstDetails = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, status, applicationReferenceNumber, id } = req.body;
+    const gstDocument = req?.files?.gstDocument;
+
+    if (!mobileNumber) {
+      return res.status(400).json({ message: "Mobile number is required" });
+    }
+
+    const gstDetails = gstRegistrationDetails();
+
+    const data = await gstDetails.findOne({
+      where: { customerMobile: mobileNumber, id: id },
+    });
+
+    if (!data) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    const finalStatus = status === "completed" ? "completed" : "inProgress";
+
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          throw new Error("File upload failed");
+        }
+      }
+      return null;
+    };
+
+    const gstDocumentUrl = await uploadFile(gstDocument);
+
+    let totalAmount = 1500;
+    let commissionToHeadOffice = 1000;
+    let commissionToFranchise = 500;
+
+    data.status = finalStatus;
+    data.gstDocument = gstDocumentUrl || data.gstDocument;
+    data.applicationReferenceNumber =
+      applicationReferenceNumber || data.applicationReferenceNumber;
+
+    data.totalAmount = totalAmount || data.totalAmount;
+    data.commissionToHeadOffice =
+      commissionToHeadOffice || data.commissionToHeadOffice;
+
+    data.commissionToFranchise =
+      commissionToFranchise || data.commissionToFranchise;
+
+    await data.save();
+
+    return res.status(200).json({
+      message: `success`,
+      data,
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+
+module.exports = { loanStatus,trainBookingUpdate ,updateGstDetails};
