@@ -7,11 +7,7 @@ const catchAsync = require("../utils/catchAsync");
 const isBlock = catchAsync(async (req, res, next) => {
   const user = req.user;
   console.log("13", user);
-  const Staff = defineStaffsDetails();
-  const Data =
-    (await Franchise.findOne({where:{ email: user.email }})) ||
-    (await Staff.findOne({where:{ emailId: user.email }})) ||
-    (await User.findOne({where:{ email: user.email }}));
+  const Data =await User.findOne({where:{ email: user.email }});
 
   if (!Data) {
     return next(new AppError("User not found", 404));
