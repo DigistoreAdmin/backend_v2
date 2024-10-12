@@ -1,4 +1,5 @@
 const catchAsync = require("../utils/catchAsync");
+const definePancardUser = require("../db/models/pancard");
 const cibilReports = require("../db/models/cibilreport");
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
@@ -178,11 +179,13 @@ const trainBookingUpdate = catchAsync(async (req, res) => {
     report.workId = workId || report.workId;
     report.status = finalStatus;
     report.ticket = ticketUrl || report.ticket;
-    report.amount=amount || report.amount
-    report.serviceCharge=serviceCharge || report.serviceCharge
-    report.commissionToFranchise=commissionToFranchise || report.commissionToFranchise
-    report.commissionToHeadOffice=commissionToHeadOffice || report.commissionToHeadOffice
-    report.totalAmount=totalAmount || report.totalAmount
+    report.amount = amount || report.amount;
+    report.serviceCharge = serviceCharge || report.serviceCharge;
+    report.commissionToFranchise =
+      commissionToFranchise || report.commissionToFranchise;
+    report.commissionToHeadOffice =
+      commissionToHeadOffice || report.commissionToHeadOffice;
+    report.totalAmount = totalAmount || report.totalAmount;
 
     await report.save();
 
@@ -198,4 +201,62 @@ const trainBookingUpdate = catchAsync(async (req, res) => {
   }
 });
 
-module.exports = { loanStatus,trainBookingUpdate };
+const updatePanDetails = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, status, acknowledgementNumber, reason, ePan } =
+      req.body;
+    console.log("req.body: ", req.body);
+    const acknowledgementFile = req?.files?.acknowledgementFile;
+
+    if (!mobileNumber) {
+      return res.status(400).json({ message: "Mobile number is required" });
+    }
+
+    const pancardUser = definePancardUser();
+
+    const report = await pancardUser.findOne({
+      where: { mobileNumber: mobileNumber },
+    });
+
+    if (!report) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    const finalStatus = status === "completed" ? "completed" : "inProgress";
+
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          throw new Error("File upload failed");
+        }
+      }
+      return null;
+    };
+
+    const acknowledgementFileUrl = await uploadFile(acknowledgementFile);
+
+    report.status = finalStatus;
+    report.acknowledgementFile =
+      acknowledgementFileUrl || report.acknowledgementFile;
+    report.acknowledgementNumber =
+      acknowledgementNumber || report.acknowledgementNumber;
+    report.reason = reason || report.reason;
+    report.ePan = ePan || report.ePan;
+
+    await report.save();
+
+    return res.status(200).json({
+      message: `success`,
+      report,
+    });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+module.exports = { loanStatus, trainBookingUpdate, updatePanDetails };
