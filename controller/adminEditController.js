@@ -13,8 +13,6 @@ const azureStorage = require('azure-storage');
 const intoStream = require('into-stream');
 const user = require("../db/models/user");
 const sequelize = require("../config/database");
-
-
 const containerName = 'imagecontainer';
 const blobService = azureStorage.createBlobService(process.env.AZURE_STORAGE_CONNECTION_STRING);
 
@@ -35,31 +33,36 @@ const uploadBlob = async (file) => {
 };
 
 const deleteFranchise = catchAsync(async (req, res, next) => {
-  try {
-    const { uniqueId } = req.body;
+    const transaction = await sequelize.transaction();
 
-    const franchise = await Franchise.findOne({
-      where: { franchiseUniqueId: uniqueId },
-    });
-    let phoneNumber = null;
-    if (franchise) {
-      phoneNumber = franchise.franchiseUniqueId.slice(3);
-    }
-    const user = await User.findOne({ where: { phoneNumber } });
-    const wallet = await wallets.findOne({ where: { uniqueId } });
+    try {
+        const { uniqueId } = req.body;
 
-    if (franchise) await franchise.destroy({ force: true });
-    if (user) await user.destroy({ force: true });
-    if (wallet) await wallet.destroy({ force: true });
+        const franchise = await Franchise.findOne({ where: { franchiseUniqueId: uniqueId }, transaction });
+        let phoneNumber = null;
+        if (franchise) {
+            phoneNumber = franchise.franchiseUniqueId.slice(3);
+        }
 
-    return res
-      .status(200)
-      .json({ message: "Franchise details deleted successfully" });
-  } catch (error) {
-    console.log("Error:", error);
-    return next(new AppError("Failed to delete Franchise!", 500));
+        const user = await User.findOne({ where: { phoneNumber }, transaction });
+        const wallet = await wallets.findOne({ where: { uniqueId }, transaction });
+
+        if (franchise) await franchise.destroy({ force: true, transaction });
+        if (user) await user.destroy({ force: true, transaction });
+        if (wallet) await wallet.destroy({ force: true, transaction });
+
+        await transaction.commit();
+
+        return res.status(200).json({ message: 'Franchise details deleted successfully' });
+    } catch (error) {
+        await transaction.rollback();
+
+        console.error("Error:", error);
+        return next(new AppError("Failed to delete Franchise!", 500));
   }
 });
+
+
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {
   try {

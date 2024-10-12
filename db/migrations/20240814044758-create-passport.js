@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","onHold","reject"),
       },
       assignedId: {
         type: Sequelize.STRING,
@@ -97,6 +97,18 @@ module.exports = {
         type: Sequelize.STRING,
       },
       oldPassportCopy: {
+        type: Sequelize.STRING,
+      },
+      passportAppointmentDate: {
+        type: Sequelize.DATE,
+      },
+      username: {
+        type: Sequelize.STRING,
+      },
+      password: {
+        type: Sequelize.STRING,
+      },
+      passportFile: {
         type: Sequelize.STRING,
       },
       createdAt: {

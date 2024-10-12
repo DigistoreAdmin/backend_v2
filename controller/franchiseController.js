@@ -83,7 +83,7 @@ const sendOtpPhoneNumber = catchAsync(async (req, res, next) => {
   console.log("otp", newOtp);
   req.session.otp = newOtp;
   req.session.phoneNumber = phoneNumber;
-  req.session.otpExpiration = new Date(Date.now() + 6 * 60 * 1000);
+  req.session.otpExpiration = new Date(Date.now() + 15 * 60 * 1000);
 
   if (newOtp == "123456") {
     res

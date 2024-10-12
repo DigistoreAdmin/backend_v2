@@ -253,7 +253,7 @@ const updatemoneyTransfer = catchAsync(async (req, res, next) => {
           userType: "franchise",
           service: "wallet payment rejected by admin",
           status: "fail",
-          amount: 0.0,
+          amount: data.amount,
           walletBalance: walletBalance.balance,
         },
         { transaction }
