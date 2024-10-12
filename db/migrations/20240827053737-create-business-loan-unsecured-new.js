@@ -69,7 +69,7 @@ module.exports = {
       completedOn:{
         type: Sequelize.DATE
       },
-      loanStatus: {
+      loanStatus:{
         type: Sequelize.JSONB,
         defaultValue: {
           documentSubmittedToBank: false,

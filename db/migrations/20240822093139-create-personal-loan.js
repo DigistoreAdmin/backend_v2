@@ -91,7 +91,7 @@ module.exports = {
           commissionCredited: false
         },
       },
-      rejectReason: {
+      rejectReason:{
         type: Sequelize.STRING
       },
       bankDetails: {
