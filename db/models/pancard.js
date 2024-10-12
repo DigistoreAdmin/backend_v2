@@ -36,7 +36,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM('inQueue', 'inProgress', 'completed'),
+      type: DataTypes.ENUM('inQueue', 'inProgress', 'completed','onHold','reject'),
       allowNull: false,
       defaultValue: 'inQueue',
     },
@@ -195,6 +195,23 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       type: DataTypes.STRING,
       allowNull: allowsNew,
     },
+    acknowledgementNumber:{
+      type: DataTypes.INTEGER,
+      allowNull:true
+    },
+    acknowledgementFile:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    reason:{
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    ePan:{
+      type: DataTypes.ENUM("received","notReceived"),
+      allowNull:true
+    },
+   
 
     // Fields specific to 'minor' PAN
     representativeName: {
