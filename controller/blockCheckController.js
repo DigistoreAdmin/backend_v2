@@ -23,7 +23,6 @@ const isBlock = catchAsync(async (req, res, next) => {
   if (Data.blocked === "blocked") {
     return next(new AppError("You are blocked by admin", 403));
   }
-
   next(); 
 });
 
