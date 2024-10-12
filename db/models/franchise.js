@@ -476,11 +476,6 @@ const Franchise = sequelize.define(
             allowNull: false,
             defaultValue: 'free', 
         },
-        blocked:{
-            type: DataTypes.ENUM("blocked","unBlocked"),
-            allowNull: false,
-            defaultValue:"unBlocked"
-          },
     },
     {
         paranoid: true,
