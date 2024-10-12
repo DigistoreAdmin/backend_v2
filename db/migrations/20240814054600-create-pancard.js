@@ -111,7 +111,6 @@ module.exports = {
       representativeDocument: {
         type: Sequelize.STRING,
       },
-
       // Field specific to 'NRI' PAN
       nriAddress: {
         type: Sequelize.STRING,
