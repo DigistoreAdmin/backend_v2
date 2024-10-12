@@ -126,7 +126,6 @@ const createStaffs = catchAsync(async (req, res, next) => {
         other,
         phone,
         remarks,
-        blocked
       },
       { transaction }
     );
