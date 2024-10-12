@@ -59,125 +59,125 @@ const deleteFranchise = catchAsync(async (req, res, next) => {
 
         console.error("Error:", error);
         return next(new AppError("Failed to delete Franchise!", 500));
-  }
+    }
 });
 
 
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {
-  try {
-    const {
-      userType,
-      employeeId,
-      firstName,
-      lastName,
-      emailId,
-      phoneNumber,
-      dateOfBirth,
-      gender,
-      addressLine1,
-      addressLine2,
-      city,
-      district,
-      state,
-      pinCode,
-      bank,
-      accountNumber,
-      ifscCode,
-      accountHolderName,
-      dateOfJoin,
-      bloodGroup,
-      employment,
-      employmentType,
-      districtOfOperation,
-      reportingManager,
-      emergencyContact,
-      isTrainingRequired,
-      totalTrainingDays,
-      employmentStartDate,
-      laptop,
-      idCard,
-      sim,
-      vistingCard,
-      posterOrBroucher,
-      other,
-      phone,
-      remarks,
-    } = req.body;
+    try {
+        const {
+            userType,
+            employeeId,
+            firstName,
+            lastName,
+            emailId,
+            phoneNumber,
+            dateOfBirth,
+            gender,
+            addressLine1,
+            addressLine2,
+            city,
+            district,
+            state,
+            pinCode,
+            bank,
+            accountNumber,
+            ifscCode,
+            accountHolderName,
+            dateOfJoin,
+            bloodGroup,
+            employment,
+            employmentType,
+            districtOfOperation,
+            reportingManager,
+            emergencyContact,
+            isTrainingRequired,
+            totalTrainingDays,
+            employmentStartDate,
+            laptop,
+            idCard,
+            sim,
+            vistingCard,
+            posterOrBroucher,
+            other,
+            phone,
+            remarks,
+        } = req.body;
 
-    const staffs = defineStaffsDetails();
+        const staffs = defineStaffsDetails();
 
-    const findStaff = await staffs.findOne({
-      where: { employeeId },
-    });
+        const findStaff = await staffs.findOne({
+            where: { employeeId },
+        });
 
-    if (!findStaff) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Staff not found" });
+        if (!findStaff) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Staff not found" });
+        }
+
+        const updatedStaff = await staffs.update(
+            {
+                userType,
+                employeeId,
+                firstName,
+                lastName,
+                emailId,
+                phoneNumber,
+                dateOfBirth,
+                gender,
+                addressLine1,
+                addressLine2,
+                city,
+                district,
+                state,
+                pinCode,
+                bank,
+                accountNumber,
+                ifscCode,
+                accountHolderName,
+                dateOfJoin,
+                bloodGroup,
+                employment,
+                employmentType,
+                districtOfOperation,
+                reportingManager,
+                emergencyContact,
+                isTrainingRequired,
+                totalTrainingDays,
+                employmentStartDate,
+                laptop,
+                idCard,
+                sim,
+                vistingCard,
+                posterOrBroucher,
+                other,
+                phone,
+                remarks,
+            },
+            {
+                where: { employeeId },
+            }
+        );
+
+        if (!updatedStaff) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Failed to update staff" });
+        }
+
+        const updatedStaffs = await staffs.findOne({
+            where: { employeeId },
+        });
+
+        return res
+            .status(200)
+            .json({ success: true, message: "Updated staff", staffs: updatedStaffs });
+    } catch (error) {
+        console.log("Error:", error);
+        return next(new AppError(error.message, 500));
     }
-
-    const updatedStaff = await staffs.update(
-      {
-        userType,
-        employeeId,
-        firstName,
-        lastName,
-        emailId,
-        phoneNumber,
-        dateOfBirth,
-        gender,
-        addressLine1,
-        addressLine2,
-        city,
-        district,
-        state,
-        pinCode,
-        bank,
-        accountNumber,
-        ifscCode,
-        accountHolderName,
-        dateOfJoin,
-        bloodGroup,
-        employment,
-        employmentType,
-        districtOfOperation,
-        reportingManager,
-        emergencyContact,
-        isTrainingRequired,
-        totalTrainingDays,
-        employmentStartDate,
-        laptop,
-        idCard,
-        sim,
-        vistingCard,
-        posterOrBroucher,
-        other,
-        phone,
-        remarks,
-      },
-      {
-        where: { employeeId },
-      }
-    );
-
-    if (!updatedStaff) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Failed to update staff" });
-    }
-
-    const updatedStaffs = await staffs.findOne({
-      where: { employeeId },
-    });
-
-    return res
-      .status(200)
-      .json({ success: true, message: "Updated staff", staffs: updatedStaffs });
-  } catch (error) {
-    console.log("Error:", error);
-    return next(new AppError(error.message, 500));
-  }
 });
 
 const updateFranchiseDetails = catchAsync(async (req, res, next) => {
@@ -436,16 +436,31 @@ const updateWallet = catchAsync(async (req, res, next) => {
   }
 });
 
-function generateRandomNumber() {
-  const randomNumber =
+  const verifyFranchise = catchAsync(async (req, res, next) => {
+    const { uniqueId,value } = req.body;
+
+    const franchise = await Franchise.findOne({
+      where: { franchiseUniqueId: uniqueId },
+    });
+
+    if (!franchise) {
+      return next(new AppError("Franchise not found", 404));
+    }
+     
+    await franchise.update({ verified: value });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Verification Status Updated',
+    });
+  })
+  
+  function generateRandomNumber() {
+    const randomNumber =
     Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
     100000000000;
-  return randomNumber.toString();
-}
-
-module.exports = {
-  updateStaffDetails,
-  deleteFranchise,
-  updateFranchiseDetails,
-  updateWallet,
-};
+    return randomNumber.toString();
+  }
+  
+  module.exports = { updateStaffDetails, deleteFranchise, updateFranchiseDetails, updateWallet,verifyFranchise };
+  

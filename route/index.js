@@ -1,7 +1,6 @@
 const express = require('express');
 
 const authRouter = require("../route/authRoute");
-const projectRouter = require("../route/projectRoute");
 const userRouter = require("../route/userRoute");
 const distributorRoute = require("../route/distributorRoute");
 const franchiseRouter = require("../route/franchiseRouter");
@@ -53,7 +52,6 @@ const router = express.Router();
 
 
 router.use("/v1/auth", authRouter);
-router.use("/v1/projects", projectRouter);
 router.use("/v1/users", userRouter);
 router.use("/v1/distributor", distributorRoute);
 router.use("/v1/franchiseRouter", franchiseRouter);

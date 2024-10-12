@@ -2,6 +2,7 @@ const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
 const sequelize = require("../config/database");
 const defineStaffsDetails = require("../db/models/staffs");
+const otpStorage = require("../utils/otpStorage");
 const AppError = require("../utils/appError");
 
 const createStaffs = catchAsync(async (req, res, next) => {

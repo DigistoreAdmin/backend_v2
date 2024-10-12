@@ -54,13 +54,11 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
     );
   }
 
-  const random12DigitNumber = generateRandomNumber();
-  let DSP = `DSP${random12DigitNumber}${Data.id}`;
-  console.log("DSP", DSP);
-  console.log("ra", random12DigitNumber);
+  const randomDigitNumber = fourDigitRandomNumberWithAlphabet()
+  const apiRequestId = `${Data.franchiseUniqueId}${randomDigitNumber}`
 
   const response = await axios.get(
-    `https://livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${phoneNumber}&Amount=${amount}&SPKey=${sp_key}&APIRequestID=${random12DigitNumber}&Optional1={Optional1}&Optional2={Optional2}&Optional3={Optional3}&Optional4={Optional4}&RefID={RefID}&GEOCode=${circle}&CustomerNumber=8606172833&Pincode=691536&Format=1&OutletID=0`
+    `https://livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${phoneNumber}&Amount=${amount}&SPKey=${sp_key}&APIRequestID=${apiRequestId}&Optional1={Optional1}&Optional2={Optional2}&Optional3={Optional3}&Optional4={Optional4}&RefID={RefID}&GEOCode=${circle}&CustomerNumber=8606172833&Pincode=691536&Format=1&OutletID=0`
   );
   console.log("res ", response);
   console.log("res ", response.data.rpid);// transation id in history
@@ -105,6 +103,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       userType: user.userType,
       service: result.rechargeType,
       customerNumber:phoneNumber,
+      serviceNumber:phoneNumber,
       serviceProvider:result.serviceProvider,
       status: "success",
       amount: amount,
@@ -158,6 +157,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       userType: user.userType,
       service: result.rechargeType,
       customerNumber:phoneNumber,
+      serviceNumber:phoneNumber,
       serviceProvider:result.serviceProvider,
       status: "pending",
       amount: amount,
@@ -189,6 +189,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       status: "fail",
       service: result.rechargeType,
       customerNumber:phoneNumber,
+      serviceNumber:phoneNumber,
       serviceProvider:result.serviceProvider,
       amount: amount,
       walletBalance: walletData.balance,
@@ -246,11 +247,17 @@ const callBackUrl = catchAsync(async (req, res, next) => {
 
 
 
-function generateRandomNumber() {
-  const randomNumber =
-    Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
-    100000000000;
-  return randomNumber.toString();
+
+
+function randomAlphabet() {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return alphabet[Math.floor(Math.random() * alphabet.length)];
+}
+
+function fourDigitRandomNumberWithAlphabet() {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number
+  const randomChar = randomAlphabet(); // Generates a random alphabet
+  return randomChar + randomNumber.toString();
 }
 
 

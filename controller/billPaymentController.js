@@ -30,14 +30,14 @@ const Circles = require("../db/models/circle");
 
 const fetchBill = catchAsync(async (req, res, next) => {
   const { SPKey, phoneNumber, accountNo } = req.body;
-
-  console.log("ll");
-
-  const random12DigitNumber = generateRandomNumber();
-  console.log("ra", random12DigitNumber);
+  const user = req.user;
+  const Data = await Franchise.findOne({ where: { email: user.email } });
+  
+  const randomDigitNumber = fourDigitRandomNumberWithAlphabet()
+  const apiRequestId = `${Data.franchiseUniqueId}${randomDigitNumber}`
 
   const response = await axios.get(
-    `https://livepay.co.in/API/FetchBill?UserId=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=0&SPKey=${SPKey}&APIRequestID=${random12DigitNumber}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=23.8530,87.9727&CustomerNumber=${phoneNumber}&Pincode=743329&Format=1&OutletID=12345`
+    `https://livepay.co.in/API/FetchBill?UserId=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=0&SPKey=${SPKey}&APIRequestID=${apiRequestId}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=23.8530,87.9727&CustomerNumber=${phoneNumber}&Pincode=743329&Format=1&OutletID=12345`
   );
 
   console.log("res data", response.data);
@@ -51,6 +51,8 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
   
 
   const Data = await Franchise.findOne({ where: { email: user.email } });
+  const randomDigitNumber = fourDigitRandomNumberWithAlphabet()
+  const apiRequestId = `${Data.franchiseUniqueId}${randomDigitNumber}`
 
   const walletData = await Wallet.findOne({ where: { uniqueId: Data.franchiseUniqueId } });
   const result = await Operator.findOne({ where: { SP_key: SPKey } });
@@ -72,15 +74,11 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
     );
   }
 
-  const random12DigitNumber = generateRandomNumber();
-  let DSP = `DSP${random12DigitNumber}${Data.id}`;
-  console.log("DSP", DSP);
-  console.log("ra", random12DigitNumber);
-
+  
   const response = await axios.get(
     fetchBillID != 0 
-    ? `https://www.livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=${amount}&SPKey=${SPKey}&APIRequestID=${random12DigitNumber}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=18.4099808,76.5834877&CustomerNumber=${phoneNumber}&Pincode=691536&FetchBillID=${fetchBillID}&Format=1&OutletID=12345`
-    : `https://www.livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=${amount}&SPKey=${SPKey}&APIRequestID=${random12DigitNumber}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=18.4099808,76.5834877&CustomerNumber=${phoneNumber}&Pincode=691536&Format=1`
+    ? `https://www.livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=${amount}&SPKey=${SPKey}&APIRequestID=${apiRequestId}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=18.4099808,76.5834877&CustomerNumber=${phoneNumber}&Pincode=691536&FetchBillID=${fetchBillID}&Format=1&OutletID=12345`
+    : `https://www.livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${accountNo}&Amount=${amount}&SPKey=${SPKey}&APIRequestID=${apiRequestId}&Optional1=&Optional2=&Optional3=&Optional4=&GEOCode=18.4099808,76.5834877&CustomerNumber=${phoneNumber}&Pincode=691536&Format=1`
 
   );
   console.log("res", response);
@@ -126,7 +124,8 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
           userName: Data.franchiseName,
           userType: user.userType,
           service: result.rechargeType,
-          customerNumber:accountNo,
+          customerNumber:phoneNumber,
+          serviceNumber:accountNo,
           serviceProvider:result.serviceProvider,
           status: "success",
           amount: amount,
@@ -167,7 +166,8 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
         userName: Data.franchiseName,
         userType: user.userType,
         service: result.rechargeType,
-        customerNumber:accountNo,
+        customerNumber:phoneNumber,
+        serviceNumber:accountNo,
         serviceProvider:result.serviceProvider,
         status: "success",
         amount: amount,
@@ -197,7 +197,8 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
       userName: Data.franchiseName,
       userType: user.userType,
       service: result.rechargeType,
-      customerNumber:accountNo,
+      customerNumber:phoneNumber,
+      serviceNumber:accountNo,
       serviceProvider:result.serviceProvider,
       status: "fail",
       amount: amount,
@@ -214,11 +215,17 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
   }
 });
 
-function generateRandomNumber() {
-  const randomNumber =
-    Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
-    100000000000;
-  return randomNumber.toString();
+
+
+function randomAlphabet() {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return alphabet[Math.floor(Math.random() * alphabet.length)];
+}
+
+function fourDigitRandomNumberWithAlphabet() {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number
+  const randomChar = randomAlphabet(); // Generates a random alphabet
+  return randomChar + randomNumber.toString();
 }
 
 

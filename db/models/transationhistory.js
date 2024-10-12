@@ -57,6 +57,10 @@ const transationHistories = sequelize.define(
       type: DataTypes.STRING,
       allowNull:true
     },
+    serviceNumber: {
+      type: DataTypes.STRING,
+      allowNull:true
+    },
     customerNumber: {
       type: DataTypes.BIGINT,
       allowNull:true
