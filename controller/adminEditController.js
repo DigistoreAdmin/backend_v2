@@ -6,6 +6,7 @@ const User = require("../db/models/user");
 const wallets = require("../db/models/wallet");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const crypto = require("crypto")
 
 const { Op, where } = require("sequelize");
 const bcrypt = require("bcrypt");
@@ -256,20 +257,53 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
         .json({ success: false, message: "Franchise not found" });
     }
 
+    const algorithm = "aes-192-cbc"; 
+    const secret = process.env.FRANCHISE_SECRET_KEY; 
+    const key = crypto.scryptSync(secret, "salt", 24);
+
+    const encryptData = (data) => {
+      const iv = crypto.randomBytes(16); 
+      const cipher = crypto.createCipheriv(algorithm, key, iv);
+
+      let encrypted = cipher.update(data, "utf8", "hex");
+      encrypted += cipher.final("hex");
+
+      return iv.toString("hex") + ":" + encrypted;
+    };
+
     let hashPan;
     panNumber && typeof panNumber === "string"
-      ? (hashPan = await bcrypt.hash(panNumber, 8))
+      ? (hashPan = encryptData(panNumber))
       : panNumber;
 
     let hashAadhaar;
     aadhaarNumber && typeof aadhaarNumber === "string"
-      ? (hashAadhaar = await bcrypt.hash(aadhaarNumber.toString(), 8))
+      ? (hashAadhaar = encryptData(aadhaarNumber.toString()))
       : aadhaarNumber;
-    console.log("Hash", hashAadhaar);
+
     let hashAccountN;
     accountNumber && typeof accountNumber === "string"
-      ? (hashAccountN = await bcrypt.hash(accountNumber.toString(), 8))
-      : accountName;
+      ? (hashAccountN = encryptData(accountNumber.toString()))
+      : accountNumber;
+
+      const updateUserDetails = await user.update(
+        {
+          email,
+          phoneNumber
+        },
+        {
+          where: {
+            email: franchise.email,
+            phoneNumber: franchise.phoneNumber,
+          },
+        },
+        transaction,
+      )
+  
+      if (!updateUserDetails){
+        await transaction.rollback();
+        throw new AppError("Failed to update user details", 400);
+      }
 
     const updatedFranchise = await Franchise.update(
       {
@@ -321,30 +355,12 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
       throw new AppError("Failed to update the franchise", 400);
     }
 
-    const updateUserDetails = await user.update(
-      {
-        email,
-        phoneNumber
-      },
-      {
-        where: {
-          email: franchise.email,
-          phoneNumber: franchise.phoneNumber,
-        },
-      },
-      transaction,
-    )
-
-    if (!updateUserDetails){
-      await transaction.rollback();
-      throw new AppError("Failed to update user details", 400);
-    }
-
     const updatedFranchises = await Franchise.findOne({
       where: { franchiseUniqueId },
     });
 
     await transaction.commit();
+    
     return res.status(200).json({
       success: true,
       message: "Franchise details updated",
