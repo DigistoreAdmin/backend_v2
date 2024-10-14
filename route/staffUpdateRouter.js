@@ -1,5 +1,5 @@
 const express = require("express");
-const { loanStatus, trainBookingUpdate, updatePanDetails } = require("../controller/staffUpdateController");
+const { loanStatus, trainBookingUpdate, updatePanDetails, incometaxUpdate } = require("../controller/staffUpdateController");
 
 const { verifyRefreshToken, verifyToken } = require("../utils/token");
 
@@ -13,5 +13,9 @@ router.route("/updateTrainBooking").put(verifyToken,verifyRefreshToken,trainBook
 router
   .route("/updatePanDetails")
   .put(verifyToken, verifyRefreshToken, updatePanDetails);
+
+router
+  .route("/incometaxUpdate")
+  .put(verifyToken, verifyRefreshToken,incometaxUpdate)
 
   module.exports = router;
