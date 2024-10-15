@@ -1,9 +1,10 @@
 const catchAsync = require("../utils/catchAsync");
 const definePancardUser = require("../db/models/pancard");
 const cibilReports = require("../db/models/cibilreport");
-const defineIncomeTax = require("../db/models/incometax")
+const defineIncomeTax = require("../db/models/incometax");
 const defineVehicleInsurance = require("../db/models/vehicleInsurance");
 const gstRegistrationDetails = require("../db/models/gstregistration");
+const definePassportDetails=require('../db/models/passport')
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
@@ -66,7 +67,6 @@ const loanStatus = catchAsync(async (req, res) => {
     }
 
     if (status === "approve" || status === "reject") {
-
       const uploadFile = async (file) => {
         if (file) {
           try {
@@ -90,12 +90,8 @@ const loanStatus = catchAsync(async (req, res) => {
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
         report,
       });
-
-    } 
-    else {
-
+    } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
@@ -107,12 +103,7 @@ const loanStatus = catchAsync(async (req, res) => {
 
 const trainBookingUpdate = catchAsync(async (req, res) => {
   try {
-    const {
-      id,
-      phoneNumber,
-      status,
-      amount
-    } = req.body;
+    const { id, phoneNumber, status, amount } = req.body;
     console.log("req.body: ", req.body);
     const ticket = req?.files?.ticket;
 
@@ -123,7 +114,7 @@ const trainBookingUpdate = catchAsync(async (req, res) => {
     const trainBookingUser = trainbooking;
 
     const report = await trainBookingUser.findOne({
-      where: { phoneNumber: phoneNumber,id:id },
+      where: { phoneNumber: phoneNumber, id: id },
     });
 
     if (!report) {
@@ -163,21 +154,21 @@ const trainBookingUpdate = catchAsync(async (req, res) => {
 
     const ticketUrl = await uploadFile(ticket);
 
-    let serviceCharge=0
-    let commissionToFranchise=0
-    let commissionToHeadOffice=0
-    
-    if(amount>100){
-      serviceCharge=100
-      commissionToFranchise=30
-      commissionToHeadOffice=70
-    }else{
-      serviceCharge=50
-      commissionToFranchise=20
-      commissionToHeadOffice=30
+    let serviceCharge = 0;
+    let commissionToFranchise = 0;
+    let commissionToHeadOffice = 0;
+
+    if (amount > 100) {
+      serviceCharge = 100;
+      commissionToFranchise = 30;
+      commissionToHeadOffice = 70;
+    } else {
+      serviceCharge = 50;
+      commissionToFranchise = 20;
+      commissionToHeadOffice = 30;
     }
-    
-    let totalAmount=amount + serviceCharge
+
+    let totalAmount = amount + serviceCharge;
 
     report.workId = workId || report.workId;
     report.status = finalStatus;
@@ -439,7 +430,7 @@ const incometaxUpdate = catchAsync(async (req, res) => {
     const incomeTaxAcknowledgement = req?.files?.incomeTaxAcknowledgement;
     const computationFile = req?.files?.computationFile;
 
-    if(!req.files){
+    if (!req.files) {
       return res.status(400).json({ message: "Files not uploaded" });
     }
 
@@ -474,25 +465,24 @@ const incometaxUpdate = catchAsync(async (req, res) => {
       return null;
     };
 
-    if (data.typeofTransaction === "salaried"){
-      console.log("Transaction", data.typeofTransaction)
+    if (data.typeofTransaction === "salaried") {
+      console.log("Transaction", data.typeofTransaction);
       totalAmount = 500;
       franchiseCommission = 100;
       HOCommission = 400;
     }
 
-    if(data.typeofTransaction === "business"){
+    if (data.typeofTransaction === "business") {
       totalAmount = 5000;
       franchiseCommission = 1000;
       HOCommission = 4000;
-    }
-    else if(data.typeofTransaction === "capitalGain"){
+    } else if (data.typeofTransaction === "capitalGain") {
       totalAmount = 5000;
       franchiseCommission = 1000;
       HOCommission = 4000;
     }
 
-    if(data.typeofTransaction === "other"){
+    if (data.typeofTransaction === "other") {
       totalAmount = 1500;
       franchiseCommission = 300;
       HOCommission = 1200;
@@ -509,7 +499,8 @@ const incometaxUpdate = catchAsync(async (req, res) => {
     data.franchiseCommission = franchiseCommission || data.franchiseCommission;
     data.HOCommission = HOCommission || data.HOCommission;
     data.totalAmount = totalAmount || data.totalAmount;
-    data.incomeTaxAcknowledgement = incomeTaxAcknowledgementUrl || data.incomeTaxAcknowledgement;
+    data.incomeTaxAcknowledgement =
+      incomeTaxAcknowledgementUrl || data.incomeTaxAcknowledgement;
     data.computationFile = computationFileUrl || data.computationFile;
 
     await data.save();
@@ -525,5 +516,79 @@ const incometaxUpdate = catchAsync(async (req, res) => {
       .json({ message: "An error occurred error", error: error.message });
   }
 });
+const passportUpdate = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, passportAppointmentDate, username, password } =
+      req.body;
+    const { passportFile } = req.files;
 
-module.exports = { loanStatus, trainBookingUpdate, updatePanDetails,updateGstDetails,updateInsuranceDetails,incometaxUpdate };
+    // if (!req.files) {
+    //   throw new AppError("Files not uploaded", 400);
+    // }
+
+    console.log("body:", req.body);
+    console.log("files:", req.files);
+
+    // Check for required fields
+    if (!mobileNumber) {
+      return res
+        .status(404)
+        .json({ message: "Missing required field: mobileNumber" });
+    }
+
+    // Define passport model
+    const passportDetails = definePassportDetails();
+
+    // Find the passport record by mobile number
+    const passportRecord = await passportDetails.findOne({
+      where: { mobileNumber },
+    });
+
+    if (!passportRecord) {
+      return res.status(404).json({ message: "Passport record not found" });
+    }
+
+    // Helper function to upload files (similar to loanStatus)
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          return null;
+        }
+      }
+    };
+
+    const passportFileUrl = await uploadFile(passportFile);
+
+    passportAppointmentDate
+      ? (passportRecord.passportAppointmentDate = passportAppointmentDate)
+      : null;
+
+    username ? (passportRecord.username = username) : null;
+    password ? (passportRecord.password = password) : null;
+    passportFileUrl ? (passportRecord.passportFile = passportFileUrl) : null;
+
+    await passportRecord.save();
+
+    res.status(200).json({
+      message: "Passport details updated successfully",
+      passportRecord,
+    });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+module.exports = {
+  loanStatus,
+  passportUpdate,
+  trainBookingUpdate,
+  updatePanDetails,
+  updateGstDetails,
+  updateInsuranceDetails,
+  incometaxUpdate,
+};
