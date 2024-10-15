@@ -7,12 +7,11 @@ const AppError = require("../utils/appError");
 
 const createStaffs = catchAsync(async (req, res, next) => {
   const {
-    userType,
     password,
     firstName,
     lastName,
-    emailId,
-    mobileNumber,
+    email,
+    phoneNumber,
     dateOfBirth,
     gender,
     addressLine1,
@@ -24,7 +23,8 @@ const createStaffs = catchAsync(async (req, res, next) => {
     bank,
     accountNumber,
     ifscCode,
-    accountHolderName,
+    accountName,
+    branchName,
     dateOfJoin,
     bloodGroup,
     employment,
@@ -42,18 +42,25 @@ const createStaffs = catchAsync(async (req, res, next) => {
     posterOrBroucher,
     other,
     phone,
+    laptopDetails,
+    phoneDetails,
+    idCardDetails,
+    vistingCardDetails,
+    posterOrBroucherDetails,
+    simDetails,
+    otherDetails,
     remarks,
   } = req.body;
 
   const transaction = await sequelize.transaction();
 
   try {
-    const numberExist = await user.findOne({
-      where: { phoneNumber: mobileNumber },
+    const mobileNumber = await user.findOne({
+      where: { phoneNumber },
       transaction,
     });
 
-    if (numberExist) {
+    if (mobileNumber) {
       await transaction.rollback();
       return res
         .status(400)
@@ -61,7 +68,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     }
 
     const mail = await user.findOne({
-      where: { email: emailId },
+      where: { email: email },
       transaction,
     });
 
@@ -73,7 +80,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     }
 
     const data = await user.create(
-      { userType, password, phoneNumber: mobileNumber, email: emailId },
+      { userType: "staff", password, phoneNumber, email },
       { transaction }
     );
 
@@ -84,18 +91,28 @@ const createStaffs = catchAsync(async (req, res, next) => {
         .json({ success: false, message: "Failed to create user" });
     }
 
-    const staffs = defineStaffsDetails(employmentType, isTrainingRequired);
+    const staffs = defineStaffsDetails(
+      employmentType,
+      isTrainingRequired,
+      laptop,
+      idCard,
+      vistingCard,
+      posterOrBroucher,
+      sim,
+      other
+    );
 
     const employeeId = "";
+
     const newStaff = await staffs.create(
       {
+        userType: "staff",
         employeeId,
-        userType,
         password: data.password,
         firstName,
         lastName,
-        emailId,
-        phoneNumber: mobileNumber,
+        email,
+        phoneNumber,
         dateOfBirth,
         gender,
         addressLine1,
@@ -106,8 +123,9 @@ const createStaffs = catchAsync(async (req, res, next) => {
         pinCode,
         bank,
         accountNumber,
+        branchName,
         ifscCode,
-        accountHolderName,
+        accountName,
         dateOfJoin,
         emergencyContact,
         isTrainingRequired,
@@ -123,8 +141,15 @@ const createStaffs = catchAsync(async (req, res, next) => {
         vistingCard,
         posterOrBroucher,
         sim,
-        other,
         phone,
+        other,
+        laptopDetails,
+        idCardDetails,
+        vistingCardDetails,
+        posterOrBroucherDetails,
+        simDetails,
+        phoneDetails,
+        otherDetails,
         remarks,
       },
       { transaction }
@@ -137,7 +162,6 @@ const createStaffs = catchAsync(async (req, res, next) => {
         .json({ success: false, message: "Failed to create new staff" });
     }
 
-    delete otpStorage[mobileNumber];
     await transaction.commit();
 
     return res.status(201).json({
