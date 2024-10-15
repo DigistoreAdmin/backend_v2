@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const TokenModel = require("../db/models/token");
 const { sendErrorResponse, sendOkResponse } = require("./utils");
 const AppError = require("../utils/appError");
+const Franchise = require("../db/models/franchise");
 
 
 // const { TOKEN_NOTFOUND, TOKEN_EXPIED_ERROR } = require("../constants/constants");
@@ -134,7 +135,13 @@ const externalServiceAuthMiddleware = async (req, res, next) => {
   const encodedCredentials = Buffer.from(credentials).toString('base64');
   req.externalServiceData = `Basic ${encodedCredentials}`;
   console.log(`Basic ${encodedCredentials}`);
-  next();
+  const user = req.user;
+  const Data = await Franchise.findOne({ where: { email: user.email } });
+  if (Data.verified == true) {
+    next();
+  }else{
+    return next(new AppError("Service Restricted. Contact Admin", 401));
+  }
 };
 
 

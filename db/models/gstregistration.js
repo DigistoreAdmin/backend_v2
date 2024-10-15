@@ -1,6 +1,13 @@
-'use strict';
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../../config/database');
+"use strict";
+const { Model, DataTypes ,Op} = require("sequelize");
+const sequelize = require("../../config/database");
+
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
 
 const gstRegistrationDetails = (typeOfBusiness) => {
 
@@ -30,6 +37,15 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
+      },
+      workId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      status: {
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        allowNull: false,
+        defaultValue: "inQueue",
       },
       customerName: {
         type: DataTypes.STRING,
@@ -92,6 +108,22 @@ const gstRegistrationDetails = (typeOfBusiness) => {
             msg: 'Business name cannot be empty',
           },
         },
+      },
+      applicationReferenceNumber: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      commissionToHeadOffice: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      commissionToFranchise: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      totalAmount: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
       },
       businessAddressLine1: {
         type: DataTypes.STRING,
@@ -197,6 +229,10 @@ const gstRegistrationDetails = (typeOfBusiness) => {
             msg: 'Pan card image must be a valid URL',
           },
         },
+      },
+      gstDocument: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       aadhaarFront: {
         type: DataTypes.STRING,
@@ -463,8 +499,29 @@ const gstRegistrationDetails = (typeOfBusiness) => {
       paranoid: true,
       freezeTableName: true,
       modelName: 'gstRegistrations',
-    },
+      hooks: {
+        beforeValidate: async (gst) => {
+          const currentDate = getCurrentDate();
+          const code = "GST";
+          const lastGst = await gstRegistration.findOne({
+            where: {
+              workId: {
+                [Op.like]: `${currentDate}${code}%`,
+              },
+            },
+            order: [["createdAt", "DESC"]],
+          });
 
+          let newIncrement = "001";
+          if (lastGst) {
+            const lastIncrement = parseInt(lastGst.workId.slice(-3));
+            newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+          }
+
+          gst.workId = `${currentDate}${code}${newIncrement}`;
+        },
+      },
+    }
   );
 
   return gstRegistration;

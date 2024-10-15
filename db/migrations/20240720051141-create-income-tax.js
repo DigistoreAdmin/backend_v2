@@ -129,6 +129,24 @@ module.exports = {
       status: {
         type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
       },
+      workId: {
+        type: Sequelize.STRING,
+      },
+      computationFile: {
+        type: Sequelize.STRING,
+      },
+      incomeTaxAcknowledgement: {
+        type: Sequelize.STRING,
+      },
+      franchiseCommission: {
+        type: Sequelize.DECIMAL,
+      },
+      HOCommission: {
+        type: Sequelize.DECIMAL,
+      },
+      totalAmount: {
+        type: Sequelize.DECIMAL,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
