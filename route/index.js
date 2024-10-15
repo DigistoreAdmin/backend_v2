@@ -1,7 +1,6 @@
 const express = require('express');
 
 const authRouter = require("../route/authRoute");
-const projectRouter = require("../route/projectRoute");
 const userRouter = require("../route/userRoute");
 const distributorRoute = require("../route/distributorRoute");
 const franchiseRouter = require("../route/franchiseRouter");
@@ -47,11 +46,13 @@ const BlockRoute = require("../route/blockRoutes")
 const fetchLoanRouter = require("../route/Loan/fetchLoanRouter");
 const fetchServicesRouter = require("../route/fetchServicesRouter");
 const adminEditRoute = require("../route/adminEditRoute")
+const contactRoute = require("../route/contactRoute")
+const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute")
 
 const router = express.Router();
 
+
 router.use("/v1/auth", authRouter);
-router.use("/v1/projects", projectRouter);
 router.use("/v1/users", userRouter);
 router.use("/v1/distributor", distributorRoute);
 router.use("/v1/franchiseRouter", franchiseRouter);
@@ -97,5 +98,7 @@ router.use("/v1/updateAccess", BlockRoute)
 router.use("/v1/fetchLoanRouter", fetchLoanRouter);
 router.use("/v1/fetchServicesRouter", fetchServicesRouter);
 router.use("/v1/adminEditRoute", adminEditRoute)
+router.use("/v1/contactRoute", contactRoute)
+router.use("/v1/insurance", vehicleInsuranceRoute)
 
 module.exports = router;

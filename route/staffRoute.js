@@ -6,12 +6,6 @@ const { verifyToken, verifyRefreshToken } = require("../utils/token");
 
 router
   .route("/createStaff")
-  .post(
-    verifyToken,
-    verifyRefreshToken,
-    restrictTo("admin"),
-    verifyOTP,
-    createStaffs
-  );
+  .post(verifyToken, verifyRefreshToken, restrictTo("admin"), createStaffs);
 
 module.exports = router;
