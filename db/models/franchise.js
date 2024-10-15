@@ -504,28 +504,48 @@ userPlans.belongsTo(Franchise, {
 
 module.exports = Franchise;
 
+var algorithm = "aes-192-cbc"; //algorithm to use
+var secret = process.env.FRANCHISE_SECRET_KEY;
+console.log('secret: ', secret);
+const key = crypto.scryptSync(secret, 'salt', 24); //create key
+
+
 Franchise.beforeCreate(async (franchise) => {
-  console.log("lllwsds");
-  if (franchise.password && typeof franchise.password === "string") {
-    franchise.password = await bcrypt.hash(franchise.password, 8);
-  }
-  if (franchise.panNumber && typeof franchise.panNumber === "string") {
-    franchise.panNumber = await bcrypt.hash(franchise.panNumber, 8);
-  }
+    console.log("lllwsds");
+    if (franchise.password && typeof franchise.password === 'string') {
+        franchise.password = await bcrypt.hash(franchise.password, 8);
+    }
+    const encryptData = (data) => {
+        const iv = crypto.randomBytes(16);
+        const cipher = crypto.createCipheriv(algorithm, key, iv);
+        let encrypted = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+        return iv.toString('hex') + ':' + encrypted; // Store IV with encrypted data
+    };
+    if (franchise.panNumber && typeof franchise.panNumber === 'string') {
+        // franchise.panNumber = await bcrypt.hash(franchise.panNumber, 8);
+        franchise.panNumber = encryptData(franchise.panNumber);
+    }
 
-  if (franchise.aadhaarNumber && typeof franchise.aadhaarNumber === "number") {
-    franchise.aadhaarNumber = await bcrypt.hash(
-      franchise.aadhaarNumber.toString(),
-      8
-    );
-  }
+    if (franchise.aadhaarNumber && typeof franchise.aadhaarNumber === 'number') {
+        // franchise.aadhaarNumber = await bcrypt.hash(franchise.aadhaarNumber.toString(), 8);
+        franchise.aadhaarNumber = encryptData(franchise.aadhaarNumber.toString());
+    }
 
-  if (franchise.accountNumber && typeof franchise.accountNumber === "number") {
-    franchise.accountNumber = await bcrypt.hash(
-      franchise.accountNumber.toString(),
-      8
-    );
-  }
+    if (franchise.accountNumber && typeof franchise.accountNumber === 'number') {
+        // franchise.accountNumber = await bcrypt.hash(franchise.accountNumber.toString(), 8);
+        franchise.accountNumber = encryptData(franchise.accountNumber.toString());
+    }
+
+    const decryptData = (encryptedData) => {
+        const [ivHex, encryptedText] = encryptedData.split(':'); // Split IV and encrypted text
+        const iv = Buffer.from(ivHex, 'hex'); // Convert IV back to buffer
+        const decipher = crypto.createDecipheriv(algorithm, key, iv);
+        let decrypted = decipher.update(encryptedText, 'hex', 'utf8') + decipher.final('utf8');
+        return decrypted;
+    };
+
+    // const decryptedAccNo=decryptData("26a2ebb5bc1e5beaa893a549f46e60a4:e5a4b418e942d413c5afe5049285b0ed")
+    // console.log('decryptedAccNo: ', decryptedAccNo);
 });
 
 Franchise.prototype.isPasswordMatch = async function (password) {
