@@ -327,8 +327,29 @@ const creatFranchise = catchAsync(async (req, res, next) => {
 
 const updateFranchise = catchAsync(async (req, res, next) => {
   try {
+
+    const transaction = await sequelize.transaction();
+    const users = req.user;
+
+    console.log("ser.franchiseUniqueId", users.email)
+    console.log("User", users)
+
+    const franchise = await Franchise.findOne({
+      where: { email: users.email },
+    });
+
+    if (!franchise) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Franchise not found" });
+    }
+
+    const franchiseUniqueId = franchise.franchiseUniqueId
+
+    console.log("Franchisse", franchiseUniqueId)
+    console.log("email", franchise.email)
+    
     const {
-      franchiseUniqueId,
       email,
       franchiseAddressLine1,
       franchiseAddressLine2,
@@ -340,10 +361,8 @@ const updateFranchise = catchAsync(async (req, res, next) => {
       ward,
       digitalElements,
       panCenter,
-
+      businessType,
     } = req.body;
-
-    const transaction = await sequelize.transaction();
     
       const shopPic = req?.files?.shopPic
 
@@ -363,17 +382,6 @@ const updateFranchise = catchAsync(async (req, res, next) => {
 
     const shopPicUrl = await uploadFile(shopPic);
 
-    const franchise = await Franchise.findOne({
-      where: { franchiseUniqueId },
-      transaction,
-    });
-
-    if (!franchise) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Franchise not found" });
-    }
-
     const updatedFranchise = await Franchise.update(
       {
         email,
@@ -387,10 +395,11 @@ const updateFranchise = catchAsync(async (req, res, next) => {
         ward,
         digitalElements,
         panCenter,
+        businessType,
         shopPic: shopPicUrl,
       },
       {
-        where: { franchiseUniqueId },
+        where: { franchiseUniqueId: franchiseUniqueId },
       },
       transaction,
     );
@@ -419,7 +428,7 @@ const updateFranchise = catchAsync(async (req, res, next) => {
     }
 
     const updatedFranchises = await Franchise.findOne({
-      where: { franchiseUniqueId },
+      where: { franchiseUniqueId: franchiseUniqueId },
     });
 
     await transaction.commit();
