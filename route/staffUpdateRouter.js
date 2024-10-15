@@ -1,5 +1,6 @@
 const express = require("express");
-const { loanStatus, trainBookingUpdate, updatePanDetails,, updateGstDetails } = require("../controller/staffUpdateController");
+const { loanStatus, trainBookingUpdate, updatePanDetails,, updateGstDetails, updateInsuranceDetails } = require("../controller/staffUpdateController");
+
 
 const { verifyRefreshToken, verifyToken } = require("../utils/token");
 
@@ -13,5 +14,7 @@ router.route("/updateGstDetails").put(verifyToken, verifyRefreshToken, updateGst
 
 router.route("/updatePanDetails").put(verifyToken, verifyRefreshToken, updatePanDetails);
 
+router.route("/updateInsuranceDetails").put(verifyToken, verifyRefreshToken, updateInsuranceDetails);
 
  module.exports = router;
+
