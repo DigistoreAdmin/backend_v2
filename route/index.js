@@ -1,7 +1,6 @@
 const express = require("express");
 
 const authRouter = require("../route/authRoute");
-const projectRouter = require("../route/projectRoute");
 const userRouter = require("../route/userRoute");
 const distributorRoute = require("../route/distributorRoute");
 const franchiseRouter = require("../route/franchiseRouter");
@@ -50,11 +49,13 @@ const adminEditRoute = require("../route/adminEditRoute");
 const contactRoute = require("../route/contactRoute");
 const medicalInsuranceRoute = require("../route/medicalInsuranceRoute");
 const microLoanRoute = require("../route/Loan/microLoanRoute");
+const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute")
+
 
 const router = express.Router();
 
+
 router.use("/v1/auth", authRouter);
-router.use("/v1/projects", projectRouter);
 router.use("/v1/users", userRouter);
 router.use("/v1/distributor", distributorRoute);
 router.use("/v1/franchiseRouter", franchiseRouter);
@@ -92,16 +93,10 @@ router.use("/v1/companyFormationRoute", companyFormationRoute);
 router.use("/v1/personalLoanRoute", personalLoanRoute);
 router.use("/v1/businessLoanNewSecured", businessLoanNewSecuredRoute);
 router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured);
-router.use(
-  "/v1/BusinessLoanUnsecuredExisting",
-  BusinessLoanUnsecuredExistingRouter
-);
+router.use("/v1/BusinessLoanUnsecuredExisting",BusinessLoanUnsecuredExistingRouter);
 router.use("/v1/students", collegeTeamRoute);
 router.use("/v1/staffUpdateRouter", staffUpdateRouter);
-router.use(
-  "/v1/partnerShipDeedPreperationRoute",
-  partnerShipDeedPreperationRoute
-);
+router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute);
 router.use("/v1/updateAccess", BlockRoute);
 router.use("/v1/fetchLoanRouter", fetchLoanRouter);
 router.use("/v1/fetchServicesRouter", fetchServicesRouter);
@@ -109,5 +104,7 @@ router.use("/v1/adminEditRoute", adminEditRoute);
 router.use("/v1/contactRoute", contactRoute);
 router.use("/v1/medicalRoute", medicalInsuranceRoute);
 router.use("/v1/microLoanRoute", microLoanRoute);
+router.use("/v1/insurance", vehicleInsuranceRoute)
+
 
 module.exports = router;

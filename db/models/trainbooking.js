@@ -139,6 +139,34 @@ module.exports = sequelize.define(
       type:DataTypes.DATE,
       allowNull:true
     },
+    amount:{
+      type:DataTypes.INTEGER,
+      allowNull:true
+    },
+    workId:{
+      type:DataTypes.STRING,
+      allowNull:true
+    },
+    ticket:{
+      type:DataTypes.STRING,
+      allowNull:true
+    },
+    serviceCharge:{
+      type:DataTypes.INTEGER,
+      allowNull:true
+    },
+    commissionToFranchise:{
+      type:DataTypes.INTEGER,
+      allowNull:true
+    },
+    commissionToHeadOffice:{
+      type:DataTypes.INTEGER,
+      allowNull:true
+    },
+    totalAmount:{
+      type:DataTypes.INTEGER,
+      allowNull:true
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
