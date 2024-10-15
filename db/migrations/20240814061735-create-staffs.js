@@ -19,7 +19,7 @@ module.exports = {
       lastName: {
         type: Sequelize.STRING,
       },
-      emailId: {
+      email: {
         type: Sequelize.STRING,
       },
       phoneNumber: {
@@ -82,34 +82,58 @@ module.exports = {
       bank: {
         type: Sequelize.STRING,
       },
+      branchName: {
+        type: Sequelize.STRING,
+      },
       accountNumber: {
         type: Sequelize.STRING,
       },
       ifscCode: {
         type: Sequelize.STRING,
       },
-      accountHolderName: {
+      accountName: {
         type: Sequelize.STRING,
       },
       laptop: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
       },
       idCard: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
       },
       phone: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
       },
       sim: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
       },
       vistingCard: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
       },
       posterOrBroucher: {
-        type: Sequelize.STRING,
+        type: Sequelize.BOOLEAN,
       },
       other: {
+        type: Sequelize.BOOLEAN,
+      },
+      laptopDetails: {
+        type: Sequelize.STRING,
+      },
+      idCardDetails: {
+        type: Sequelize.STRING,
+      },
+      phoneDetails: {
+        type: Sequelize.STRING,
+      },
+      simDetails: {
+        type: Sequelize.STRING,
+      },
+      vistingCardDetails: {
+        type: Sequelize.STRING,
+      },
+      posterOrBroucherDetails: {
+        type: Sequelize.STRING,
+      },
+      otherDetails: {
         type: Sequelize.STRING,
       },
       remarks: {
@@ -136,7 +160,7 @@ module.exports = {
 
     const existingValues = enumValues[0].map((row) => row.enumlabel);
 
-    if (!existingValues.includes('staff')) {
+    if (!existingValues.includes("staff")) {
       await queryInterface.sequelize.query(`
         ALTER TYPE "enum_staffs_userType" ADD VALUE 'staff';
       `);

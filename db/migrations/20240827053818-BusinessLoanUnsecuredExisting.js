@@ -64,6 +64,43 @@ module.exports = {
       sourceOfIncome: {
         type: Sequelize.STRING,
       },
+      loanStatus: {
+        type: Sequelize.JSONB,
+        defaultValue: {
+          documentSubmittedToBank: false,
+          bankVerified: false,
+          bankApprovalOrReject: false,
+          loanDispersed: false,
+          commissionCredited: false
+        },
+      },
+      rejectReason: {
+        type: Sequelize.STRING
+      },
+      bankDetails: {
+        type: Sequelize.STRING
+      },
+      loanGivenByBank: {
+        type: Sequelize.BIGINT
+      },
+      doneBy: {
+        type: Sequelize.STRING
+      },
+      serviceCharge: {
+        type: Sequelize.INTEGER
+      },
+      commissionToFranchise: {
+        type: Sequelize.INTEGER
+      },
+      commissionToHO: {
+        type: Sequelize.INTEGER
+      },
+      otherPayments: {
+        type: Sequelize.STRING
+      },
+      otherDocumentsByStaff: {
+        type: Sequelize.STRING
+      },
       status: {
         type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
       },

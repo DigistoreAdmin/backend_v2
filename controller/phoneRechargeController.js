@@ -54,13 +54,11 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
     );
   }
 
-  const random12DigitNumber = generateRandomNumber();
-  let DSP = `DSP${random12DigitNumber}${Data.id}`;
-  console.log("DSP", DSP);
-  console.log("ra", random12DigitNumber);
+  const randomDigitNumber = fourDigitRandomNumberWithAlphabet()
+  const apiRequestId = `${Data.franchiseUniqueId}${randomDigitNumber}`
 
   const response = await axios.get(
-    `https://livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${phoneNumber}&Amount=${amount}&SPKey=${sp_key}&APIRequestID=${random12DigitNumber}&Optional1={Optional1}&Optional2={Optional2}&Optional3={Optional3}&Optional4={Optional4}&RefID={RefID}&GEOCode=${circle}&CustomerNumber=8606172833&Pincode=691536&Format=1&OutletID=0`
+    `https://livepay.co.in/API/TransactionAPI?UserID=2955&Token=a3c538a805fdd227025b84aa7d59ff7b&Account=${phoneNumber}&Amount=${amount}&SPKey=${sp_key}&APIRequestID=${apiRequestId}&Optional1={Optional1}&Optional2={Optional2}&Optional3={Optional3}&Optional4={Optional4}&RefID={RefID}&GEOCode=${circle}&CustomerNumber=8606172833&Pincode=691536&Format=1&OutletID=0`
   );
   console.log("res ", response);
   console.log("res ", response.data.rpid);// transation id in history
@@ -88,7 +86,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
 
     let newBalance =
       walletData.balance - response.data.amount + franciseCommissionAmount;
-
+      newBalance = Math.round(newBalance * 100) / 100;
     console.log("newBalance", newBalance);
 
     const updated = await Wallet.update(
@@ -103,7 +101,10 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       uniqueId: Data.franchiseUniqueId,
       userName: Data.franchiseName,
       userType: user.userType,
-      service: serr,
+      service: result.rechargeType,
+      customerNumber:phoneNumber,
+      serviceNumber:phoneNumber,
+      serviceProvider:result.serviceProvider,
       status: "success",
       amount: amount,
       franchiseCommission: franciseCommissionAmount,
@@ -111,7 +112,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       walletBalance: newBalance,
     });
 
-    console.log("transatin History checking working fine", transatinH);
+    // console.log("transatin History checking working fine", transatinH);
 
     if (updated && transatinH) {
       return res
@@ -139,7 +140,7 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
 
     let newBalance =
       walletData.balance - response.data.amount + franciseCommissionAmount;
-
+      newBalance = Math.round(newBalance * 100) / 100;
     console.log("newBalance", newBalance);
 
     const updated = await Wallet.update(
@@ -154,7 +155,10 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
       uniqueId: Data.franchiseUniqueId,
       userName: Data.franchiseName,
       userType: user.userType,
-      service: serr,
+      service: result.rechargeType,
+      customerNumber:phoneNumber,
+      serviceNumber:phoneNumber,
+      serviceProvider:result.serviceProvider,
       status: "pending",
       amount: amount,
       franchiseCommission: franciseCommissionAmount,
@@ -165,27 +169,35 @@ const mobileRecharge = catchAsync(async (req, res, next) => {
     if (updated && transatinH) {
       return res
         .status(200)
-        .json({ data: response.data, message: "recharge Processing" });
+        .json({ data: response.data, message: "Recharge Processing" });
     }
     } 
    else 
    {
     //
+    if (!response.data.rpid) {
+      return res
+        .status(400)
+        .json({ error: response.data, message: "Try Again Later" });
+    }
      const serr = `Mobile Recharge Number:${phoneNumber} sim:${result.serviceProvider}`;
     const transatinH = await transationHistory.create({
       transactionId: response.data.rpid,
       uniqueId: Data.franchiseUniqueId,
       userName: Data.franchiseName,
       userType: user.userType,
-      service: serr,
       status: "fail",
+      service: result.rechargeType,
+      customerNumber:phoneNumber,
+      serviceNumber:phoneNumber,
+      serviceProvider:result.serviceProvider,
       amount: amount,
       walletBalance: walletData.balance,
     });
     if (transatinH) {
       return res
         .status(400)
-        .json({ error: response.data, message: "Operation failed" });
+        .json({ error: response.data, message: "Something Went Wrong" });
     }
   }
 });
@@ -215,7 +227,9 @@ const callBackUrl = catchAsync(async (req, res, next) => {
     console.log("uniqueId",data.uniqueId);
     // d = data.uniqueId
     const amount = await Wallet.findOne({ where: { uniqueId:data.uniqueId } })
-    let newBalance = AMOUNT + amount.balance - data.franchiseCommission
+    // let newBalance = AMOUNT + amount.balance - data.franchiseCommission
+    let newBalance = Number(AMOUNT) + Number(amount.balance) - Number(data.franchiseCommission);
+    newBalance = Math.round(newBalance * 100) / 100;
     const update = await transationHistory.update({ status:"fail", amount: AMOUNT,adminCommission: 0.00, franchiseCommission: 0.00, walletBalance: newBalance  },{where:{transactionId:TRANID}})
     console.log("121",update);
     console.log("newBalance",newBalance);
@@ -233,11 +247,17 @@ const callBackUrl = catchAsync(async (req, res, next) => {
 
 
 
-function generateRandomNumber() {
-  const randomNumber =
-    Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
-    100000000000;
-  return randomNumber.toString();
+
+
+function randomAlphabet() {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return alphabet[Math.floor(Math.random() * alphabet.length)];
+}
+
+function fourDigitRandomNumberWithAlphabet() {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000); // Generates a 4-digit number
+  const randomChar = randomAlphabet(); // Generates a random alphabet
+  return randomChar + randomNumber.toString();
 }
 
 
