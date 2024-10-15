@@ -1,5 +1,5 @@
 const express = require("express");
-const { loanStatus, trainBookingUpdate, updatePanDetails,, updateGstDetails, updateInsuranceDetails, incometaxUpdate } = require("../controller/staffUpdateController");
+const { loanStatus, trainBookingUpdate, updatePanDetails, updateGstDetails, updateInsuranceDetails, incometaxUpdate } = require("../controller/staffUpdateController");
 
 const { verifyRefreshToken, verifyToken } = require("../utils/token");
 
