@@ -45,12 +45,14 @@ const partnerShipDeedPreperationRoute = require("../route/partnerShipDeedPrepera
 const BlockRoute = require("../route/blockRoutes");
 const fetchLoanRouter = require("../route/Loan/fetchLoanRouter");
 const fetchServicesRouter = require("../route/fetchServicesRouter");
+const rankRoute = require("../route/studentRankRoute");
 const adminEditRoute = require("../route/adminEditRoute");
 const contactRoute = require("../route/contactRoute");
 const medicalInsuranceRoute = require("../route/medicalInsuranceRoute");
 const microLoanRoute = require("../route/Loan/microLoanRoute");
 const staffUpdateLoanRoute=require("../route/Loan/staffUpdateRouter")
 const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute")
+
 
 
 const router = express.Router();
@@ -101,12 +103,14 @@ router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute
 router.use("/v1/updateAccess", BlockRoute);
 router.use("/v1/fetchLoanRouter", fetchLoanRouter);
 router.use("/v1/fetchServicesRouter", fetchServicesRouter);
+router.use("/v1/rankRoute", rankRoute);
 router.use("/v1/adminEditRoute", adminEditRoute);
 router.use("/v1/contactRoute", contactRoute);
 router.use("/v1/medicalRoute", medicalInsuranceRoute);
 router.use("/v1/microLoanRoute", microLoanRoute);
 router.use("/v1/staffUpdateLoanRoute", staffUpdateLoanRoute)
 router.use("/v1/insurance", vehicleInsuranceRoute)
+
 
 
 module.exports = router;
