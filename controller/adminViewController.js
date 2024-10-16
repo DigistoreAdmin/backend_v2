@@ -114,6 +114,12 @@ const getFranchise = catchAsync(async (req, res) => {
       .json({ succes: "false", message: "No data to display" });
   }
 
+    if (Data.panNumber) Data.panNumber = decryptData(Data.panNumber);
+    if (Data.accountNumber) Data.accountNumber = decryptData(Data.accountNumber);
+    if (Data.aadhaarNumber) Data.aadhaarNumber = decryptData(Data.aadhaarNumber);
+    Data.password = "";  
+
+
   return res.status(200).json({ succes: "success", data: Data });
 });
 
