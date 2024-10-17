@@ -2,8 +2,37 @@ const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
 const sequelize = require("../config/database");
 const defineStaffsDetails = require("../db/models/staffs");
+const azureStorage = require("azure-storage");
+const intoStream = require("into-stream");
 const otpStorage = require("../utils/otpStorage");
 const AppError = require("../utils/appError");
+
+const containerName = "imagecontainer";
+const blobService = azureStorage.createBlobService(
+  process.env.AZURE_STORAGE_CONNECTION_STRING
+);
+
+const uploadBlob = (file) => {
+  return new Promise((resolve, reject) => {
+    const blobName = file.name;
+    const stream = intoStream(file.data);
+    const streamLength = file.data.length;
+
+    blobService.createBlockBlobFromStream(
+      containerName,
+      blobName,
+      stream,
+      streamLength,
+      (err) => {
+        if (err) {
+          return reject(`Error uploading file ${blobName}: ${err.message}`);
+        }
+        const blobUrl = blobService.getUrl(containerName, blobName);
+        resolve(blobUrl);
+      }
+    );
+  });
+};
 
 const createStaffs = catchAsync(async (req, res, next) => {
   const {
@@ -51,6 +80,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     otherDetails,
     remarks,
   } = req.body;
+
 
   const transaction = await sequelize.transaction();
 
@@ -102,6 +132,8 @@ const createStaffs = catchAsync(async (req, res, next) => {
       other
     );
 
+    const profilePicUrl = await uploadBlob(req.files.profilePic);
+
     const employeeId = "";
 
     const newStaff = await staffs.create(
@@ -142,6 +174,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
         posterOrBroucher,
         sim,
         phone,
+        profilePic: profilePicUrl,
         other,
         laptopDetails,
         idCardDetails,
