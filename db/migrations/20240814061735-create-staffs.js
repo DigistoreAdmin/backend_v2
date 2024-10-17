@@ -19,6 +19,9 @@ module.exports = {
       lastName: {
         type: Sequelize.STRING,
       },
+      profilePic: {
+        type: Sequelize.STRING,
+      },
       email: {
         type: Sequelize.STRING,
       },
@@ -106,6 +109,7 @@ module.exports = {
       sim: {
         type: Sequelize.BOOLEAN,
       },
+      
       vistingCard: {
         type: Sequelize.BOOLEAN,
       },
@@ -138,6 +142,9 @@ module.exports = {
       },
       remarks: {
         type: Sequelize.STRING,
+      },
+      blocked: {
+        type: Sequelize.ENUM("blocked", "unBlocked"),
       },
       createdAt: {
         allowNull: false,
