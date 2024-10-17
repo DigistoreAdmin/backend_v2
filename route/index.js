@@ -49,6 +49,7 @@ const adminEditRoute = require("../route/adminEditRoute");
 const contactRoute = require("../route/contactRoute");
 const medicalInsuranceRoute = require("../route/medicalInsuranceRoute");
 const microLoanRoute = require("../route/Loan/microLoanRoute");
+const microLoanShopRoute = require("../route/Loan/microLoanShopRoute");
 const staffUpdateLoanRoute=require("../route/Loan/staffUpdateRouter")
 const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute")
 
@@ -105,6 +106,7 @@ router.use("/v1/adminEditRoute", adminEditRoute);
 router.use("/v1/contactRoute", contactRoute);
 router.use("/v1/medicalRoute", medicalInsuranceRoute);
 router.use("/v1/microLoanRoute", microLoanRoute);
+router.use("/v1/microLoanShopRoute", microLoanShopRoute);
 router.use("/v1/staffUpdateLoanRoute", staffUpdateLoanRoute)
 router.use("/v1/insurance", vehicleInsuranceRoute)
 
