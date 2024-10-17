@@ -639,6 +639,160 @@ const getVehicleInsurance = catchAsync(async (req,res,next) => {
   }  
 } )
 
+const getAllWorks = catchAsync(async (req, res, next) => {
+  try {
+    const { 
+      page, pageLimit, search, filterBy, filterValue, sortBy, sortOrder, 
+      sortByTable, filterByTable
+    } = req.query;
+
+    if (!page || !pageLimit) {
+      return res.status(400).json({
+        error: "page and pageLimit query parameters are required",
+      });
+    }
+
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
+
+    const allowedTables = [
+      'panCardUsers',
+      'passportDetails',
+      'kSwiftDetails',
+      'busBookingsDetails',
+      'fssaiRegistrations',
+      'fssaiLicences',
+      'trainBookingDetails',
+      'udyamRegistrations',
+      'financialstatements',
+      'companyFormations',
+      'gstRegistrations',
+      'gstFilings',
+      'incomeTaxFilings',
+      'partnershipDeeds',
+      'packingLicences',
+      'vehicleInsurance',
+    ];
+
+    const [
+      pancardDetails,
+      passportDetails,
+      kSwiftDetails,
+      busBookingsDetails,
+      fssaiRegistrationDetails,
+      fssaiLicenceDetails,
+      trainBookingDetails,
+      udyamRegistrationDetails,
+      financialstatementDetails,
+      companyFormationDetails,
+      gstRegistrationsDetails,
+      gstFilingDetails,
+      incomeTaxFilingsDetails,
+      partnershipDeedPreparations,
+      packingLicenceDetails,
+      vehicleInsuranceDetails,
+    ] = await Promise.all([
+      panCardUsers().findAndCountAll(),
+      definePassportDetails().findAndCountAll(),
+      kswift.findAndCountAll(),
+      BusBooking.findAndCountAll(),
+      fssaiRegistrations.findAndCountAll(),
+      fssaiLicences.findAndCountAll(),
+      trainBooking.findAndCountAll(),
+      udyamRegistrations.findAndCountAll(),
+      financialstatements.findAndCountAll(),
+      companyFormations.findAndCountAll(),
+      gstRegistrationDetails().findAndCountAll(),
+      gstFilings.findAndCountAll(),
+      incomeTaxFilingDetails().findAndCountAll(),
+      partnerShipDeedTable.findAndCountAll(),
+      packingLicence.findAndCountAll(),
+      defineVehicleInsurance().findAndCountAll(),
+    ]);
+
+    let combinedData = [
+      ...pancardDetails.rows.map(item => ({ ...item.dataValues, tableName: 'panCardUsers' })),
+      ...passportDetails.rows.map(item => ({ ...item.dataValues, tableName: 'passportDetails' })),
+      ...kSwiftDetails.rows.map(item => ({ ...item.dataValues, tableName: 'kSwiftDetails' })),
+      ...busBookingsDetails.rows.map(item => ({ ...item.dataValues, tableName: 'busBookingsDetails' })),
+      ...fssaiRegistrationDetails.rows.map(item => ({ ...item.dataValues, tableName: 'fssaiRegistrations' })),
+      ...fssaiLicenceDetails.rows.map(item => ({ ...item.dataValues, tableName: 'fssaiLicences' })),
+      ...trainBookingDetails.rows.map(item => ({ ...item.dataValues, tableName: 'trainBookingDetails' })),
+      ...udyamRegistrationDetails.rows.map(item => ({ ...item.dataValues, tableName: 'udyamRegistrations' })),
+      ...financialstatementDetails.rows.map(item => ({ ...item.dataValues, tableName: 'financialstatements' })),
+      ...companyFormationDetails.rows.map(item => ({ ...item.dataValues, tableName: 'companyFormations' })),
+      ...gstRegistrationsDetails.rows.map(item => ({ ...item.dataValues, tableName: 'gstRegistrations' })),
+      ...gstFilingDetails.rows.map(item => ({ ...item.dataValues, tableName: 'gstFilings' })),
+      ...incomeTaxFilingsDetails.rows.map(item => ({ ...item.dataValues, tableName: 'incomeTaxFilings' })),
+      ...partnershipDeedPreparations.rows.map(item => ({ ...item.dataValues, tableName: 'partnershipDeeds' })),
+      ...packingLicenceDetails.rows.map(item => ({ ...item.dataValues, tableName: 'packingLicences' })),
+      ...vehicleInsuranceDetails.rows.map(item => ({ ...item.dataValues, tableName: 'vehicleInsurance' })),
+    ];
+
+    if (filterByTable) {
+      if (!allowedTables.includes(filterByTable)) {
+        return res.status(400).json({
+          error: `Invalid table name '${filterByTable}'. Allowed table names are: ${allowedTables.join(', ')}.`,
+        });
+      }
+      combinedData = combinedData.filter(item => item.tableName === filterByTable);
+    }
+
+    if (search) {
+      combinedData = combinedData.filter(item =>
+        Object.values(item).some(value =>
+          String(value).toLowerCase().includes(search.toLowerCase())
+        )
+      );
+    }
+
+    if (filterBy && filterValue) {
+      combinedData = combinedData.filter(item => String(item[filterBy]) === filterValue);
+    }
+
+    combinedData.sort((a, b) => {
+      if (sortByTable) {
+        if (a.tableName < b.tableName) return -1;
+        if (a.tableName > b.tableName) return 1;
+      }
+
+      const sortField = sortBy || 'updatedAt';
+      const sortDirection = sortOrder === 'asc' ? 1 : -1;
+
+      if (a[sortField] < b[sortField]) return -1 * sortDirection;
+      if (a[sortField] > b[sortField]) return 1 * sortDirection;
+      return 0;
+    });
+
+    const totalItems = combinedData.length;
+    const paginatedData = combinedData.slice(offset, offset + limit);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    if(totalItems===0){
+      return res.status(404).json({
+        status:"fail",
+        message:"No data found"
+      })
+    }
+
+    res.status(200).json({
+      status: "success",
+      currentPage: pageNumber,
+      totalPages,
+      totalItems,
+      results: paginatedData.length,
+      data: paginatedData,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+});
+
+
 module.exports = {
   getPackingLicences,
   getPartnerShipDeedPreparation,
@@ -656,5 +810,6 @@ module.exports = {
   fetchFinancialStatements,
   fetchCompanyFormationDetails,
   getVehicleInsurance,
+  getAllWorks
 };
 
