@@ -182,6 +182,7 @@ const updateStaffDetails = catchAsync(async (req, res, next) => {
 });
 
 const updateFranchiseDetails = catchAsync(async (req, res, next) => {
+  const transaction = await sequelize.transaction();
   try {
     const {
       franchiseUniqueId,
@@ -217,8 +218,6 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
       onBoardedPersonName,
       userPlan,
     } = req.body;
-
-    const transaction = await sequelize.transaction();
     
       const aadhaarPicFront = req?.files?.aadhaarPicFront
       const aadhaarPicback  = req?.files?.aadhaarPicback
@@ -296,9 +295,9 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
             email: franchise.email,
             phoneNumber: franchise.phoneNumber,
           },
-        },
-        transaction,
-      )
+          transaction, 
+        }
+      );
   
       if (!updateUserDetails){
         await transaction.rollback();
@@ -367,6 +366,7 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
       updatedFranchises,
     });
   } catch (error) {
+    await transaction.rollback();
     console.error("Error:", error);
     return next(new AppError(error.message, 500));
   }
