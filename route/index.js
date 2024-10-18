@@ -50,10 +50,13 @@ const adminEditRoute = require("../route/adminEditRoute");
 const contactRoute = require("../route/contactRoute");
 const medicalInsuranceRoute = require("../route/medicalInsuranceRoute");
 const microLoanRoute = require("../route/Loan/microLoanRoute");
+const microLoanShopRoute = require("../route/Loan/microLoanShopRoute");
 const staffUpdateLoanRoute=require("../route/Loan/staffUpdateRouter")
 const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute")
 const rechapiPhoneRechargeRoute = require("../route/rechapi-routes/phoneRechargeRoute")
 const rechapiBillPaymentRoute = require("../route/rechapi-routes/billPaymentRoute")
+const busBookingRechapi = require("../route/rechapi-routes/busBookingRoute")
+
 
 const router = express.Router();
 
@@ -108,9 +111,12 @@ router.use("/v1/adminEditRoute", adminEditRoute);
 router.use("/v1/contactRoute", contactRoute);
 router.use("/v1/medicalRoute", medicalInsuranceRoute);
 router.use("/v1/microLoanRoute", microLoanRoute);
+router.use("/v1/microLoanShopRoute", microLoanShopRoute);
 router.use("/v1/staffUpdateLoanRoute", staffUpdateLoanRoute)
 router.use("/v1/insurance", vehicleInsuranceRoute)
 router.use("/v1/rechapiPhoneRechargeRoute",rechapiPhoneRechargeRoute)
 router.use("/v1/rechapiBillPaymentRoute",rechapiBillPaymentRoute)
+router.use("/v1/bus",busBookingRechapi )
+
 
 module.exports = router;
