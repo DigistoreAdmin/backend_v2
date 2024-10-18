@@ -408,6 +408,14 @@ const updateWallet = catchAsync(async (req, res, next) => {
     };
 
     let amountValue = JSON.parse(amount);
+
+    if (
+      (amountValue.credit && ((typeof amountValue.credit != "number") || amountValue.credit <= 0) || (amountValue.credit === 0)) ||
+      (amountValue.debit && ((typeof amountValue.debit != "number") || amountValue.debit <= 0) || (amountValue.debit === 0))
+    ) {
+      return res.status(400).json({ message: "Enter a valid amount" });
+    }
+
     let credited =
       amountValue.credit && sum(wallet.balance, amountValue.credit);
     let debited = amountValue.debit && sub(wallet.balance, amountValue.debit);
@@ -437,6 +445,7 @@ const updateWallet = catchAsync(async (req, res, next) => {
       },
       { where: { uniqueId: uniqueId } }
     );
+    
 
     if (updatedW && transactionH) {
       res.status(200).json({
