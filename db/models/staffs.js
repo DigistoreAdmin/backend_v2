@@ -95,6 +95,10 @@ const defineStaffsDetails = (
           },
         },
       },
+      profilePic: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       phoneNumber: {
         type: DataTypes.BIGINT,
         allowNull: false,
@@ -407,10 +411,10 @@ const defineStaffsDetails = (
         type: DataTypes.STRING,
         allowNull: true,
       },
-      blocked:{
-        type: DataTypes.ENUM("blocked","unBlocked"),
+      blocked: {
+        type: DataTypes.ENUM("blocked", "unBlocked"),
         allowNull: false,
-        defaultValue:"unBlocked"
+        defaultValue: "unBlocked",
       },
       createdAt: {
         allowNull: false,
