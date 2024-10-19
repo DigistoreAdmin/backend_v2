@@ -153,7 +153,7 @@ const newVehicleLoan = (typeofLoan, cibil) => {
         },
       },
       cibil: {
-        type: DataTypes.ENUM("approved", "noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       cibilScore: {

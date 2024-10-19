@@ -120,7 +120,7 @@ const createNewVehicleLoan = catchAsync(async (req, res, next) => {
       break;
   }
 
-  if (cibil === "approved") {
+  if (cibil === "true") {
     const cibilReportUrl = await uploadFile(req.files.cibilReport);
     additionalData = {
       ...additionalData,
@@ -144,11 +144,11 @@ const createNewVehicleLoan = catchAsync(async (req, res, next) => {
   const count = await newVehicleLoan(typeofLoan, cibil).count({
     where: {
       workId: {
-        [Op.like]: `${currentDate}VLE%`,
+        [Op.like]: `${currentDate}VLN%`,
       },
     },
   });
-  const workId = `${currentDate}VLE${(count + 1).toString().padStart(3, "0")}`;
+  const workId = `${currentDate}VLN${(count + 1).toString().padStart(3, "0")}`;
 
   const vehicleLoan = newVehicleLoan(typeofLoan, cibil);
 
