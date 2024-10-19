@@ -1,5 +1,5 @@
 "use strict";
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 const sequelize = require("../../config/database");
 
 const getCurrentDate = () => {
@@ -14,7 +14,7 @@ const createCibilReport = (purpose) => {
   const allowNullPro = purpose === "alreadyHaveCibilReport" ? false : true;
 
   const cibilReport = sequelize.define(
-    "cibilReport",
+    "cibilReports",
     {
       id: {
         allowNull: false,
@@ -167,7 +167,7 @@ const createCibilReport = (purpose) => {
     {
       paranoid: true,
       freezeTableName: true,
-      modelName: "cibilReport",
+      modelName: "cibilReports",
       hooks: {
         beforeValidate: async (loan) => {
           const currentDate = getCurrentDate();
