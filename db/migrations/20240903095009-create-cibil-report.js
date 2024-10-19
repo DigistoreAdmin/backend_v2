@@ -43,6 +43,15 @@ module.exports = {
       panCardBack: {
         type: Sequelize.STRING,
       },
+      amount: {
+        type: Sequelize.DECIMAL,
+      },
+      workId:{
+        type: Sequelize.STRING,
+      },
+      loanType: {
+        type: Sequelize.ENUM("businessLoanUnsecuredNew","businessLoanUnscuredExisting","BusinessLoanNewSecured","businessLoanExisting","housingLoan","loanAgainstProperty","RefinanceOrUsedVehicle","newVehicle","personalLoan","microLoansShop","microLoan"),
+      },
       status: {
         type: Sequelize.ENUM("approve", "pending", "reject", "process"),
       },

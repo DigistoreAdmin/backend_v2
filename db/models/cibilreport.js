@@ -2,6 +2,13 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../../config/database");
 
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
+
 const createCibilReport = (purpose) => {
   const allowNullProp = purpose === "applyForCivilReport" ? false : true;
   const allowNullPro = purpose === "alreadyHaveCibilReport" ? false : true;
@@ -117,6 +124,18 @@ const createCibilReport = (purpose) => {
           },
         },
       },
+      amount: {
+        type: DataTypes.DECIMAL,
+        allowNull:true,
+      },
+      workId:{
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      loanType: {
+        type: DataTypes.ENUM("businessLoanUnsecuredNew","businessLoanUnscuredExisting","BusinessLoanNewSecured","businessLoanExisting","housingLoan","loanAgainstProperty","RefinanceOrUsedVehicle","newVehicle","personalLoan","microLoansShop","microLoan"),
+        allowNull: true,
+      },
       status: {
         allowNull: true,
         type: DataTypes.ENUM("approve", "pending", "reject", "process"),
@@ -149,7 +168,30 @@ const createCibilReport = (purpose) => {
       paranoid: true,
       freezeTableName: true,
       modelName: "cibilReport",
-    }
+      hooks: {
+        beforeValidate: async (loan) => {
+          const currentDate = getCurrentDate();
+          const code = "CR";
+          const lastLoan = await cibilReport.findOne({
+            where: {
+              workId: {
+                [Op.like]: `${currentDate}${code}%`,
+              },
+            },
+            order: [["createdAt", "DESC"]],
+          });
+
+          let newIncrement = "001";
+          if (lastLoan) {
+            const lastIncrement = parseInt(lastLoan.workId.slice(-3));
+            newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+          }
+
+          loan.workId = `${currentDate}${code}${newIncrement}`;
+        },
+      },
+    },
+    
   );
 
   return cibilReport;
