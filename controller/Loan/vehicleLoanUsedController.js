@@ -126,7 +126,7 @@ const createUsedVehicleLoan = catchAsync(async (req, res, next) => {
       break;
   }
 
-  if (cibil === "approved") {
+  if (cibil === "true") {
     const cibilReportUrl = await uploadFile(req.files.cibilReport);
     additionalData = {
       ...additionalData,

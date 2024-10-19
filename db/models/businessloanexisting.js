@@ -4,8 +4,8 @@ const sequelize = require('../../config/database');
 
 const businessLoanExistingDetails = (cibil) => {
 
-  const cibilNullVal = cibil === 'approved' ? false : true
-  const cibilAcknowledgementNullVal = cibil === 'noCibil' ? false : true
+  const cibilNullVal = cibil === 'true' ? false : true
+  const cibilAcknowledgementNullVal = cibil === 'false' ? false : true
 
   const businessLoanExisting = sequelize.define(
     'businessLoanExisting',
@@ -104,7 +104,7 @@ const businessLoanExistingDetails = (cibil) => {
         },
       },
       cibil: {
-        type: DataTypes.ENUM("approved", "noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         validate: {
           notNull: {

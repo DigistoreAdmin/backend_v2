@@ -28,7 +28,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       cibil: {
-        type: Sequelize.ENUM("approved","noCibil")
+        type: Sequelize.BOOLEAN
       },
       cibilScore: {
         type: Sequelize.STRING

@@ -89,7 +89,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       cibil: {
-        type: Sequelize.ENUM("approved", "noCibil"),
+        type: Sequelize.BOOLEAN,
       },
       cibilAcknowledgement: {
         type: Sequelize.STRING,
