@@ -3,8 +3,8 @@ const { Model ,DataTypes } = require("sequelize");
 const sequelize= require('../../config/database')
 
 const defineBusinessLoanUnsecuredNew =(cibil)=>{
-  const cibilNullvalue=cibil==="approved" ? false : true;
-  const cibilAcknowledgment=cibil==="noCibil" ? false : true;
+  const cibilNullvalue=cibil==="true" ? false : true;
+  const cibilAcknowledgment=cibil==="false" ? false : true;
 
   const businessLoanUnsecuredNew =sequelize.define(
     "businessLoanUnsecuredNew", 
@@ -85,7 +85,7 @@ const defineBusinessLoanUnsecuredNew =(cibil)=>{
         },
       },
       cibil:{
-        type: DataTypes.ENUM("approved","noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       cibilScore: {

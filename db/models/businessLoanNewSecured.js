@@ -10,8 +10,8 @@ const getCurrentDate = () => {
 };
 
 const defineBusinessLoanNewSecured = (cibil) => {
-  const isNoCibil = cibil === "noCibil" ? false : true;
-  const isApproved = cibil === "approved" ? false : true;
+  const isNoCibil = cibil === "false" ? false : true;
+  const isApproved = cibil === "true" ? false : true;
 
   const BusinessLoanNewSecured = sequelize.define(
     "BusinessLoanNewSecured",
@@ -178,7 +178,7 @@ const defineBusinessLoanNewSecured = (cibil) => {
         type: DataTypes.ARRAY(DataTypes.STRING),
       },
       cibil: {
-        type: DataTypes.ENUM("approved", "noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       cibilAcknowledgement: {
