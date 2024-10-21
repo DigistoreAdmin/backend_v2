@@ -17,7 +17,8 @@ const gstFilings = require("../db/models/gstfiling");
 const incomeTaxFilingDetails = require("../db/models/incometax");
 const partnerShipDeedTable = require("../db/models/partnershipdeedpreperation");
 const packingLicence = require("../db/models/packinglicences");
-const defineVehicleInsurance = require("../db/models/vehicleInsurance")
+const defineVehicleInsurance = require("../db/models/vehicleInsurance");
+const { object } = require("into-stream");
 
 
 const getPancardDetails = async (req, res) => {
@@ -233,80 +234,37 @@ const getFssaiLicence = catchAsync(async (req, res, next) => {
 
 
 
-const fetchTrainBookingDetails = catchAsync(async(req,res)=>{
-    
-        try {
-              const {page,pageLimit} = req.query
-    
-              if (!page || !pageLimit) {
-                return res.status(400).json({ error: "page and pageSize are required" });
-              }
-            
-              const pageNumber = parseInt(page, 10);
-              const pageLimitNumber = parseInt(pageLimit, 10);
-            
-              const limit = pageLimitNumber;
-              const offset = (pageNumber - 1) * limit;
-    
-    
-            const Data= await trainBooking.findAndCountAll({limit,offset})
+const fetchTrainBookingDetails = catchAsync(async (req, res) => {
 
-            if (Data.count === 0) {
-              return res
-                .status(404)
-                .json({ succes: "false", message: "No data to display" });
-            }
-          
-            if (Data.rows.length === 0) {
-              return res
-                .status(404)
-                .json({ succes: "false", message: "No data to display" });
-            }
-    
-            return res.json({
-                status: "success",
-                data: Data,
-                totalItems: Data.count,
-                totalPages: Math.ceil(Data.count / limit),
-                currentPage: pageNumber,
-              });
-    
-          } catch (error) {
-            console.error("Error:", error);
-            return next(new AppError(error.message, 500));
-          }  
-})
-
-const fetchUdyamRegistrationDetails = catchAsync(async(req,res)=>{
   try {
-    const {page,pageLimit} = req.query
+    const { page, pageLimit } = req.query
 
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
     }
-  
+
     const pageNumber = parseInt(page, 10);
     const pageLimitNumber = parseInt(pageLimit, 10);
-  
+
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
 
-  const Data= await udyamRegistrations.findAndCountAll({limit,offset})
+    const Data = await trainBooking.findAndCountAll({ limit, offset })
 
-  if (Data.count === 0) {
-    return res
-      .status(404)
-      .json({ succes: "false", message: "No data to display" });
-  }
+    if (Data.count === 0) {
+      return res
+        .status(404)
+        .json({ succes: "false", message: "No data to display" });
+    }
 
-  if (Data.rows.length === 0) {
-    return res
-      .status(404)
-      .json({ succes: "false", message: "No data to display" });
-  }
+    if (Data.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ succes: "false", message: "No data to display" });
+    }
 
-  return res.json({
+    return res.json({
       status: "success",
       data: Data,
       totalItems: Data.count,
@@ -314,42 +272,42 @@ const fetchUdyamRegistrationDetails = catchAsync(async(req,res)=>{
       currentPage: pageNumber,
     });
 
-} catch (error) {
-  console.error("Error:", error);
-  return next(new AppError(error.message, 500));
-}  
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
 })
 
-const fetchFinancialStatements = catchAsync(async(req,res)=>{
+const fetchUdyamRegistrationDetails = catchAsync(async (req, res) => {
   try {
-    const {page,pageLimit} = req.query
+    const { page, pageLimit } = req.query
 
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
     }
-  
+
     const pageNumber = parseInt(page, 10);
     const pageLimitNumber = parseInt(pageLimit, 10);
-  
+
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
 
-  const Data= await financialstatements.findAndCountAll({limit,offset})
+    const Data = await udyamRegistrations.findAndCountAll({ limit, offset })
 
-  if (Data.count === 0) {
-    return res
-      .status(404)
-      .json({ succes: "false", message: "No data to display" });
-  }
+    if (Data.count === 0) {
+      return res
+        .status(404)
+        .json({ succes: "false", message: "No data to display" });
+    }
 
-  if (Data.rows.length === 0) {
-    return res
-      .status(404)
-      .json({ succes: "false", message: "No data to display" });
-  }
+    if (Data.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ succes: "false", message: "No data to display" });
+    }
 
-  return res.json({
+    return res.json({
       status: "success",
       data: Data,
       totalItems: Data.count,
@@ -357,42 +315,42 @@ const fetchFinancialStatements = catchAsync(async(req,res)=>{
       currentPage: pageNumber,
     });
 
-} catch (error) {
-  console.error("Error:", error);
-  return next(new AppError(error.message, 500));
-}  
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
 })
 
-const fetchCompanyFormationDetails = catchAsync(async(req,res)=>{
+const fetchFinancialStatements = catchAsync(async (req, res) => {
   try {
-    const {page,pageLimit} = req.query
+    const { page, pageLimit } = req.query
 
     if (!page || !pageLimit) {
       return res.status(400).json({ error: "page and pageSize are required" });
     }
-  
+
     const pageNumber = parseInt(page, 10);
     const pageLimitNumber = parseInt(pageLimit, 10);
-  
+
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
 
-  const Data= await companyFormations.findAndCountAll({limit,offset})
+    const Data = await financialstatements.findAndCountAll({ limit, offset })
 
-  if (Data.count === 0) {
-    return res
-      .status(404)
-      .json({ succes: "false", message: "No data to display" });
-  }
+    if (Data.count === 0) {
+      return res
+        .status(404)
+        .json({ succes: "false", message: "No data to display" });
+    }
 
-  if (Data.rows.length === 0) {
-    return res
-      .status(404)
-      .json({ succes: "false", message: "No data to display" });
-  }
+    if (Data.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ succes: "false", message: "No data to display" });
+    }
 
-  return res.json({
+    return res.json({
       status: "success",
       data: Data,
       totalItems: Data.count,
@@ -400,10 +358,53 @@ const fetchCompanyFormationDetails = catchAsync(async(req,res)=>{
       currentPage: pageNumber,
     });
 
-} catch (error) {
-  console.error("Error:", error);
-  return next(new AppError(error.message, 500));
-}  
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+})
+
+const fetchCompanyFormationDetails = catchAsync(async (req, res) => {
+  try {
+    const { page, pageLimit } = req.query
+
+    if (!page || !pageLimit) {
+      return res.status(400).json({ error: "page and pageSize are required" });
+    }
+
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
+
+
+    const Data = await companyFormations.findAndCountAll({ limit, offset })
+
+    if (Data.count === 0) {
+      return res
+        .status(404)
+        .json({ succes: "false", message: "No data to display" });
+    }
+
+    if (Data.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ succes: "false", message: "No data to display" });
+    }
+
+    return res.json({
+      status: "success",
+      data: Data,
+      totalItems: Data.count,
+      totalPages: Math.ceil(Data.count / limit),
+      currentPage: pageNumber,
+    });
+
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
 })
 
 
@@ -598,53 +599,50 @@ const getPackingLicences = catchAsync(async (req, res, next) => {
   });
 });
 
-const getVehicleInsurance = catchAsync(async (req,res,next) => {
+const getVehicleInsurance = catchAsync(async (req, res, next) => {
 
-  try{
-  const { page, pageLimit } = req.query;
+  try {
+    const { page, pageLimit } = req.query;
 
-  if(!page || !pageLimit){
-    return res
-    .status(400)
-    .json({ error: "page and pageLimit query parameters are required"})
-  }
+    if (!page || !pageLimit) {
+      return res
+        .status(400)
+        .json({ error: "page and pageLimit query parameters are required" })
+    }
 
-  const pageNumber = parseInt(page, 10)
-  const pageLimitNumber = parseInt(pageLimit, 10)
+    const pageNumber = parseInt(page, 10)
+    const pageLimitNumber = parseInt(pageLimit, 10)
 
-  const limit = pageLimitNumber
-  const offset = (pageNumber - 1) * limit
+    const limit = pageLimitNumber
+    const offset = (pageNumber - 1) * limit
 
-  const vehicleInsurance = await defineVehicleInsurance()
-  const getInsurance = await vehicleInsurance.findAndCountAll({
-    limit,
-    offset,
-  })
+    const vehicleInsurance = await defineVehicleInsurance()
+    const getInsurance = await vehicleInsurance.findAndCountAll({
+      limit,
+      offset,
+    })
 
-  if(!getInsurance) {
-    return next(new AppError("Data not found", 404))
-  }
+    if (!getInsurance) {
+      return next(new AppError("Data not found", 404))
+    }
 
-  res.status(200).json({
-    data: getInsurance.rows,
-    totalPages: Math.ceil(getInsurance.count / limit),
-    totalItems: getInsurance.count,
-    currentPage: pageNumber,
-    currentPage: pageNumber,
-  })
+    res.status(200).json({
+      data: getInsurance.rows,
+      totalPages: Math.ceil(getInsurance.count / limit),
+      totalItems: getInsurance.count,
+      currentPage: pageNumber,
+      currentPage: pageNumber,
+    })
   }
   catch (error) {
     console.error("Error:", error);
     return next(new AppError(error.message, 500));
-  }  
-} )
+  }
+})
 
 const getAllWorks = catchAsync(async (req, res, next) => {
   try {
-    const { 
-      page, pageLimit, search, filterBy, filterValue, sortBy, sortOrder, 
-      sortByTable, filterByTable
-    } = req.query;
+    const { page, pageLimit, search, sortBy, sortOrder, filter } = req.query;
 
     if (!page || !pageLimit) {
       return res.status(400).json({
@@ -677,6 +675,17 @@ const getAllWorks = catchAsync(async (req, res, next) => {
       'vehicleInsurance',
     ];
 
+    if (filter) {
+      const filterObj = JSON.parse(filter);
+      const keys = Object.keys(filterObj)
+      if (keys.includes("tableName")) {
+        let table = filterObj["tableName"]
+        if (!allowedTables.includes(table)) {
+          return next(new AppError(`The table name '${table}' is not valid. Please use one of the following allowed table names: ${allowedTables.join(', ')}.`, 400));
+        }
+      }
+    }
+
     const [
       pancardDetails,
       passportDetails,
@@ -694,6 +703,7 @@ const getAllWorks = catchAsync(async (req, res, next) => {
       partnershipDeedPreparations,
       packingLicenceDetails,
       vehicleInsuranceDetails,
+      franchises
     ] = await Promise.all([
       panCardUsers().findAndCountAll(),
       definePassportDetails().findAndCountAll(),
@@ -711,35 +721,106 @@ const getAllWorks = catchAsync(async (req, res, next) => {
       partnerShipDeedTable.findAndCountAll(),
       packingLicence.findAndCountAll(),
       defineVehicleInsurance().findAndCountAll(),
+      Franchise.findAll(),
     ]);
 
+    const franchiseMap = franchises.reduce((map, franchise) => {
+      map[franchise.franchiseUniqueId] = franchise.franchiseName;
+      return map;
+    }, {});
+
     let combinedData = [
-      ...pancardDetails.rows.map(item => ({ ...item.dataValues, tableName: 'panCardUsers' })),
-      ...passportDetails.rows.map(item => ({ ...item.dataValues, tableName: 'passportDetails' })),
-      ...kSwiftDetails.rows.map(item => ({ ...item.dataValues, tableName: 'kSwiftDetails' })),
-      ...busBookingsDetails.rows.map(item => ({ ...item.dataValues, tableName: 'busBookingsDetails' })),
-      ...fssaiRegistrationDetails.rows.map(item => ({ ...item.dataValues, tableName: 'fssaiRegistrations' })),
-      ...fssaiLicenceDetails.rows.map(item => ({ ...item.dataValues, tableName: 'fssaiLicences' })),
-      ...trainBookingDetails.rows.map(item => ({ ...item.dataValues, tableName: 'trainBookingDetails' })),
-      ...udyamRegistrationDetails.rows.map(item => ({ ...item.dataValues, tableName: 'udyamRegistrations' })),
-      ...financialstatementDetails.rows.map(item => ({ ...item.dataValues, tableName: 'financialstatements' })),
-      ...companyFormationDetails.rows.map(item => ({ ...item.dataValues, tableName: 'companyFormations' })),
-      ...gstRegistrationsDetails.rows.map(item => ({ ...item.dataValues, tableName: 'gstRegistrations' })),
-      ...gstFilingDetails.rows.map(item => ({ ...item.dataValues, tableName: 'gstFilings' })),
-      ...incomeTaxFilingsDetails.rows.map(item => ({ ...item.dataValues, tableName: 'incomeTaxFilings' })),
-      ...partnershipDeedPreparations.rows.map(item => ({ ...item.dataValues, tableName: 'partnershipDeeds' })),
-      ...packingLicenceDetails.rows.map(item => ({ ...item.dataValues, tableName: 'packingLicences' })),
-      ...vehicleInsuranceDetails.rows.map(item => ({ ...item.dataValues, tableName: 'vehicleInsurance' })),
+      ...pancardDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'panCardUsers',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...passportDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'passportDetails',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...kSwiftDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'kSwiftDetails',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...busBookingsDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'busBookingsDetails',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...fssaiRegistrationDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'fssaiRegistrations',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...fssaiLicenceDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'fssaiLicences',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...trainBookingDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'trainBookingDetails',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...udyamRegistrationDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'udyamRegistrations',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...financialstatementDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'financialstatements',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...companyFormationDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'companyFormations',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...gstRegistrationsDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'gstRegistrations',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...gstFilingDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'gstFilings',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...incomeTaxFilingsDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'incomeTaxFilings',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...partnershipDeedPreparations.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'partnershipDeeds',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...packingLicenceDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'packingLicences',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...vehicleInsuranceDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'vehicleInsurance',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
     ];
 
-    if (filterByTable) {
-      if (!allowedTables.includes(filterByTable)) {
-        return res.status(400).json({
-          error: `Invalid table name '${filterByTable}'. Allowed table names are: ${allowedTables.join(', ')}.`,
-        });
-      }
-      combinedData = combinedData.filter(item => item.tableName === filterByTable);
+    if (filter) {
+      const filterObj = JSON.parse(filter);
+
+      Object.keys(filterObj).forEach(key => {
+        const filterValue = filterObj[key];
+        combinedData = combinedData.filter(item => String(item[key]) === String(filterValue));
+      });
     }
+
 
     if (search) {
       combinedData = combinedData.filter(item =>
@@ -749,16 +830,7 @@ const getAllWorks = catchAsync(async (req, res, next) => {
       );
     }
 
-    if (filterBy && filterValue) {
-      combinedData = combinedData.filter(item => String(item[filterBy]) === filterValue);
-    }
-
     combinedData.sort((a, b) => {
-      if (sortByTable) {
-        if (a.tableName < b.tableName) return -1;
-        if (a.tableName > b.tableName) return 1;
-      }
-
       const sortField = sortBy || 'updatedAt';
       const sortDirection = sortOrder === 'asc' ? 1 : -1;
 
@@ -771,11 +843,11 @@ const getAllWorks = catchAsync(async (req, res, next) => {
     const paginatedData = combinedData.slice(offset, offset + limit);
     const totalPages = Math.ceil(totalItems / limit);
 
-    if(totalItems===0){
+    if (totalItems === 0) {
       return res.status(404).json({
-        status:"fail",
-        message:"No data found"
-      })
+        status: "fail",
+        message: "No data found",
+      });
     }
 
     res.status(200).json({
@@ -791,6 +863,7 @@ const getAllWorks = catchAsync(async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 });
+
 
 
 module.exports = {
