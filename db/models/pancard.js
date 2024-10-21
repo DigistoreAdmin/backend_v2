@@ -1,5 +1,5 @@
 'use strict';
-const { Model, DataTypes } = require('sequelize');
+const { Model, DataTypes ,Op} = require('sequelize');
 const sequelize = require('../../config/database');
 
 const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
@@ -13,6 +13,13 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
   const allowNullVe = panType === "duplicateOrChangePancard" ? false : true;
   const allow = panType === "minorPancard" ? false : true;
   const allowNullV = panType === "NRIPancard" ? false : true;
+
+  const getCurrentDate = () => {
+    const date = new Date();
+    return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}${date.getFullYear()}`;
+  };
 
   const PancardUser = sequelize.define('pancardUser', {
     id: {
@@ -32,6 +39,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
         }
       },
     uniqueId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    workId: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -236,6 +247,18 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       type: DataTypes.STRING,
       allowNull: allowNullV,
     },
+    commissionToHeadOffice: {
+      type: DataTypes.DECIMAL,
+      allowNull:true
+    },
+    commissionToFranchise: {
+      type: DataTypes.DECIMAL,
+      allowNull:true
+    },
+    totalAmount: {
+      type: DataTypes.DECIMAL,
+      allowNull:true
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
@@ -252,7 +275,29 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
   }, {
     paranoid: true,
     freezeTableName: true,
-    modelName: 'pancardUser'
+    modelName: 'pancardUser',
+    hooks: {
+      beforeValidate: async (pan) => {
+        const currentDate = getCurrentDate();
+        const code = "PAN";
+        const lastPan = await PancardUser.findOne({
+          where: {
+            workId: {
+              [Op.like]: `${currentDate}${code}%`,
+            },
+          },
+          order: [["createdAt", "DESC"]],
+        });
+
+        let newIncrement = "001";
+        if (lastPan) {
+          const lastIncrement = parseInt(lastPan.workId.slice(-3));
+          newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+        }
+
+        pan.workId = `${currentDate}${code}${newIncrement}`;
+      },
+    },
   });
 
   return PancardUser;
