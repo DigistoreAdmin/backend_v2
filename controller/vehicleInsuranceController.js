@@ -44,11 +44,12 @@ const createVehicleInsurance = async (req, res) => {
       insuranceType,
       commercialOrType2Vehicle,
       isPolicyExpired,
+      anyClaims,
     } = req.body;
 
     const VehicleInsurance = defineVehicleInsurance(
       commercialOrType2Vehicle,
-      isPolicyExpired
+      isPolicyExpired,
     );
 
     const {
@@ -64,6 +65,7 @@ const createVehicleInsurance = async (req, res) => {
       vehicleEngineNumber,
       vehicleChasisNumber,
       otherDocuments,
+      previousPolicyDocument,
     } = req.files;
 
     const uploadFile = async (file) => {
@@ -92,6 +94,7 @@ const createVehicleInsurance = async (req, res) => {
     const vehicleEngineNumberUrl = await uploadFile(vehicleEngineNumber);
     const vehicleChasisNumberUrl = await uploadFile(vehicleChasisNumber);
     const otherDocumentsUrl = await uploadFile(otherDocuments);
+    const previousPolicyDocumentUrl = await uploadFile(previousPolicyDocument);
 
     const user = req.user;
         if (!user) {
@@ -131,6 +134,7 @@ const createVehicleInsurance = async (req, res) => {
       insuranceType,
       commercialOrType2Vehicle,
       isPolicyExpired,
+      anyClaims,
       rcFront: rcFrontUrl,
       rcBack: rcBackUrl,
       aadhaarFront: aadhaarFrontUrl,
@@ -143,6 +147,7 @@ const createVehicleInsurance = async (req, res) => {
       vehicleEngineNumber: vehicleEngineNumberUrl,
       vehicleChasisNumber: vehicleChasisNumberUrl,
       otherDocuments: otherDocumentsUrl,
+      previousPolicyDocument: previousPolicyDocumentUrl,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
