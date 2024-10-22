@@ -328,21 +328,7 @@ const creatFranchise = catchAsync(async (req, res, next) => {
 const updateFranchise = catchAsync(async (req, res, next) => {
   const transaction = await sequelize.transaction();
   try {
-
-    const {
-      email,
-      franchiseAddressLine1,
-      franchiseAddressLine2,
-      state,
-      district,
-      pinCode,
-      postOffice,
-      panchayath,
-      ward,
-      digitalElements,
-      panCenter,
-      businessType,
-    } = req.body;
+    const body=req.body
 
     const users = req.user;
 
@@ -386,7 +372,7 @@ const updateFranchise = catchAsync(async (req, res, next) => {
 
     const updateUser = await user.update(
       {
-        email,
+        email:body.email,
       },
       {
         where: {
@@ -404,18 +390,18 @@ const updateFranchise = catchAsync(async (req, res, next) => {
 
     const updatedFranchise = await Franchise.update(
       {
-        email,
-        franchiseAddressLine1,
-        franchiseAddressLine2,
-        state,
-        district,
-        pinCode,
-        postOffice,
-        panchayath,
-        ward,
-        digitalElements,
-        panCenter,
-        businessType,
+        email:body.email,
+        franchiseAddressLine1:body.franchiseAddressLine1,
+        franchiseAddressLine2:body.franchiseAddressLine2,
+        state:body.state,
+        district:body.district,
+        pinCode:body.pinCode,
+        postOffice:body.postOffice,
+        panchayath:body.panchayath,
+        ward:body.ward,
+        digitalElements:body.digitalElements,
+        panCenter:body.panCenter,
+        businessType:body.businessType,
         shopPic: shopPicUrl,
       },
       {
