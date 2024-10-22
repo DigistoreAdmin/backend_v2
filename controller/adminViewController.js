@@ -68,6 +68,7 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
 
   const pageNumber = parseInt(page, 10);
   const pageLimitNumber = parseInt(pageLimit, 10);
+
   const limit = pageLimitNumber;
   const offset = (pageNumber - 1) * limit;
 

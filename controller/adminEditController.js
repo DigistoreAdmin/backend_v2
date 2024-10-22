@@ -413,8 +413,8 @@ const updateWallet = catchAsync(async (req, res, next) => {
     let debited = amountValue.debit && sub(wallet.balance, amountValue.debit);
     let servicez = "";
     credited
-      ? (servicez = "wallet credited by admin")
-      : (servicez = "wallet debited by admin");
+      ? (servicez = "Wallet Credite")
+      : (servicez = "Wallet Debite");
 
     console.log("balance", wallet.balance);
     console.log("updated balance", credited, debited);
@@ -431,6 +431,7 @@ const updateWallet = catchAsync(async (req, res, next) => {
         userName: franchise.franchiseName,
         userType: franchise.userType,
         service: servicez,
+        serviceProvider:":Admin",
         amount: amountValue.credit || amountValue.debit,
         walletBalance: credited || debited,
         status: "success",

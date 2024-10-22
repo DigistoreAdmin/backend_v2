@@ -7,13 +7,14 @@ const {
   wallet,
   updateFranchise,
 } = require("../controller/franchiseController");
-const { rateLimiting } = require("../utils/redis");
+// const { rateLimiting } = require("../utils/redis");
 const {verifyToken, verifyRefreshToken} = require('../utils/token')
 const router = require("express").Router();
 
 
-router.route("/sendOtpPhoneNumber").post(rateLimiting,sendOtpPhoneNumber);
+// router.route("/sendOtpPhoneNumber").post(rateLimiting,sendOtpPhoneNumber);
 
+router.route("/sendOtpPhoneNumber").post(sendOtpPhoneNumber);
 router.route("/sendOtpEmail").post(sendOtpEmail);
 
 router.route("/verifyOtp").post(verifyOtp);

@@ -345,23 +345,23 @@ const updateFranchise = catchAsync(async (req, res, next) => {
 
     const transaction = await sequelize.transaction();
     
-      const shopPic = req?.files?.shopPic
+    //   const shopPic = req?.files?.shopPic
 
-    const uploadFile = async (file) => {
-      if (file) {
-        try {
-          return await uploadBlob(file);
-        } catch (error) {
-          console.error(`Error uploading file ${file.name}:`, error);
-          // return null;
-        }
-      } else {
-        console.error('File is missing:', file);
-        // return null;
-      }
-    };
+    // const uploadFile = async (file) => {
+    //   if (file) {
+    //     try {
+    //       return await uploadBlob(file);
+    //     } catch (error) {
+    //       console.error(`Error uploading file ${file.name}:`, error);
+    //       // return null;
+    //     }
+    //   } else {
+    //     console.error('File is missing:', file);
+    //     // return null;
+    //   }
+    // };
 
-    const shopPicUrl = await uploadFile(shopPic);
+    // const shopPicUrl = await uploadFile(shopPic);
 
     const franchise = await Franchise.findOne({
       where: { franchiseUniqueId },
@@ -387,7 +387,7 @@ const updateFranchise = catchAsync(async (req, res, next) => {
         ward,
         digitalElements,
         panCenter,
-        shopPic: shopPicUrl,
+        // shopPic: shopPicUrl,
       },
       {
         where: { franchiseUniqueId },
