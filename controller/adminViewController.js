@@ -115,6 +115,12 @@ const getFranchise = catchAsync(async (req, res) => {
       .json({ succes: "false", message: "No data to display" });
   }
 
+    if (Data.panNumber) Data.panNumber = decryptData(Data.panNumber);
+    if (Data.accountNumber) Data.accountNumber = decryptData(Data.accountNumber);
+    if (Data.aadhaarNumber) Data.aadhaarNumber = decryptData(Data.aadhaarNumber);
+    Data.password = "";  
+
+
   return res.status(200).json({ succes: "success", data: Data });
 });
 
@@ -324,9 +330,24 @@ const getAllStaff = catchAsync(async (req, res, next) => {
   }
 });
 
+const getStaff = catchAsync(async (req, res) => {
+  const { employeeId } = req.query;
+  const staffDetail= staff()
+  const Data = await staffDetail.findOne({where: {employeeId} });
+
+  if(!Data) {
+    return res
+      .status(404)
+      .json({ succes: "false", message: "No data to display" });
+  }
+  Data.password=""
+  return res.status(200).json({ succes: "success", data: Data });
+});
+
 module.exports = {
   getAllFranchises,
   getFranchise,
   updateStaffDetails,
   getAllStaff,
+  getStaff
 };
