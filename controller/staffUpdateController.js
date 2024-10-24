@@ -8,12 +8,15 @@ const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
 const trainbooking = require("../db/models/trainbooking");
+const transationHistory = require("../db/models/transationhistory");
 const { Op } = require("sequelize");
 const containerName = "imagecontainer";
 const blobService = azureStorage.createBlobService(
   process.env.AZURE_STORAGE_CONNECTION_STRING
 );
 const BusBooking = require('../db/models/busbooking');
+const Franchise = require("../db/models/franchise");
+const wallets = require("../db/models/wallet");
 
 const uploadBlob = (file) => {
   return new Promise((resolve, reject) => {
@@ -106,20 +109,38 @@ const loanStatus = catchAsync(async (req, res) => {
   }
 });
 
-const trainBookingUpdate = catchAsync(async (req, res) => {
+const trainBookingUpdate = catchAsync(async (req, res,next) => {
   try {
     const {
       id,
       phoneNumber,
       status,
-      amount
+      amount,
+      accountNo,
     } = req.body;
+
     console.log("req.body: ", req.body);
+
+    const user=req.user
+
     const ticket = req?.files?.ticket;
 
     if (!phoneNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
     }
+
+ const franchiseData = await Franchise.findOne({
+    where: { email: user.email },
+  });
+
+  if (!franchiseData) return next(new AppError("Franchise not found", 404));
+
+  const walletData = await wallets.findOne({
+    where: { uniqueId: franchiseData.franchiseUniqueId },
+  });
+
+  if (!walletData) return next(new AppError("Wallet not found", 404));
+
 
     const trainBookingUser = trainbooking;
 
@@ -178,7 +199,7 @@ const trainBookingUpdate = catchAsync(async (req, res) => {
       commissionToHeadOffice=30
     }
     
-    let totalAmount=amount + serviceCharge
+    let totalAmount=parseInt(amount) + serviceCharge
 
     report.workId = workId || report.workId;
     report.status = finalStatus;
@@ -191,12 +212,47 @@ const trainBookingUpdate = catchAsync(async (req, res) => {
       commissionToHeadOffice || report.commissionToHeadOffice;
     report.totalAmount = totalAmount || report.totalAmount;
 
-    await report.save();
 
+  if(totalAmount > walletData.balance){
+    return next(new AppError("Insufficient wallet balance", 401));
+    }
+
+  await report.save();
+
+   const newBalance =Math.round(walletData.balance-totalAmount)
+
+  // Update wallet balance
+  const updated = await wallets.update(
+    { balance: newBalance },
+    { where: { uniqueId: franchiseData.franchiseUniqueId } }
+  );
+  
+  
+  const transactionId=generateRandomId()
+
+  const newTransactionHistory = await transationHistory.create({
+    transactionId: transactionId,
+    uniqueId: franchiseData.franchiseUniqueId,
+    userName: franchiseData.franchiseName,
+    userType: user.userType,
+    service: "trainBooking",
+    customerNumber: phoneNumber,
+    serviceNumber: accountNo,
+    serviceProvider: "trainBooking",
+    status: "success",
+    amount: totalAmount,
+    franchiseCommission: commissionToFranchise,
+    adminCommission: commissionToHeadOffice,
+    walletBalance: newBalance,
+  });
+
+  if (newTransactionHistory && updated) {
     return res.status(200).json({
       message: "success",
       report,
     });
+  }
+
   } catch (error) {
     console.error(error);
     return res
@@ -205,12 +261,15 @@ const trainBookingUpdate = catchAsync(async (req, res) => {
   }
 });
 
-const updatePanDetails = catchAsync(async (req, res) => {
+const updatePanDetails = catchAsync(async (req, res,next) => {
   try {
-    const { mobileNumber, status, acknowledgementNumber, reason, ePan } =
+    const { mobileNumber,id,status, acknowledgementNumber, reason, ePan,accountNo } =
       req.body;
     console.log("req.body: ", req.body);
     const acknowledgementFile = req?.files?.acknowledgementFile;
+
+    const user=req.user
+
 
     if (!mobileNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
@@ -219,12 +278,26 @@ const updatePanDetails = catchAsync(async (req, res) => {
     const pancardUser = definePancardUser();
 
     const report = await pancardUser.findOne({
-      where: { mobileNumber: mobileNumber },
+      where: { mobileNumber: mobileNumber ,id:id},
     });
 
     if (!report) {
       return res.status(404).json({ message: "Record not found" });
     }
+
+    const franchiseData = await Franchise.findOne({
+      where: { email: user.email },
+    });
+    
+    if (!franchiseData) return next(new AppError("Franchise not found", 404));
+    
+    
+    const walletData = await wallets.findOne({
+      where: { uniqueId: franchiseData.franchiseUniqueId },
+    });
+    
+    if (!walletData) return next(new AppError("Wallet not found", 404));
+    
 
     const finalStatus = status === "completed" ? "completed" : "inProgress";
 
@@ -242,6 +315,11 @@ const updatePanDetails = catchAsync(async (req, res) => {
 
     const acknowledgementFileUrl = await uploadFile(acknowledgementFile);
 
+    
+    let totalAmount = 1500;
+    let commissionToHeadOffice = 1000;
+    let commissionToFranchise = 500;
+
     report.status = finalStatus;
     report.acknowledgementFile =
       acknowledgementFileUrl || report.acknowledgementFile;
@@ -249,13 +327,54 @@ const updatePanDetails = catchAsync(async (req, res) => {
       acknowledgementNumber || report.acknowledgementNumber;
     report.reason = reason || report.reason;
     report.ePan = ePan || report.ePan;
+    
+    report.totalAmount = totalAmount || report.totalAmount;
+    report.commissionToHeadOffice =
+      commissionToHeadOffice || report.commissionToHeadOffice;
 
-    await report.save();
+      report.commissionToFranchise =
+      commissionToFranchise || report.commissionToFranchise;
 
+  
+      if(totalAmount > walletData.balance){
+        return next(new AppError("Insufficient wallet balance", 401));
+        }
+  
+      await report.save();
+  
+      const newBalance =Math.round(walletData.balance-totalAmount)
+  
+      
+      // Update wallet balance
+      const updated = await wallets.update(
+        { balance: newBalance },
+        { where: { uniqueId: franchiseData.franchiseUniqueId } }
+      );
+  
+      const transactionId=generateRandomId()
+  
+    const newTransactionHistory = await transationHistory.create({
+        transactionId: transactionId,
+        uniqueId: franchiseData.franchiseUniqueId,
+        userName: franchiseData.franchiseName,
+        userType: user.userType,
+        service: "pancard",
+        customerNumber: mobileNumber,
+        serviceNumber: accountNo,
+        serviceProvider: "pancard",
+        status: "success",
+        amount: totalAmount,
+        franchiseCommission: commissionToFranchise,
+        adminCommission: commissionToHeadOffice,
+        walletBalance: newBalance,
+      });
+  
+    if (newTransactionHistory && updated) {
     return res.status(200).json({
       message: `success`,
       report,
     });
+  }
   } catch (error) {
     console.error(error);
     return res
@@ -264,14 +383,16 @@ const updatePanDetails = catchAsync(async (req, res) => {
   }
 });
 
-const updateGstDetails = catchAsync(async (req, res) => {
+const updateGstDetails = catchAsync(async (req, res,next) => {
   try {
-    const { mobileNumber, status, applicationReferenceNumber, id } = req.body;
+    const { mobileNumber, status, applicationReferenceNumber, id ,accountNo} = req.body;
     const gstDocument = req?.files?.gstDocument;
 
     if (!mobileNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
     }
+
+    const user=req.user
 
     const gstDetails = gstRegistrationDetails();
 
@@ -283,6 +404,18 @@ const updateGstDetails = catchAsync(async (req, res) => {
       return res.status(404).json({ message: "Record not found" });
     }
 
+    const franchiseData = await Franchise.findOne({
+      where: { email: user.email },
+    });
+    
+    if (!franchiseData) return next(new AppError("Franchise not found", 404));
+    
+    
+    const walletData = await wallets.findOne({
+      where: { uniqueId: franchiseData.franchiseUniqueId },
+    });
+    
+    if (!walletData) return next(new AppError("Wallet not found", 404));
     const finalStatus = status === "completed" ? "completed" : "inProgress";
 
     const uploadFile = async (file) => {
@@ -315,12 +448,43 @@ const updateGstDetails = catchAsync(async (req, res) => {
     data.commissionToFranchise =
       commissionToFranchise || data.commissionToFranchise;
 
-    await data.save();
-
+      if(totalAmount > walletData.balance){
+        return next(new AppError("Insufficient wallet balance", 401));
+        }
+  
+      await data.save();
+  
+      const newBalance =Math.round(walletData.balance-totalAmount)
+  
+      const updated = await wallets.update(
+        { balance: newBalance },
+        { where: { uniqueId: franchiseData.franchiseUniqueId } }
+      );
+  
+      const transactionId=generateRandomId()
+  
+      const newTransactionHistory = await transationHistory.create({
+        transactionId: transactionId,
+        uniqueId: franchiseData.franchiseUniqueId,
+        userName: franchiseData.franchiseName,
+        userType: user.userType,
+        service: "gst",
+        customerNumber: mobileNumber,
+        serviceNumber: accountNo,
+        serviceProvider: "gst",
+        status: "success",
+        amount: totalAmount,
+        franchiseCommission: commissionToFranchise,
+        adminCommission: commissionToHeadOffice,
+        walletBalance: newBalance,
+      });
+  
+    if (newTransactionHistory && updated) {
     return res.status(200).json({
       message: `success`,
       data,
     });
+  }
   } catch (error) {
     console.error(error);
     return res
@@ -433,9 +597,9 @@ const updateInsuranceDetails = catchAsync(async (req, res) => {
   }
 });
 
-const incometaxUpdate = catchAsync(async (req, res) => {
+const incometaxUpdate = catchAsync(async (req, res,next) => {
   try {
-    const { phoneNumber, status, id } = req.body;
+    const { phoneNumber, status, id,accountNo } = req.body;
 
     const incomeTaxAcknowledgement = req?.files?.incomeTaxAcknowledgement;
     const computationFile = req?.files?.computationFile;
@@ -443,6 +607,9 @@ const incometaxUpdate = catchAsync(async (req, res) => {
     if(!req.files){
       return res.status(400).json({ message: "Files not uploaded" });
     }
+
+    const user=req.user
+
 
     if (!phoneNumber && !id) {
       return res.status(400).json({ message: "input fields are required" });
@@ -462,6 +629,19 @@ const incometaxUpdate = catchAsync(async (req, res) => {
         message: "Record not found",
       });
     }
+
+    const franchiseData = await Franchise.findOne({
+      where: { email: user.email },
+    });
+    
+    if (!franchiseData) return next(new AppError("Franchise not found", 404));
+    
+    
+    const walletData = await wallets.findOne({
+      where: { uniqueId: franchiseData.franchiseUniqueId },
+    });
+    
+    if (!walletData) return next(new AppError("Wallet not found", 404));
 
     const uploadFile = async (file) => {
       if (file) {
@@ -513,12 +693,44 @@ const incometaxUpdate = catchAsync(async (req, res) => {
     data.incomeTaxAcknowledgement = incomeTaxAcknowledgementUrl || data.incomeTaxAcknowledgement;
     data.computationFile = computationFileUrl || data.computationFile;
 
+    
+    if(totalAmount > walletData.balance){
+      return next(new AppError("Insufficient wallet balance", 401));
+      }
+
     await data.save();
 
-    return res.status(200).json({
-      message: "Success",
-      data,
+    const newBalance =Math.round(walletData.balance-totalAmount)
+
+    const updated = await wallets.update(
+      { balance: newBalance },
+      { where: { uniqueId: franchiseData.franchiseUniqueId } }
+    );
+
+    const transactionId=generateRandomId()
+
+    const newTransactionHistory = await transationHistory.create({
+      transactionId: transactionId,
+      uniqueId: franchiseData.franchiseUniqueId,
+      userName: franchiseData.franchiseName,
+      userType: user.userType,
+      service: "incomeTax",
+      customerNumber: phoneNumber,
+      serviceNumber: accountNo,
+      serviceProvider: "incomeTax",
+      status: "success",
+      amount: totalAmount,
+      franchiseCommission: franchiseCommission,
+      adminCommission: HOCommission,
+      walletBalance: newBalance,
     });
+
+    if (newTransactionHistory && updated) {
+      return res.status(200).json({
+        message: "success",
+        data,
+      });
+      }
   } catch (error) {
     console.log(error);
     return res
@@ -527,16 +739,19 @@ const incometaxUpdate = catchAsync(async (req, res) => {
   }
 });
 
-const updateBusBooking = catchAsync(async (req, res) => {
+const updateBusBooking = catchAsync(async (req, res,next) => {
   try {
     let status = "inProgress"
     const {
       id,
       phoneNumber,
       amount,
+      accountNo,
     } = req.body;
     console.log("req.body: ", req.body);
     const ticket = req?.files?.ticket;
+
+    const user=req.user
 
     if (!phoneNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
@@ -546,9 +761,24 @@ const updateBusBooking = catchAsync(async (req, res) => {
       where: { phoneNumber, id },
     });
 
+
     if (!data) {
       return res.status(404).json({ message: "No data found" });
     }
+
+    const franchiseData = await Franchise.findOne({
+      where: { email: user.email },
+    });
+    
+    if (!franchiseData) return next(new AppError("Franchise not found", 404));
+    
+    
+    const walletData = await wallets.findOne({
+      where: { uniqueId: franchiseData.franchiseUniqueId },
+    });
+    
+    if (!walletData) return next(new AppError("Wallet not found", 404));
+    
 
     const uploadFile = async (file) => {
       if (file) {
@@ -606,12 +836,47 @@ const updateBusBooking = catchAsync(async (req, res) => {
     data.commissionToHO = commissionToHO || data.commissionToHO
     data.totalAmount = totalAmount || data.totalAmount
 
+
+    if(totalAmount > walletData.balance){
+      return next(new AppError("Insufficient wallet balance", 401));
+      }
+
     await data.save();
 
+    const newBalance =Math.round(walletData.balance-totalAmount)
+
+    
+    // Update wallet balance
+    const updated = await wallets.update(
+      { balance: newBalance },
+      { where: { uniqueId: franchiseData.franchiseUniqueId } }
+    );
+
+    const transactionId=generateRandomId()
+
+    const newTransactionHistory = await transationHistory.create({
+      transactionId: transactionId,
+      uniqueId: franchiseData.franchiseUniqueId,
+      userName: franchiseData.franchiseName,
+      userType: user.userType,
+      service: "busBooking",
+      customerNumber: phoneNumber,
+      serviceNumber: accountNo,
+      serviceProvider: "busBooking",
+      status: "success",
+      amount: totalAmount,
+      franchiseCommission: commissionToFranchise,
+      adminCommission: commissionToHO,
+      walletBalance: newBalance,
+    });
+
+    if (newTransactionHistory && updated) {
     return res.status(200).json({
       message: "success",
       data,
     });
+    }
+
   } catch (error) {
     console.error(error);
     return res
@@ -619,5 +884,11 @@ const updateBusBooking = catchAsync(async (req, res) => {
       .json({ message: "An error occurred", error: error.message });
   }
 });
+
+function generateRandomId() {
+  const prefix = "DSP";
+  const timestamp = Date.now().toString(); 
+  return prefix + timestamp;
+}
 
 module.exports = { loanStatus, trainBookingUpdate, updatePanDetails,updateGstDetails,updateInsuranceDetails,incometaxUpdate,updateBusBooking };
