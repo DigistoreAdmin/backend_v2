@@ -143,7 +143,75 @@ const getPlacesByZone = catchAsync(async (req, res) => {
   }
 });
 
+const passportUpdate = catchAsync(async (req, res) => {
+  try {
+    const { mobileNumber, passportAppointmentDate, username, password } =
+      req.body;
+    const { passportFile } = req.files;
+
+    // if (!req.files) {
+    //   throw new AppError("Files not uploaded", 400);
+    // }
+
+    console.log("body:", req.body);
+    console.log("files:", req.files);
+
+    // Check for required fields
+    if (!mobileNumber) {
+      return res
+        .status(404)
+        .json({ message: "Missing required field: mobileNumber" });
+    }
+
+    // Define passport model
+    const passportDetails = definePassportDetails();
+
+    // Find the passport record by mobile number
+    const passportRecord = await passportDetails.findOne({
+      where: { mobileNumber },
+    });
+
+    if (!passportRecord) {
+      return res.status(404).json({ message: "Passport record not found" });
+    }
+
+    // Helper function to upload files (similar to loanStatus)
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          return null;
+        }
+      }
+    };
+
+    const passportFileUrl = await uploadFile(passportFile);
+
+    passportAppointmentDate
+      ? (passportRecord.passportAppointmentDate = passportAppointmentDate)
+      : null;
+
+    username ? (passportRecord.username = username) : null;
+    password ? (passportRecord.password = password) : null;
+    passportFileUrl ? (passportRecord.passportFile = passportFileUrl) : null;
+
+    await passportRecord.save();
+
+    res.status(200).json({
+      message: "Passport details updated successfully",
+      passportRecord,
+    });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
 module.exports = {
   createPassport,
   getPlacesByZone,
+  passportUpdate,
 };

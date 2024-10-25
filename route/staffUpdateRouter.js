@@ -6,7 +6,6 @@ const {
   updateGstDetails,
   updateInsuranceDetails,
   incometaxUpdate,
-  passportUpdate,
 } = require("../controller/staffUpdateController");
 
 const { verifyRefreshToken, verifyToken } = require("../utils/token");
@@ -34,9 +33,5 @@ router
 router
   .route("/incometaxUpdate")
   .put(verifyToken, verifyRefreshToken, incometaxUpdate);
-
-router
-  .route("/passportUpdate")
-  .put(verifyToken, verifyRefreshToken, passportUpdate);
 
 module.exports = router;
