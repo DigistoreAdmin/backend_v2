@@ -813,10 +813,15 @@ const getAllWorks = catchAsync(async (req, res, next) => {
 
     if (filter) {
       const filterObj = JSON.parse(filter);
-
+    
       Object.keys(filterObj).forEach(key => {
         const filterValue = filterObj[key];
-        combinedData = combinedData.filter(item => String(item[key]) === String(filterValue));
+    
+        if (Array.isArray(filterValue)) {
+          combinedData = combinedData.filter(item => filterValue.includes(String(item[key])));
+        } else {
+          combinedData = combinedData.filter(item => String(item[key]) === String(filterValue));
+        }
       });
     }
 
