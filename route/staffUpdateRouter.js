@@ -17,8 +17,6 @@ router.route("/updatePanDetails").put(verifyToken, verifyRefreshToken, updatePan
 
 router.route("/updateInsuranceDetails").put(verifyToken, verifyRefreshToken, updateInsuranceDetails);
 
-router.route("/incometaxUpdate").put(verifyToken, verifyRefreshToken,incometaxUpdate)
-
 module.exports = router;
 
 
