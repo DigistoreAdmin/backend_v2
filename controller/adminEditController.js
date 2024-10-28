@@ -34,38 +34,39 @@ const uploadBlob = async (file) => {
 };
 
 const deleteFranchise = catchAsync(async (req, res, next) => {
-    const transaction = await sequelize.transaction();
+  const transaction = await sequelize.transaction();
 
-    try {
-        const { uniqueId } = req.body;
+  try {
+    const { uniqueId } = req.body;
 
-        const franchise = await Franchise.findOne({ where: { franchiseUniqueId: uniqueId }, transaction });
-        let phoneNumber = null;
-        if (franchise) {
-            phoneNumber = franchise.franchiseUniqueId.slice(3);
-        }
-
-        const user = await User.findOne({ where: { phoneNumber }, transaction });
-        const wallet = await wallets.findOne({ where: { uniqueId }, transaction });
-
-        if (franchise) await franchise.destroy({ force: true, transaction });
-        if (user) await user.destroy({ force: true, transaction });
-        if (wallet) await wallet.destroy({ force: true, transaction });
-
-        await transaction.commit();
-
-        return res.status(200).json({ message: 'Franchise details deleted successfully' });
-    } catch (error) {
-        await transaction.rollback();
-
-        console.error("Error:", error);
-        return next(new AppError("Failed to delete Franchise!", 500));
+    const franchise = await Franchise.findOne({ where: { franchiseUniqueId: uniqueId }, transaction });
+    let phoneNumber = null;
+    if (franchise) {
+      phoneNumber = franchise.franchiseUniqueId.slice(3);
     }
+
+    const user = await User.findOne({ where: { phoneNumber }, transaction });
+    const wallet = await wallets.findOne({ where: { uniqueId }, transaction });
+
+    if (franchise) await franchise.destroy({ force: true, transaction });
+    if (user) await user.destroy({ force: true, transaction });
+    if (wallet) await wallet.destroy({ force: true, transaction });
+
+    await transaction.commit();
+
+    return res.status(200).json({ message: 'Franchise details deleted successfully' });
+  } catch (error) {
+    await transaction.rollback();
+
+    console.error("Error:", error);
+    return next(new AppError("Failed to delete Franchise!", 500));
+  }
 });
 
 
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {
+
     try {
         const {
           employeeId,  
@@ -199,13 +200,14 @@ const updateStaffDetails = catchAsync(async (req, res, next) => {
             where: { employeeId: findStaff.employeeId },
         });
 
-        return res
-            .status(200)
-            .json({ success: true, message: "Updated staff", staffs: updatedStaffs });
-    } catch (error) {
-        console.log("Error:", error);
-        return next(new AppError(error.message, 500));
-    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Updated staff", staffs: updatedStaffs });
+  } catch (error) {
+    console.log("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
 });
 
 const updateFranchiseDetails = catchAsync(async (req, res, next) => {
@@ -245,12 +247,12 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
       onBoardedPersonName,
       userPlan,
     } = req.body;
-    
-      const aadhaarPicFront = req?.files?.aadhaarPicFront
-      const aadhaarPicback  = req?.files?.aadhaarPicback
-      const panPic = req?.files?.panPic
-      const bankPassbookPic = req?.files?.bankPassbookPic
-      const shopPic = req?.files?.shopPic
+
+    const aadhaarPicFront = req?.files?.aadhaarPicFront
+    const aadhaarPicback = req?.files?.aadhaarPicback
+    const panPic = req?.files?.panPic
+    const bankPassbookPic = req?.files?.bankPassbookPic
+    const shopPic = req?.files?.shopPic
 
     const uploadFile = async (file) => {
       if (file) {
@@ -283,12 +285,12 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
         .json({ success: false, message: "Franchise not found" });
     }
 
-    const algorithm = "aes-192-cbc"; 
-    const secret = process.env.FRANCHISE_SECRET_KEY; 
+    const algorithm = "aes-192-cbc";
+    const secret = process.env.FRANCHISE_SECRET_KEY;
     const key = crypto.scryptSync(secret, "salt", 24);
 
     const encryptData = (data) => {
-      const iv = crypto.randomBytes(16); 
+      const iv = crypto.randomBytes(16);
       const cipher = crypto.createCipheriv(algorithm, key, iv);
 
       let encrypted = cipher.update(data, "utf8", "hex");
@@ -312,24 +314,24 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
       ? (hashAccountN = encryptData(accountNumber.toString()))
       : accountNumber;
 
-      const updateUserDetails = await user.update(
-        {
-          email,
-          phoneNumber
+    const updateUserDetails = await user.update(
+      {
+        email,
+        phoneNumber
+      },
+      {
+        where: {
+          email: franchise.email,
+          phoneNumber: franchise.phoneNumber,
         },
-        {
-          where: {
-            email: franchise.email,
-            phoneNumber: franchise.phoneNumber,
-          },
-          transaction, 
-        }
-      );
-  
-      if (!updateUserDetails){
-        await transaction.rollback();
-        throw new AppError("Failed to update user details", 400);
+        transaction,
       }
+    );
+
+    if (!updateUserDetails) {
+      await transaction.rollback();
+      throw new AppError("Failed to update user details", 400);
+    }
 
     const updatedFranchise = await Franchise.update(
       {
@@ -386,7 +388,7 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
     });
 
     await transaction.commit();
-    
+
     return res.status(200).json({
       success: true,
       message: "Franchise details updated",
@@ -473,7 +475,7 @@ const updateWallet = catchAsync(async (req, res, next) => {
       },
       { where: { uniqueId: uniqueId } }
     );
-    
+
 
     if (updatedW && transactionH) {
       res.status(200).json({
@@ -489,31 +491,66 @@ const updateWallet = catchAsync(async (req, res, next) => {
   }
 });
 
-  const verifyFranchise = catchAsync(async (req, res, next) => {
-    const { uniqueId,value } = req.body;
+const verifyFranchise = catchAsync(async (req, res, next) => {
+  const { uniqueId, value } = req.body;
 
-    const franchise = await Franchise.findOne({
-      where: { franchiseUniqueId: uniqueId },
-    });
+  const franchise = await Franchise.findOne({
+    where: { franchiseUniqueId: uniqueId },
+  });
 
-    if (!franchise) {
-      return next(new AppError("Franchise not found", 404));
-    }
-     
-    await franchise.update({ verified: value });
+  if (!franchise) {
+    return next(new AppError("Franchise not found", 404));
+  }
 
-    res.status(200).json({
-      status: 'success',
-      message: 'Verification Status Updated',
-    });
-  })
-  
-  function generateRandomNumber() {
-    const randomNumber =
+  await franchise.update({ verified: value });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Verification Status Updated',
+  });
+})
+
+function generateRandomNumber() {
+  const randomNumber =
     Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
     100000000000;
-    return randomNumber.toString();
+  return randomNumber.toString();
+}
+
+const deleteStaff = catchAsync(async (req, res, next) => {
+  const { employeeId } = req.body;
+  console.log('employeeId: ', employeeId);
+
+  if (!employeeId) {
+    return next(new AppError('employeeId is required', 400));
   }
-  
-  module.exports = { updateStaffDetails, deleteFranchise, updateFranchiseDetails, updateWallet,verifyFranchise };
-  
+
+  const staffTable = defineStaffsDetails();
+  const staff = await staffTable.findOne({ where: { employeeId } });
+
+  if (!staff) {
+    return next(new AppError('No staff found with that employeeId', 404));
+  }
+  const { email, phoneNumber } = staff
+  await staffTable.destroy({ where: { employeeId }, force: true });
+
+  const userData = await User.findOne({ where: { email, phoneNumber } })
+  if (userData) {
+    await User.destroy({ where: { email, phoneNumber }, force: true })
+  }
+
+  return res.status(200).json({
+    status: 'success',
+    message: "Staff data deleted successfully",
+    data: null,
+  });
+});
+
+
+
+
+module.exports = {
+  updateStaffDetails, deleteFranchise, updateFranchiseDetails, updateWallet, verifyFranchise,
+  deleteStaff
+};
+

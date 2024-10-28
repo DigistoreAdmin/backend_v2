@@ -655,36 +655,6 @@ const getAllWorks = catchAsync(async (req, res, next) => {
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;
 
-    const allowedTables = [
-      'panCardUsers',
-      'passportDetails',
-      'kSwiftDetails',
-      'busBookingsDetails',
-      'fssaiRegistrations',
-      'fssaiLicences',
-      'trainBookingDetails',
-      'udyamRegistrations',
-      'financialstatements',
-      'companyFormations',
-      'gstRegistrations',
-      'gstFilings',
-      'incomeTaxFilings',
-      'partnershipDeeds',
-      'packingLicences',
-      'vehicleInsurance',
-    ];
-
-    if (filter) {
-      const filterObj = JSON.parse(filter);
-      const keys = Object.keys(filterObj)
-      if (keys.includes("tableName")) {
-        let table = filterObj["tableName"]
-        if (!allowedTables.includes(table)) {
-          return next(new AppError(`The table name '${table}' is not valid. Please use one of the following allowed table names: ${allowedTables.join(', ')}.`, 400));
-        }
-      }
-    }
-
     const [
       pancardDetails,
       passportDetails,
@@ -731,95 +701,106 @@ const getAllWorks = catchAsync(async (req, res, next) => {
     let combinedData = [
       ...pancardDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'panCardUsers',
+        tableName: 'Pan Card',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...passportDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'passportDetails',
+        tableName: 'Passport',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...kSwiftDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'kSwiftDetails',
+        tableName: 'K-Swift',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...busBookingsDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'busBookingsDetails',
+        tableName: 'Bus Booking',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...fssaiRegistrationDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'fssaiRegistrations',
+        tableName: 'FSSAI Registration',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...fssaiLicenceDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'fssaiLicences',
+        tableName: 'FSSAI Licence',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...trainBookingDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'trainBookingDetails',
+        tableName: 'Train Booking',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...udyamRegistrationDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'udyamRegistrations',
+        tableName: 'Udyam Registration',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...financialstatementDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'financialstatements',
+        tableName: 'Financial Statement',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...companyFormationDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'companyFormations',
+        tableName: 'Company Formation',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...gstRegistrationsDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'gstRegistrations',
+        tableName: 'GST Registration',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...gstFilingDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'gstFilings',
+        tableName: 'GST Filing',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...incomeTaxFilingsDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'incomeTaxFilings',
+        tableName: 'IncomeTax Filing',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...partnershipDeedPreparations.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'partnershipDeeds',
+        tableName: 'Partnership Deed',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...packingLicenceDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'packingLicences',
+        tableName: 'Packing Licence',
         franchiseName: franchiseMap[item.uniqueId],
       })),
       ...vehicleInsuranceDetails.rows.map(item => ({
         ...item.dataValues,
-        tableName: 'vehicleInsurance',
+        tableName: 'Vehicle Insurance',
         franchiseName: franchiseMap[item.uniqueId],
       })),
     ];
 
     if (filter) {
       const filterObj = JSON.parse(filter);
+      console.table(filterObj)
 
       Object.keys(filterObj).forEach(key => {
         const filterValue = filterObj[key];
-        combinedData = combinedData.filter(item => String(item[key]) === String(filterValue));
+        if (Array.isArray(filterValue)) {
+
+          if (filterValue.length != 0) {
+            console.log('filterValue: ', filterValue);
+            if (Array.isArray(filterValue)) {
+              combinedData = combinedData.filter(item => filterValue.includes(String(item[key])));
+            } else {
+              combinedData = combinedData.filter(item => String(item[key]) === String(filterValue));
+            }
+          }
+        }
+
       });
     }
-
 
     if (search) {
       combinedData = combinedData.filter(item =>
@@ -854,7 +835,6 @@ const getAllWorks = catchAsync(async (req, res, next) => {
       currentPage: pageNumber,
       totalPages,
       totalItems,
-      results: paginatedData.length,
       data: paginatedData,
     });
   } catch (error) {
