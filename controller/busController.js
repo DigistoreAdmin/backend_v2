@@ -9,6 +9,8 @@ const blobService = azureStorage.createBlobService(
     process.env.AZURE_STORAGE_CONNECTION_STRING
 );
 const containerName = "imagecontainer";
+const TransactionHistory = require("../db/models/transationhistory");
+const Wallet=require('../db/models/wallet');
 
 const uploadBlob = (file) => {
     return new Promise((resolve, reject) => {
@@ -67,12 +69,11 @@ const busBooking = catchAsync(async (req, res, next) => {
 });
 
 const updateBusBooking = catchAsync(async (req, res) => {
+
+    const user = req.user
     try {
         let status = "inProgress"
-        const {
-            id,
-            phoneNumber,
-            amount,
+        const { id, uniqueId, phoneNumber, amount,
         } = req.body;
         console.log("req.body: ", req.body);
         const ticket = req?.files?.ticket;
@@ -81,12 +82,23 @@ const updateBusBooking = catchAsync(async (req, res) => {
             return res.status(400).json({ message: "Mobile number is required" });
         }
 
+        const franchiseData = await Franchise.findOne({
+            where: { franchiseUniqueId: uniqueId },
+        });
+
+        const walletData = await Wallet.findOne({ where: { uniqueId } })
+        console.log('walletData: ', walletData);
+        if (!walletData) {
+            return res.status(404).json({ message: "No wallet data associated with this franchise" })
+        }
+        const { balance } = walletData
+
         const data = await BusBooking.findOne({
             where: { phoneNumber, id },
         });
 
         if (!data) {
-            return res.status(404).json({ message: "No data found" });
+            return res.status(404).json({ message: "No bus booking data found" });
         }
 
         const uploadFile = async (file) => {
@@ -120,21 +132,13 @@ const updateBusBooking = catchAsync(async (req, res) => {
 
         const ticketUrl = await uploadFile(ticket);
 
-        let serviceCharge = 0
-        let commissionToFranchise = 0
-        let commissionToHO = 0
-
-        if (amount > 100) {
-            serviceCharge = 100
-            commissionToFranchise = 30
-            commissionToHO = 70
-        } else {
-            serviceCharge = 50
-            commissionToFranchise = 20
-            commissionToHO = 30
-        }
+        const { serviceCharge, commissionToFranchise, commissionToHO } = calculateCommission(amount)
 
         let totalAmount = parseInt(amount) + serviceCharge
+        if (totalAmount > balance) {
+            return res.status(400).json({ message: "Insufficient balance for franchise" });
+        }
+
         status = "completed"
         data.workId = workId || data.workId;
         data.status = status;
@@ -147,9 +151,46 @@ const updateBusBooking = catchAsync(async (req, res) => {
 
         await data.save();
 
+        const newBalance = Math.round(balance - totalAmount);
+
+        await Wallet.update(
+            { balance: newBalance },
+            { where: { uniqueId } }
+        );
+
+        const transactionId = generateRandomId();
+
+        const newTransactionHistory = await TransactionHistory.create({
+            transactionId: transactionId,
+            uniqueId: franchiseData.franchiseUniqueId,
+            userName: franchiseData.franchiseName,
+            userType: user.userType,
+            service: "busBooking",
+            customerNumber: phoneNumber,
+            serviceNumber: "",
+            serviceProvider: "busBooking",
+            status: "success",
+            amount: totalAmount,
+            franchiseCommission: commissionToFranchise,
+            adminCommission: commissionToHO,
+            walletBalance: newBalance,
+        });
+
+        newTransactionHistory.save()
+
+        if (newTransactionHistory) {
+            let updated = newBalance + commissionToFranchise;
+
+            await Wallet.update(
+                { balance: updated },
+                { where: { uniqueId: franchiseData.franchiseUniqueId } }
+            );
+        }
+
         return res.status(200).json({
             message: "success",
             data,
+            newTransactionHistory
         });
     } catch (error) {
         console.error(error);
@@ -158,6 +199,32 @@ const updateBusBooking = catchAsync(async (req, res) => {
             .json({ message: "An error occurred", error: error.message });
     }
 });
+
+function calculateCommission(amount) {
+    let serviceCharge = 0
+    let commissionToFranchise = 0
+    let commissionToHO = 0
+    if (amount < 500) {
+        serviceCharge = 50
+        commissionToFranchise = 30
+        commissionToHO = 20
+    } else if (amount < 1000) {
+        serviceCharge = 70
+        commissionToFranchise = 40
+        commissionToHO = 30
+    } else {
+        serviceCharge = 100
+        commissionToFranchise = 50
+        commissionToHO = 50
+    }
+    return { serviceCharge, commissionToFranchise, commissionToHO };
+}
+
+function generateRandomId() {
+    const prefix = "DSP";
+    const timestamp = Date.now().toString();
+    return prefix + timestamp;
+}
 
 module.exports = {
     busBooking,
