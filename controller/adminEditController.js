@@ -66,111 +66,140 @@ const deleteFranchise = catchAsync(async (req, res, next) => {
 
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {
-  try {
-    const {
-      userType,
-      employeeId,
-      firstName,
-      lastName,
-      emailId,
-      phoneNumber,
-      dateOfBirth,
-      gender,
-      addressLine1,
-      addressLine2,
-      city,
-      district,
-      state,
-      pinCode,
-      bank,
-      accountNumber,
-      ifscCode,
-      accountHolderName,
-      dateOfJoin,
-      bloodGroup,
-      employment,
-      employmentType,
-      districtOfOperation,
-      reportingManager,
-      emergencyContact,
-      isTrainingRequired,
-      totalTrainingDays,
-      employmentStartDate,
-      laptop,
-      idCard,
-      sim,
-      vistingCard,
-      posterOrBroucher,
-      other,
-      phone,
-      remarks,
-    } = req.body;
 
-    const staffs = defineStaffsDetails();
+    try {
+        const {
+          employeeId,  
+          firstName,
+          lastName,
+          dateOfBirth,
+          gender,
+          employment,
+          employmentType,
+          addressLine1,
+          addressLine2,
+          emergencyContact,
+          districtOfOperation,
+          reportingManager,
+          dateOfJoin,
+          isTrainingRequired,
+          totalTrainingDays,
+          employmentStartDate,
+          city,
+          district,
+          state,
+          pinCode,
+          bank,
+          accountNumber,
+          branchName,
+          ifscCode,
+          accountName,
+          bloodGroup,
+          laptop,
+          idCard,
+          sim,
+          phone,
+          vistingCard,
+          posterOrBroucher,
+          other,
+          laptopDetails,
+          idCardDetails,
+          phoneDetails,
+          simDetails,
+          vistingCardDetails,
+          posterOrBroucherDetails,
+          otherDetails,
+          remarks,
+        } = req.body;
 
-    const findStaff = await staffs.findOne({
-      where: { employeeId },
-    });
+        const staffs = defineStaffsDetails();
 
-    if (!findStaff) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Staff not found" });
-    }
+        const findStaff = await staffs.findOne({
+            where: { employeeId },
+        });
 
-    const updatedStaff = await staffs.update(
-      {
-        userType,
-        employeeId,
-        firstName,
-        lastName,
-        emailId,
-        phoneNumber,
-        dateOfBirth,
-        gender,
-        addressLine1,
-        addressLine2,
-        city,
-        district,
-        state,
-        pinCode,
-        bank,
-        accountNumber,
-        ifscCode,
-        accountHolderName,
-        dateOfJoin,
-        bloodGroup,
-        employment,
-        employmentType,
-        districtOfOperation,
-        reportingManager,
-        emergencyContact,
-        isTrainingRequired,
-        totalTrainingDays,
-        employmentStartDate,
-        laptop,
-        idCard,
-        sim,
-        vistingCard,
-        posterOrBroucher,
-        other,
-        phone,
-        remarks,
-      },
-      {
-        where: { employeeId },
-      }
-    );
+        if (!findStaff) {
+            return res
+                .status(404)
+                .json({ success: false, message: "Staff not found" });
+        }
 
-    if (!updatedStaff) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Failed to update staff" });
-    }
+        const uploadFile = async (file) => {
+          if (file) {
+            try {
+              return await uploadBlob(file);
+            } catch (error) {
+              console.error(`Error uploading file ${file.name}:`, error);
+              // return null;
+            }
+          } else {
+            console.error('File is missing:', file);
+            // return null;
+          }
+        };
 
-    const updatedStaffs = await staffs.findOne({
-      where: { employeeId },
-    });
+        const profilePic = req?.files?.profilePic
+        const profilePicUrl = await uploadFile(profilePic)
+
+        const updatedStaff = await staffs.update(
+            { 
+              firstName,
+              lastName,
+              profilePic:profilePicUrl,
+              dateOfBirth,
+              gender,
+              employment,
+              employmentType,
+              addressLine1,
+              addressLine2,
+              emergencyContact,
+              districtOfOperation,
+              reportingManager,
+              dateOfJoin,
+              isTrainingRequired,
+              totalTrainingDays,
+              employmentStartDate,
+              city,
+              district,
+              state,
+              pinCode,
+              bank,
+              accountNumber,
+              branchName,
+              ifscCode,
+              accountName,
+              bloodGroup,
+              laptop,
+              idCard,
+              sim,
+              phone,
+              vistingCard,
+              posterOrBroucher,
+              other,
+              laptopDetails,
+              idCardDetails,
+              phoneDetails,
+              simDetails,
+              vistingCardDetails,
+              posterOrBroucherDetails,
+              otherDetails,
+              remarks,
+            },
+            {
+                where: { employeeId: findStaff.employeeId },
+            }
+        );
+
+        if (!updatedStaff) {
+            return res
+                .status(400)
+                .json({ success: false, message: "Failed to update staff" });
+        }
+
+        const updatedStaffs = await staffs.findOne({
+            where: { employeeId: findStaff.employeeId },
+        });
+
 
     return res
       .status(200)
