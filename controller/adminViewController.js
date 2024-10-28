@@ -6,37 +6,34 @@ const user = require("../db/models/user");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { Op } = require("sequelize");
-const crypto = require('crypto')
+const crypto = require("crypto");
 
-
-const algorithm = "aes-192-cbc"; 
-const secret = process.env.FRANCHISE_SECRET_KEY;  
-const key = crypto.scryptSync(secret, 'salt', 24);
+const algorithm = "aes-192-cbc";
+const secret = process.env.FRANCHISE_SECRET_KEY;
+const key = crypto.scryptSync(secret, "salt", 24);
 
 const decryptData = (encryptedData) => {
   try {
-
-    if (!encryptedData || !encryptedData.includes(':')) {
-      console.error('Invalid encrypted data format', encryptedData);
-      return null;  
+    if (!encryptedData || !encryptedData.includes(":")) {
+      console.error("Invalid encrypted data format", encryptedData);
+      return null;
     }
 
-    const [ivHex, encryptedText] = encryptedData.split(':');
-    const iv = Buffer.from(ivHex, 'hex');
+    const [ivHex, encryptedText] = encryptedData.split(":");
+    const iv = Buffer.from(ivHex, "hex");
     const decipher = crypto.createDecipheriv(algorithm, key, iv);
-    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+    let decrypted = decipher.update(encryptedText, "hex", "utf8");
+    decrypted += decipher.final("utf8");
     return decrypted;
-
   } catch (error) {
-    console.error('Decryption error:', error);
-    return null;  
+    console.error("Decryption error:", error);
+    return null;
   }
 };
 
 const getAllFranchises = catchAsync(async (req, res, next) => {
   const { sort, filter, search, page, pageLimit } = req.query;
-  const order = sort ? [[sort, "DESC"]] : [];
+  const order = sort ? [[sort, "DESC"]] : [["createdAt", "DESC"]];
   const where = {};
 
   if (filter) {
@@ -48,6 +45,7 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
     if (filters.phoneNumber) where.phoneNumber = filters.phoneNumber;
     if (filters.panCenter) where.panCenter = filters.panCenter;
     if (filters.blocked) where.blocked = filters.blocked;
+    if (filters.verified) where.verified = filters.verified;
   }
 
   const phoneNumber = parseFloat(search);
@@ -81,7 +79,9 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
     });
 
     if (data.count === 0 || data.rows.length === 0) {
-      return res.status(404).json({ success: "false", message: "No data to display" });
+      return res
+        .status(404)
+        .json({ success: "false", message: "No data to display" });
     }
 
     // Decrypt sensitive fields
@@ -89,7 +89,7 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
       if (row.panNumber) row.panNumber = decryptData(row.panNumber);
       if (row.accountNumber) row.accountNumber = decryptData(row.accountNumber);
       if (row.aadhaarNumber) row.aadhaarNumber = decryptData(row.aadhaarNumber);
-      row.password = "";  
+      row.password = "";
     });
 
     return res.json({
@@ -107,19 +107,18 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
 
 const getFranchise = catchAsync(async (req, res) => {
   const { franchiseUniqueId } = req.query;
-  const Data = await Franchise.findOne({where: {franchiseUniqueId} });
+  const Data = await Franchise.findOne({ where: { franchiseUniqueId } });
 
-  if(!Data) {
+  if (!Data) {
     return res
       .status(404)
       .json({ succes: "false", message: "No data to display" });
   }
 
-    if (Data.panNumber) Data.panNumber = decryptData(Data.panNumber);
-    if (Data.accountNumber) Data.accountNumber = decryptData(Data.accountNumber);
-    if (Data.aadhaarNumber) Data.aadhaarNumber = decryptData(Data.aadhaarNumber);
-    Data.password = "";  
-
+  if (Data.panNumber) Data.panNumber = decryptData(Data.panNumber);
+  if (Data.accountNumber) Data.accountNumber = decryptData(Data.accountNumber);
+  if (Data.aadhaarNumber) Data.aadhaarNumber = decryptData(Data.aadhaarNumber);
+  Data.password = "";
 
   return res.status(200).json({ succes: "success", data: Data });
 });
@@ -332,15 +331,15 @@ const getAllStaff = catchAsync(async (req, res, next) => {
 
 const getStaff = catchAsync(async (req, res) => {
   const { employeeId } = req.query;
-  const staffDetail= staff()
-  const Data = await staffDetail.findOne({where: {employeeId} });
+  const staffDetail = staff();
+  const Data = await staffDetail.findOne({ where: { employeeId } });
 
-  if(!Data) {
+  if (!Data) {
     return res
       .status(404)
       .json({ succes: "false", message: "No data to display" });
   }
-  Data.password=""
+  Data.password = "";
   return res.status(200).json({ succes: "success", data: Data });
 });
 
@@ -349,5 +348,5 @@ module.exports = {
   getFranchise,
   updateStaffDetails,
   getAllStaff,
-  getStaff
+  getStaff,
 };
