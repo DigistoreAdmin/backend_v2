@@ -439,5 +439,5 @@ module.exports = {
   restrictTo,
   verifyOTP,
   logout,
-  changePassword
+  changePassword,
 };

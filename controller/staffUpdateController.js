@@ -1,6 +1,6 @@
 const catchAsync = require("../utils/catchAsync");
 const cibilReports = require("../db/models/cibilreport");
-const defineIncomeTax = require("../db/models/incometax")
+const defineIncomeTax = require("../db/models/incometax");
 const defineVehicleInsurance = require("../db/models/vehicleInsurance");
 const gstRegistrationDetails = require("../db/models/gstregistration");
 const azureStorage = require("azure-storage");
@@ -65,7 +65,6 @@ const loanStatus = catchAsync(async (req, res) => {
     }
 
     if (status === "approve" || status === "reject") {
-
       const uploadFile = async (file) => {
         if (file) {
           try {
@@ -89,12 +88,8 @@ const loanStatus = catchAsync(async (req, res) => {
         message: "Status, CIBIL Report, and CIBIL Score updated successfully",
         report,
       });
-
-    } 
-    else {
-
+    } else {
       res.status(400).json({ message: "Invalid status value" });
-
     }
   } catch (error) {
     console.log(error);
