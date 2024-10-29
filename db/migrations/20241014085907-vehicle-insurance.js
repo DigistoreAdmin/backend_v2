@@ -45,6 +45,12 @@ module.exports = {
           "standAlone"
         ),
       },
+      anyClaims: {
+        type: Sequelize.BOOLEAN,
+      },
+      previousPolicyDocument: {
+        type: Sequelize.STRING,
+      },
       rcFront: {
         type: Sequelize.STRING,
       },
