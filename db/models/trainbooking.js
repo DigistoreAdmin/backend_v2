@@ -128,7 +128,7 @@ module.exports = sequelize.define(
     },
     status:{
       allowNull:false,
-      type: DataTypes.ENUM("inQueue","inProgress","completed"),  
+      type: DataTypes.ENUM("inQueue","inProgress","completed","rejected"),  
       defaultValue:"inQueue"
     },
     assignedOn:{

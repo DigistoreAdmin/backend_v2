@@ -19,7 +19,7 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed", "onHold", "reject"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed", "onHold", "rejected"),
         defaultValue: "inQueue",
       },
       assignedId: {

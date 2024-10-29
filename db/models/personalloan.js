@@ -5,8 +5,8 @@ const sequelize = require("../../config/database");
 const definePersonalLoan = (salariedOrBusiness,cibil) => {
   const isSalaried = salariedOrBusiness === "salaried" ? false : true;
   const isBusiness = salariedOrBusiness === "business" ? false : true;
-  const cibilNullvalue=cibil==="approved" ? false : true;
-  const cibilAcknowledgment=cibil==="noCibil" ? false : true;
+  const cibilNullvalue=cibil==="true" ? false : true;
+  const cibilAcknowledgment=cibil==="true" ? false : true;
 
   const personalLoan = sequelize.define(
     "personalLoan",
@@ -87,7 +87,7 @@ const definePersonalLoan = (salariedOrBusiness,cibil) => {
         },
       },
       cibil:{
-        type: DataTypes.ENUM("approved","noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       cibilScore: {
@@ -181,7 +181,7 @@ const definePersonalLoan = (salariedOrBusiness,cibil) => {
       },
       status:{
         allowNull:false,
-        type: DataTypes.ENUM("inQueue","inProgress","completed"),  
+        type: DataTypes.ENUM("inQueue","inProgress","completed","rejected"),  
         defaultValue:"inQueue"
       },
       assignedOn:{

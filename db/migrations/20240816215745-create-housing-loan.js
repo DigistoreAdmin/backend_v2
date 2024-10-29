@@ -92,7 +92,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       cibil: {
-        type: Sequelize.ENUM("approved", "noCibil"),
+        type: Sequelize.BOOLEAN,
       },
       cibilAcknowledgement: {
         type: Sequelize.STRING,
@@ -110,7 +110,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","rejected"),
       },
       assignedId: {
         type: Sequelize.STRING,
