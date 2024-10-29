@@ -31,7 +31,7 @@ module.exports = {
         type: Sequelize.DECIMAL,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","rejected"),
       },
       customerEmailId: {
         type: Sequelize.STRING,

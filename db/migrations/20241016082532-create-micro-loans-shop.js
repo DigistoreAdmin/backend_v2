@@ -88,7 +88,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "Completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","rejected"),
         defaultValue: "inQueue",
       },
       createdAt: {

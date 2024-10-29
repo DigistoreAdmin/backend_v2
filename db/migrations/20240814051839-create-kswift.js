@@ -30,6 +30,16 @@ module.exports = {
       businessAddressLine2: {
         type: Sequelize.STRING,
       },
+      status: {
+        type: Sequelize.ENUM(
+          "inQueue",
+          "inProgress",
+          "completed",
+          "onHold",
+          "rejected"
+        ),
+        default: "inQueue",
+      },
       pinCode: {
         type: Sequelize.INTEGER,
       },
