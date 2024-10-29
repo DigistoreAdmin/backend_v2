@@ -7,6 +7,8 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const { Op } = require("sequelize");
 const crypto = require("crypto");
+const wallets = require("../db/models/wallet");
+
 
 const algorithm = "aes-192-cbc";
 const secret = process.env.FRANCHISE_SECRET_KEY;
@@ -107,20 +109,37 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
 
 const getFranchise = catchAsync(async (req, res) => {
   const { franchiseUniqueId } = req.query;
-  const Data = await Franchise.findOne({ where: { franchiseUniqueId } });
 
-  if (!Data) {
-    return res
-      .status(404)
-      .json({ succes: "false", message: "No data to display" });
+  // Fetch franchise data and wallet data concurrently
+  const [Data, walletData] = await Promise.all([
+    Franchise.findOne({ where: { franchiseUniqueId } }),
+    wallets.findOne({ where: { uniqueId: franchiseUniqueId } }),
+  ]);
+
+  // Check if franchise data exists
+  if (!Data || !walletData) {
+    return res.status(404).json({
+      success: "false",
+      message: "No data to display",
+    });
   }
 
+  // Decrypt sensitive data if present
   if (Data.panNumber) Data.panNumber = decryptData(Data.panNumber);
   if (Data.accountNumber) Data.accountNumber = decryptData(Data.accountNumber);
   if (Data.aadhaarNumber) Data.aadhaarNumber = decryptData(Data.aadhaarNumber);
+
+  // Clear the password for security
   Data.password = "";
 
-  return res.status(200).json({ succes: "success", data: Data });
+  const franchiseDataWithBalance = {
+    ...Data.toJSON(),
+    walletBalance: walletData.balance,
+  };
+  return res
+    .status(200)
+    .json({ success: "success", data: franchiseDataWithBalance });
+
 });
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {
