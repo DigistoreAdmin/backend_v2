@@ -105,10 +105,5 @@ const loanStatus = catchAsync(async (req, res) => {
 });
 
 
-
-
-
 module.exports = { loanStatus };
-
-
 

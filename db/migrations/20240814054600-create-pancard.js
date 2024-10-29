@@ -14,6 +14,9 @@ module.exports = {
       uniqueId: {
         type:Sequelize.STRING,
       },
+      workId: {
+        type: Sequelize.STRING,
+      },
       status:{
         type: Sequelize.ENUM('inQueue','inProgress','completed',"onHold","rejected"),
         default:'inQueue',
@@ -131,6 +134,17 @@ module.exports = {
       ePan:{
         type: Sequelize.ENUM("received","notReceived"),
         allowNull:true
+      },
+      commissionToHeadOffice: {
+        type: Sequelize.DECIMAL,
+       
+      },
+      commissionToFranchise: {
+        type: Sequelize.DECIMAL,
+        
+      },
+      totalAmount: {
+        type: Sequelize.DECIMAL,
       },
       createdAt: {
         type: Sequelize.DATE,
