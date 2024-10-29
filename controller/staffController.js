@@ -81,7 +81,6 @@ const createStaffs = catchAsync(async (req, res, next) => {
     remarks,
   } = req.body;
 
-
   const transaction = await sequelize.transaction();
 
   try {
@@ -210,6 +209,69 @@ const createStaffs = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+const updateStaff = catchAsync(async (req, res, next) => {
+  try {
+    const {
+      addressLine1,
+        addressLine2,
+        state,
+        district,
+        pinCode,
+        city,
+        ward,
+    } = req.body;
+    const user = req.user;
+
+    const staffs = defineStaffsDetails();
+
+    const staff =await  staffs.findOne({ where: { email: user.email } });
+    console.log("email", user.email);
+    // console.log("staff",staff)
+
+    if (!staff) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Staff not found" });
+    }
+
+    const employeeId = staff.employeeId;
+    console.log("employeeId: ", employeeId);
+
+    const updatedStaff = await staffs.update(
+      {
+        addressLine1,
+        addressLine2,
+        state,
+        district,
+        pinCode,
+        city,
+        ward,      
+      },
+      {
+        where: { employeeId: employeeId },
+      }
+    );
+    if (!updatedStaff) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Failed to update staff" });
+    }
+
+    const updatedStaffs=await staffs.findOne({
+      where: { employeeId: employeeId}
+    })
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Updated staff",  updatedStaffs });
+  } catch (error) {
+    console.log("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+});
+
 module.exports = {
   createStaffs,
+  updateStaff,
 };
