@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../../config/database");
 
 const WorkTime = sequelize.define(
-  "WorkTime",
+  "WorkTimes",
   {
     workId: {
       type: DataTypes.STRING,
@@ -48,7 +48,7 @@ const WorkTime = sequelize.define(
   {
     paranoid: true,
     freezeTableName: true,
-    modelName: "WorkTime",
+    modelName: "WorkTimes",
   }
 );
 
