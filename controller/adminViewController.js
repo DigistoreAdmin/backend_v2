@@ -9,6 +9,7 @@ const { Op } = require("sequelize");
 const crypto = require("crypto");
 const wallets = require("../db/models/wallet");
 
+
 const algorithm = "aes-192-cbc";
 const secret = process.env.FRANCHISE_SECRET_KEY;
 const key = crypto.scryptSync(secret, "salt", 24);
@@ -34,7 +35,7 @@ const decryptData = (encryptedData) => {
 
 const getAllFranchises = catchAsync(async (req, res, next) => {
   const { sort, filter, search, page, pageLimit } = req.query;
-  const order = sort ? [[sort, "DESC"]] : [];
+  const order = sort ? [[sort, "DESC"]] : [["createdAt", "DESC"]];
   const where = {};
 
   if (filter) {
@@ -46,6 +47,7 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
     if (filters.phoneNumber) where.phoneNumber = filters.phoneNumber;
     if (filters.panCenter) where.panCenter = filters.panCenter;
     if (filters.blocked) where.blocked = filters.blocked;
+    if (filters.verified) where.verified = filters.verified;
   }
 
   const phoneNumber = parseFloat(search);
@@ -66,6 +68,7 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
 
   const pageNumber = parseInt(page, 10);
   const pageLimitNumber = parseInt(pageLimit, 10);
+
   const limit = pageLimitNumber;
   const offset = (pageNumber - 1) * limit;
 
@@ -136,6 +139,7 @@ const getFranchise = catchAsync(async (req, res) => {
   return res
     .status(200)
     .json({ success: "success", data: franchiseDataWithBalance });
+
 });
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {

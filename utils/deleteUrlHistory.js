@@ -13,7 +13,7 @@ const deleteUrlHistory = async () => {
       },
     });
 
-    console.log(`Deleted ${deletedRecords} old API logs.`);
+    // console.log(`Deleted ${deletedRecords} old API logs.`);
   } catch (error) {
     console.error("Error deleting old API logs:", error);
   }
