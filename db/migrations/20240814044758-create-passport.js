@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed","onHold","reject"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","onHold","rejected"),
       },
       assignedId: {
         type: Sequelize.STRING,
@@ -124,6 +124,7 @@ module.exports = {
       },
     });
   },
+  
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("passport");
   },

@@ -36,7 +36,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM('inQueue', 'inProgress', 'completed','onHold','reject'),
+      type: DataTypes.ENUM('inQueue', 'inProgress', 'completed','onHold','rejected'),
       allowNull: false,
       defaultValue: 'inQueue',
     },

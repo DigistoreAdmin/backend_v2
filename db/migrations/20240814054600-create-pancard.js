@@ -15,7 +15,7 @@ module.exports = {
         type:Sequelize.STRING,
       },
       status:{
-        type: Sequelize.ENUM('inQueue','inProgress','completed',"onHold","reject"),
+        type: Sequelize.ENUM('inQueue','inProgress','completed',"onHold","rejected"),
         default:'inQueue',
       },
       assignedId:{
