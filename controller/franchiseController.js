@@ -326,11 +326,10 @@ const creatFranchise = catchAsync(async (req, res, next) => {
 });
 
 const updateFranchise = catchAsync(async (req, res, next) => {
-  const transaction = await sequelize.transaction();
+
   try {
 
     const {
-      email,
       franchiseAddressLine1,
       franchiseAddressLine2,
       state,
@@ -351,11 +350,9 @@ const updateFranchise = catchAsync(async (req, res, next) => {
 
     const franchise = await Franchise.findOne({
       where: { email: users.email },
-      transaction,
     });
 
     if (!franchise) {
-      await transaction.rollback();
       return res
         .status(404)
         .json({ success: false, message: "Franchise not found" });
@@ -366,45 +363,26 @@ const updateFranchise = catchAsync(async (req, res, next) => {
     console.log("Franchisse", franchiseUniqueId)
     console.log("email", franchise.email)
     
-      const shopPic = req?.files?.shopPic
+    //   const shopPic = req?.files?.shopPic
 
-    const uploadFile = async (file) => {
-      if (file) {
-        try {
-          return await uploadBlob(file);
-        } catch (error) {
-          console.error(`Error uploading file ${file.name}:`, error);
-          // return null;
-        }
-      } else {
-        console.error('File is missing:', file);
-        // return null;
-      }
-    };
+    // const uploadFile = async (file) => {
+    //   if (file) {
+    //     try {
+    //       return await uploadBlob(file);
+    //     } catch (error) {
+    //       console.error(`Error uploading file ${file.name}:`, error);
+    //       // return null;
+    //     }
+    //   } else {
+    //     console.error('File is missing:', file);
+    //     // return null;
+    //   }
+    // };
 
-    const shopPicUrl = await uploadFile(shopPic);
-
-    const updateUser = await user.update(
-      {
-        email,
-      },
-      {
-        where: {
-          email: franchise.email,
-          phoneNumber: franchise.phoneNumber,
-        },
-      },
-      {transaction},
-    )
-
-    if (!updateUser){
-      await transaction.rollback();
-      throw new AppError("Failed to update user details", 400);
-    }
+    // const shopPicUrl = await uploadFile(shopPic);
 
     const updatedFranchise = await Franchise.update(
       {
-        email,
         franchiseAddressLine1,
         franchiseAddressLine2,
         state,
@@ -416,25 +394,20 @@ const updateFranchise = catchAsync(async (req, res, next) => {
         digitalElements,
         panCenter,
         businessType,
-        shopPic: shopPicUrl,
+        // shopPic: shopPicUrl,
       },
       {
         where: { franchiseUniqueId: franchiseUniqueId },
       },
-      {transaction},
     );
 
     if (!updatedFranchise) {
-      await transaction.rollback();
       throw new AppError("Failed to update the franchise", 400);
     }
 
     const updatedFranchises = await Franchise.findOne({
       where: { franchiseUniqueId: franchiseUniqueId },
-      transaction,
     });
-
-    await transaction.commit();
 
     return res.status(200).json({
       success: true,
@@ -443,7 +416,6 @@ const updateFranchise = catchAsync(async (req, res, next) => {
     });
 
   } catch (error) {
-    await transaction.rollback();
     console.error("Error:", error);
     return next(new AppError(error.message, 500));
   }

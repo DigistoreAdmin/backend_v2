@@ -268,7 +268,7 @@ const defineHousingLoan = (isSalariedOrBusiness, cibil) => {
         },
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         allowNull: false,
         defaultValue: "inQueue",
       },
