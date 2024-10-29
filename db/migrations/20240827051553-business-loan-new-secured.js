@@ -56,7 +56,7 @@ module.exports = {
         type:Sequelize.ARRAY(Sequelize.STRING)
       },
       cibil: {
-        type: Sequelize.ENUM("approved", "noCibil"),
+        type: Sequelize.BOOLEAN,
       },
       cibilAcknowledgement: {
         type: Sequelize.STRING,
