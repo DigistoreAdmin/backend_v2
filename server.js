@@ -6,10 +6,12 @@ const fileUpload = require("express-fileupload");
 const path = require("path");
 const session = require("express-session");
 const PgSession = require("connect-pg-simple")(session);
-const router = require('./route/index');
+const router = require("./route/index");
 const catchAsync = require("./utils/catchAsync");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controller/errorController");
+const apiLogger = require("./utils/apiLogger");
+const deleteUrlHistory = require("./utils/deleteUrlHistory");
 
 app.set("trust proxy", 1); // Trust the first proxy
 
@@ -38,6 +40,8 @@ const corsOptionsDelegate = function (req, callback) {
   }
   callback(null, corsOptions); // callback expects two parameters: error and options
 };
+
+// deleteUrlHistory()
 
 app.use(cors(corsOptionsDelegate));
 
@@ -86,6 +90,8 @@ function getISTDateTime() {
   };
   return new Intl.DateTimeFormat("en-IN", options).format(now);
 }
+
+app.use(apiLogger);
 
 app.get("/", (req, res) => {
   res.json({

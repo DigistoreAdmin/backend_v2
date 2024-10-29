@@ -28,7 +28,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       cibil:{
-        type: Sequelize.ENUM("approved","noCibil")
+        type: Sequelize.BOOLEAN
       },
       cibilScore: {
         type: Sequelize.INTEGER
@@ -73,7 +73,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       status:{
-        type:Sequelize.ENUM("inQueue","inProgress","completed")
+        type:Sequelize.ENUM("inQueue","inProgress","completed","rejected")
       },
       assignedOn:{
         type: Sequelize.DATE

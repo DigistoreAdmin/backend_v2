@@ -3,6 +3,7 @@ const {
   updateStaffDetails,
   getAllStaff,
   getFranchise,
+  getStaff,
 } = require("../controller/adminViewController");
 
 const { verifyToken, verifyRefreshToken } = require("../utils/token");
@@ -23,5 +24,6 @@ router
   
 router.route("/getAllStaff").get(verifyToken, verifyRefreshToken, getAllStaff);
 
+router.route("/getStaff").get(verifyToken,verifyRefreshToken,getStaff)
 
 module.exports = router;

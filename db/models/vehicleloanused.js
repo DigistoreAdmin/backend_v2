@@ -2,8 +2,8 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../../config/database");
 
 const usedvehicleLoan = (typeofLoan, cibil) => {
-  const allowNullCibilApp = cibil === "approved" ? false : true;
-  const allowNullNoCibil = cibil === "noCibil" ? false : true;
+  const allowNullCibilApp = cibil === "true" ? false : true;
+  const allowNullNoCibil = cibil === "false" ? false : true;
   const allowNullbus = typeofLoan === "business" ? false : true;
   const allowNullsal = typeofLoan === "salaried" ? false : true;
 
@@ -171,7 +171,7 @@ const usedvehicleLoan = (typeofLoan, cibil) => {
         },
       },
       cibil: {
-        type: DataTypes.ENUM("approved", "noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       cibilScore: {
@@ -229,7 +229,7 @@ const usedvehicleLoan = (typeofLoan, cibil) => {
         },
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "Completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         allowNull: false,
         defaultValue: "inQueue",
       },

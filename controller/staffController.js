@@ -2,8 +2,37 @@ const user = require("../db/models/user");
 const catchAsync = require("../utils/catchAsync");
 const sequelize = require("../config/database");
 const defineStaffsDetails = require("../db/models/staffs");
+const azureStorage = require("azure-storage");
+const intoStream = require("into-stream");
 const otpStorage = require("../utils/otpStorage");
 const AppError = require("../utils/appError");
+
+const containerName = "imagecontainer";
+const blobService = azureStorage.createBlobService(
+  process.env.AZURE_STORAGE_CONNECTION_STRING
+);
+
+const uploadBlob = (file) => {
+  return new Promise((resolve, reject) => {
+    const blobName = file.name;
+    const stream = intoStream(file.data);
+    const streamLength = file.data.length;
+
+    blobService.createBlockBlobFromStream(
+      containerName,
+      blobName,
+      stream,
+      streamLength,
+      (err) => {
+        if (err) {
+          return reject(`Error uploading file ${blobName}: ${err.message}`);
+        }
+        const blobUrl = blobService.getUrl(containerName, blobName);
+        resolve(blobUrl);
+      }
+    );
+  });
+};
 
 const createStaffs = catchAsync(async (req, res, next) => {
   const {
@@ -102,6 +131,8 @@ const createStaffs = catchAsync(async (req, res, next) => {
       other
     );
 
+    const profilePicUrl = await uploadBlob(req.files.profilePic);
+
     const employeeId = "";
 
     const newStaff = await staffs.create(
@@ -142,6 +173,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
         posterOrBroucher,
         sim,
         phone,
+        profilePic: profilePicUrl,
         other,
         laptopDetails,
         idCardDetails,
@@ -177,6 +209,69 @@ const createStaffs = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+const updateStaff = catchAsync(async (req, res, next) => {
+  try {
+    const {
+      addressLine1,
+        addressLine2,
+        state,
+        district,
+        pinCode,
+        city,
+        ward,
+    } = req.body;
+    const user = req.user;
+
+    const staffs = defineStaffsDetails();
+
+    const staff =await  staffs.findOne({ where: { email: user.email } });
+    console.log("email", user.email);
+    // console.log("staff",staff)
+
+    if (!staff) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Staff not found" });
+    }
+
+    const employeeId = staff.employeeId;
+    console.log("employeeId: ", employeeId);
+
+    const updatedStaff = await staffs.update(
+      {
+        addressLine1,
+        addressLine2,
+        state,
+        district,
+        pinCode,
+        city,
+        ward,      
+      },
+      {
+        where: { employeeId: employeeId },
+      }
+    );
+    if (!updatedStaff) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Failed to update staff" });
+    }
+
+    const updatedStaffs=await staffs.findOne({
+      where: { employeeId: employeeId}
+    })
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Updated staff",  updatedStaffs });
+  } catch (error) {
+    console.log("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+});
+
 module.exports = {
   createStaffs,
+  updateStaff,
 };

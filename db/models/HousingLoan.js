@@ -12,8 +12,8 @@ const getCurrentDate = () => {
 const defineHousingLoan = (isSalariedOrBusiness, cibil) => {
   const isSalaried = isSalariedOrBusiness === "salaried" ? false : true;
   const isBusiness = isSalariedOrBusiness === "business" ? false : true;
-  const isNoCibil = cibil === "noCibil" ? false : true;
-  const isApproved = cibil === "approved" ? false : true;
+  const isNoCibil = cibil === "false" ? false : true;
+  const isApproved = cibil === "true" ? false : true;
 
   const HousingLoan = sequelize.define(
     "housingLoans",
@@ -228,7 +228,7 @@ const defineHousingLoan = (isSalariedOrBusiness, cibil) => {
         },
       },
       cibil: {
-        type: DataTypes.ENUM("approved", "noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       cibilAcknowledgement: {
@@ -268,7 +268,7 @@ const defineHousingLoan = (isSalariedOrBusiness, cibil) => {
         },
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         allowNull: false,
         defaultValue: "inQueue",
       },

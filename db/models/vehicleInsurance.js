@@ -44,7 +44,7 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
         allowNull: true,
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         allowNull:false,
         defaultValue: "inQueue",
       },
@@ -96,6 +96,20 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
           "standAlone"
         ),
         allowNull: false,
+      },
+      anyClaims: {
+        type: DataTypes.BOOLEAN,
+        allowNull:false,
+        validate: {
+          isIn: {
+            args: [[true, false]],
+            msg: "anyClaims value must be true or false",
+          }
+        }
+      },
+      previousPolicyDocument: {
+        type:DataTypes.STRING,
+        allowNull:true,
       },
       rcFront: {
         type: DataTypes.STRING,

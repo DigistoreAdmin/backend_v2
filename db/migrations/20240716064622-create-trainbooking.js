@@ -40,7 +40,7 @@ module.exports = {
         type: Sequelize.JSONB
       },
       status: {
-        type: Sequelize.ENUM("inQueue","inProgress","completed")
+        type: Sequelize.ENUM("inQueue","inProgress","completed","rejected")
       },
       assignedId: {
         type: Sequelize.STRING

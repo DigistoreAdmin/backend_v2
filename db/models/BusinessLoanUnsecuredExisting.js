@@ -12,8 +12,8 @@ const getCurrentDate = () => {
 
 const defineBusinessLoanUnscuredExisting = (cibil) => {
 
-  const isNoCibil = cibil === "noCibil" ? false : true;
-  const isApproved = cibil === "approved" ? false : true;
+  const isNoCibil = cibil === "false" ? false : true;
+  const isApproved = cibil === "true" ? false : true;
 
   const businessLoanUnscuredExisting = sequelize.define(
     "businessLoanUnscuredExisting",
@@ -96,7 +96,7 @@ const defineBusinessLoanUnscuredExisting = (cibil) => {
         allowNull: false,
       },
       cibil: {
-        type: DataTypes.ENUM("approved", "noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
       },
       cibilAcknowledgement: {
@@ -176,7 +176,7 @@ const defineBusinessLoanUnscuredExisting = (cibil) => {
         allowNull: true
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         allowNull: false,
         defaultValue: "inQueue",
       },

@@ -129,7 +129,7 @@ module.exports = sequelize.define(
       allowNull: true,
     },
     status: {
-      type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+      type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
       allowNull: false,
       defaultValue: "inQueue"
     },
@@ -140,6 +140,34 @@ module.exports = sequelize.define(
     completedOn: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+    workId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    ticket: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    amount: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    serviceCharge: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    commissionToFranchise: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    commissionToHO: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    totalAmount: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     },
     createdAt: {
       allowNull: false,

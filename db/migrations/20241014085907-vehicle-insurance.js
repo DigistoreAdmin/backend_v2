@@ -26,7 +26,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","rejected"),
       },
       customerName: {
         type: Sequelize.STRING,
@@ -44,6 +44,12 @@ module.exports = {
           "thirdParty",
           "standAlone"
         ),
+      },
+      anyClaims: {
+        type: Sequelize.BOOLEAN,
+      },
+      previousPolicyDocument: {
+        type: Sequelize.STRING,
       },
       rcFront: {
         type: Sequelize.STRING,

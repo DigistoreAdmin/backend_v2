@@ -127,7 +127,7 @@ module.exports = {
         type: Sequelize.ARRAY(STRING),
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","rejected"),
       },
       workId: {
         type: Sequelize.STRING,
