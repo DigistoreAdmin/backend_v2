@@ -2,6 +2,9 @@ const Franchise = require('../db/models/franchise');
 const panCardUsers = require('../db/models/pancard');
 const azureStorage = require('azure-storage');
 const intoStream = require('into-stream');
+const transationHistory = require('../db/models/transationhistory')
+const wallets = require('../db/models/wallet');
+const catchAsync = require('../utils/catchAsync');
 
 const containerName = 'imagecontainer';
 const blobService = azureStorage.createBlobService(process.env.AZURE_STORAGE_CONNECTION_STRING);
@@ -166,4 +169,132 @@ const createPancard = async (req, res) => {
   }
 };
 
-module.exports = { createPancard };
+const updatePanDetails = catchAsync(async (req, res,next) => {
+  try {
+    const { mobileNumber,id,status, acknowledgementNumber, reason, ePan,accountNo } =
+      req.body;
+    console.log("req.body: ", req.body);
+    const acknowledgementFile = req?.files?.acknowledgementFile;
+
+    const user=req.user
+
+
+    if (!mobileNumber) {
+      return res.status(400).json({ message: "Mobile number is required" });
+    }
+
+    const pancardUser = panCardUsers();
+
+    const report = await pancardUser.findOne({
+      where: { mobileNumber: mobileNumber ,id:id},
+    });
+
+    if (!report) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    const franchiseData = await Franchise.findOne({
+      where: { email: user.email },
+    });
+    
+    if (!franchiseData) return next(new AppError("Franchise not found", 404));
+    
+    
+    const walletData = await wallets.findOne({
+      where: { uniqueId: franchiseData.franchiseUniqueId },
+    });
+    
+    if (!walletData) return next(new AppError("Wallet not found", 404));
+    
+
+    const finalStatus = status === "completed" ? "completed" : "inProgress";
+
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(`Error uploading file ${file.name}:`, error);
+          throw new Error("File upload failed");
+        }
+      }
+      return null;
+    };
+
+    const acknowledgementFileUrl = await uploadFile(acknowledgementFile);
+
+    
+    let totalAmount = 1500;
+    let commissionToHeadOffice = 1000;
+    let commissionToFranchise = 500;
+
+    report.status = finalStatus;
+    report.acknowledgementFile =
+      acknowledgementFileUrl || report.acknowledgementFile;
+    report.acknowledgementNumber =
+      acknowledgementNumber || report.acknowledgementNumber;
+    report.reason = reason || report.reason;
+    report.ePan = ePan || report.ePan;
+    
+    report.totalAmount = totalAmount || report.totalAmount;
+    report.commissionToHeadOffice =
+      commissionToHeadOffice || report.commissionToHeadOffice;
+
+      report.commissionToFranchise =
+      commissionToFranchise || report.commissionToFranchise;
+
+  
+      if(totalAmount > walletData.balance){
+        return next(new AppError("Insufficient wallet balance", 401));
+        }
+  
+      await report.save();
+  
+      const newBalance =Math.round(walletData.balance-totalAmount)
+  
+      
+      // Update wallet balance
+      const updated = await wallets.update(
+        { balance: newBalance },
+        { where: { uniqueId: franchiseData.franchiseUniqueId } }
+      );
+  
+      const transactionId=generateRandomId()
+  
+    const newTransactionHistory = await transationHistory.create({
+        transactionId: transactionId,
+        uniqueId: franchiseData.franchiseUniqueId,
+        userName: franchiseData.franchiseName,
+        userType: user.userType,
+        service: "pancard",
+        customerNumber: mobileNumber,
+        serviceNumber: accountNo,
+        serviceProvider: "pancard",
+        status: "success",
+        amount: totalAmount,
+        franchiseCommission: commissionToFranchise,
+        adminCommission: commissionToHeadOffice,
+        walletBalance: newBalance,
+      });
+  
+    if (newTransactionHistory && updated) {
+    return res.status(200).json({
+      message: `success`,
+      report,
+    });
+  }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+
+function generateRandomId() {
+  const prefix = "DSP";
+  const timestamp = Date.now().toString(); 
+  return prefix + timestamp;
+}
+
+module.exports = { createPancard, updatePanDetails };

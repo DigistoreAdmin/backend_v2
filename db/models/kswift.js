@@ -26,6 +26,10 @@ const kswift = sequelize.define(
         },
       },
     },
+    status:{
+      type: DataTypes.ENUM('inQueue','inProgress','completed',"onHold","rejected"),
+      default:'inQueue',
+    },
     mobileNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
