@@ -416,7 +416,7 @@ const updateFranchise = catchAsync(async (req, res, next) => {
         digitalElements,
         panCenter,
         businessType,
-        shopPic: shopPicUrl,
+        // shopPic: shopPicUrl,
       },
       {
         where: { franchiseUniqueId: franchiseUniqueId },

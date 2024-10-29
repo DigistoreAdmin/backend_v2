@@ -6,7 +6,7 @@ const { restrictTo } = require('../controller/authController.js');
 
 router.route("/deleteFranchise").delete(verifyToken, verifyRefreshToken, restrictTo("admin"), deleteFranchise)
 router.route('/updateStaffDetails').put(verifyToken, verifyRefreshToken, restrictTo("admin"), updateStaffDetails)
-router.route('/updateFranchiseDetails').put(verifyToken,verifyRefreshToken, restrictTo("admin"), updateFranchiseDetails)
+router.route('/updateFranchiseDetails').put(verifyToken,verifyRefreshToken, restrictTo("admin","staff"), updateFranchiseDetails)
 router.route('/updateWallet').put(verifyToken,verifyRefreshToken, restrictTo("admin"),updateWallet)
 router.route('/verifyFranchise').put(verifyToken,verifyRefreshToken, restrictTo("admin"),verifyFranchise)
 
