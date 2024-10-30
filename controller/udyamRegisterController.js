@@ -36,11 +36,11 @@ const udyamRegistration = catchAsync( async(req,res,next)=>{
 try {
     const {
         customerName,
-        mobileNumber,
+        phoneNumber,
         email,
         businessName,
-        addressLine1,
-        addressLine2,
+        businessAddressLine1,
+        businessAddressLine2,
         pinCode,
         shopLongitude,
         shopLatitude,
@@ -54,7 +54,7 @@ try {
         annualTurnOver,
     } = req.body
 
-    if(!customerName || !mobileNumber || !email || !businessName || !addressLine1 || 
+    if(!customerName || !phoneNumber || !email || !businessName || !businessAddressLine1 || 
           !pinCode || !shopLongitude || !shopLatitude || !religionWithCaste || !totalNumberOfEmployees ||
         !totalMen || !totalWomen || !firmRegistrationDate || !firmCommencementDate || !businessType || !annualTurnOver){
             return next(new AppError("All required fields must be provided",400));
@@ -63,10 +63,10 @@ console.log("body", req.body)
     const {
         aadhaarFront,
         aadhaarBack,
-        pancard
+        panPic
     }=req.files
     console.log("files",req.files)
-    if(!aadhaarBack || !aadhaarFront || !pancard){
+    if(!aadhaarBack || !aadhaarFront || !panPic){
         return next(new AppError("All required files must be provided",400));
 
     }
@@ -95,11 +95,11 @@ console.log("body", req.body)
     const newUdyamRegistration = await udyamRegistrations.create({
         uniqueId,
         customerName,
-        mobileNumber,
+        phoneNumber,
         email,
         businessName,
-        addressLine1,
-        addressLine2,
+        businessAddressLine1,
+        businessAddressLine2,
         pinCode,
         shopLongitude,
         shopLatitude,
@@ -113,7 +113,7 @@ console.log("body", req.body)
         annualTurnOver,
         aadhaarFront: await uploadFile(req.files.aadhaarFront),
         aadhaarBack:await uploadFile(req.files.aadhaarBack),
-        pancard:await uploadFile(req.files.pancard)
+        panPic:await uploadFile(req.files.panPic)
     })
 
     if(!newUdyamRegistration){

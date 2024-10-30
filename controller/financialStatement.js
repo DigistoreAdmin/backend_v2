@@ -42,13 +42,13 @@ const financialStatement= catchAsync(async(req,res,next)=>{
             customerName,
             businessName,
             businessType,
-            mobileNumber,
+            phoneNumber,
             email,
             gstUsername,
             gstPassword,
         } =req.body
 
-        if(!customerName || !businessName || !businessType || !mobileNumber || !email || !gstUsername || !gstPassword){
+        if(!customerName || !businessName || !businessType || !phoneNumber || !email || !gstUsername || !gstPassword){
             return next(new AppError("All required fields must be provided",400));
         }
 
@@ -92,7 +92,7 @@ const financialStatement= catchAsync(async(req,res,next)=>{
             customerName,
             businessName,
             businessType,
-            mobileNumber,
+            phoneNumber,
             email,
             gstUsername,
             gstPassword:hashedGstPassword,

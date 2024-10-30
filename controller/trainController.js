@@ -117,20 +117,20 @@ const trainBookingUpdate = catchAsync(async (req, res, next) => {
 
     let serviceCharge = 0;
     let commissionToFranchise = 0;
-    let commissionToHeadOffice = 0;
+    let commissionToHO = 0;
 
     if (amount < 500) {
       serviceCharge = 50;
       commissionToFranchise = 30;
-      commissionToHeadOffice = 20;
+      commissionToHO = 20;
     } else if (amount < 1000) {
       serviceCharge = 70;
       commissionToFranchise = 40;
-      commissionToHeadOffice = 30;
+      commissionToHO = 30;
     } else {
       serviceCharge = 100;
       commissionToFranchise = 50;
-      commissionToHeadOffice = 50;
+      commissionToHO = 50;
     }
 
     let totalAmount = parseInt(amount) + serviceCharge;
@@ -142,8 +142,8 @@ const trainBookingUpdate = catchAsync(async (req, res, next) => {
     report.serviceCharge = serviceCharge || report.serviceCharge;
     report.commissionToFranchise =
       commissionToFranchise || report.commissionToFranchise;
-    report.commissionToHeadOffice =
-      commissionToHeadOffice || report.commissionToHeadOffice;
+    report.commissionToHO =
+      commissionToHO || report.commissionToHO;
     report.totalAmount = totalAmount || report.totalAmount;
 
     if (totalAmount > walletData.balance) {
@@ -173,7 +173,7 @@ const trainBookingUpdate = catchAsync(async (req, res, next) => {
       status: "success",
       amount: totalAmount,
       franchiseCommission: commissionToFranchise,
-      adminCommission: commissionToHeadOffice,
+      adminCommission: commissionToHO,
       walletBalance: newBalance,
     });
 

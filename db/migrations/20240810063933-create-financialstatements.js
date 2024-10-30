@@ -21,7 +21,7 @@ module.exports = {
       businessType: {
         type: Sequelize.ENUM("proprietary","partnership","company")
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT
       },
       email: {
