@@ -39,7 +39,7 @@ const microLoans = sequelize.define(
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: {
@@ -86,7 +86,7 @@ const microLoans = sequelize.define(
         },
       },
     },
-    pan: {
+    panPic: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
