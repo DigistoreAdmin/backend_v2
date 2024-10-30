@@ -35,16 +35,16 @@ const uploadBlob = async (file) => {
 const fssaiRegistration = catchAsync(async (req, res, next) => {
 
     try {
-        const { customerName, mobileNumber, email, businessName,
-            businessAddressLine1, businessAddressLine2, pincode, productsOrItems, circleOfTheUnit
+        const { customerName, phoneNumber, email, businessName,
+            businessAddressLine1, businessAddressLine2, pinCode, productsOrItems, circleOfTheUnit
         } = req.body
-        if (!customerName || !mobileNumber || !email || !businessName || !businessAddressLine1 || !pincode || !productsOrItems || !circleOfTheUnit) {
+        if (!customerName || !phoneNumber || !email || !businessName || !businessAddressLine1 || !pinCode || !productsOrItems || !circleOfTheUnit) {
             return next(new AppError("All required fields must be provided.", 400));
         }
 
-        const { aadhaarFront, aadhaarBack, panCard, photo, waterTestPaper } = req.files;
-        if (!aadhaarFront || !aadhaarBack || !panCard || !photo || !waterTestPaper) {
-            return next(new AppError("All required files (aadhaarFront, aadhaarBack, panCard, photo, waterTestPaper) must be uploaded.", 400));
+        const { aadhaarFront, aadhaarBack, panPic, photo, waterTestPaper } = req.files;
+        if (!aadhaarFront || !aadhaarBack || !panPic || !photo || !waterTestPaper) {
+            return next(new AppError("All required files (aadhaarFront, aadhaarBack, panPic, photo, waterTestPaper) must be uploaded.", 400));
         }
 
         const uploadFile = async (file) => {
@@ -79,17 +79,17 @@ const fssaiRegistration = catchAsync(async (req, res, next) => {
         const newFssai = await fssaiRegistrations.create({
             uniqueId,
             customerName,
-            mobileNumber,
+            phoneNumber,
             email,
             businessName,
             businessAddressLine1,
             businessAddressLine2,
-            pincode,
+            pinCode,
             productsOrItems,
             circleOfTheUnit,
             aadhaarFront: await uploadFile(aadhaarFront),
             aadhaarBack: await uploadFile(aadhaarBack),
-            panCard: await uploadFile(panCard),
+            panPic: await uploadFile(panPic),
             photo: await uploadFile(photo),
             waterTestPaper: await uploadFile(waterTestPaper)
         })

@@ -38,8 +38,8 @@ const gstRegistration = catchAsync(async (req, res, next) => {
   try {
     const {
       customerName,
-      customerEmailId,
-      customerMobile,
+      email,
+      phoneNumber,
       businessName,
       businessAddressLine1,
       businessAddressLine2,
@@ -98,12 +98,12 @@ const gstRegistration = catchAsync(async (req, res, next) => {
       for (let i = 1; i <= noOfPartners; i++) {
         const partnerNo = `${i}`;
         const photoFile = req.files[`partner${i}photo`];
-        const panCardFile = req.files[`partner${i}panCard`];
+        const panCardFile = req.files[`partner${i}panPic`];
         const aadhaarFrontFile = req.files[`partner${i}aadhaarFront`];
         const aadhaarBackFile = req.files[`partner${i}aadhaarBack`];
         const addressLine1 = req.body[`partner${i}addressLine1`];
         const addressLine2 = req.body[`partner${i}addressLine2`];
-        const pincode = req.body[`partner${i}pincode`];
+        const pinCode = req.body[`partner${i}pinCode`];
         const latitude = req.body[`partner${i}latitude`];
         const longitude = req.body[`partner${i}longitude`];
         if (
@@ -112,7 +112,7 @@ const gstRegistration = catchAsync(async (req, res, next) => {
           aadhaarFrontFile &&
           aadhaarBackFile &&
           addressLine1 &&
-          pincode &&
+          pinCode &&
           latitude &&
           longitude
         ) {
@@ -125,12 +125,12 @@ const gstRegistration = catchAsync(async (req, res, next) => {
             updatedPartnersDetails.push({
               partnerNo: partnerNo,
               photo: photoImg,
-              panCard: panCardImg,
+              panPic: panCardImg,
               aadhaarFront: aadhaarFrontImg,
               aadhaarBack: aadhaarBackImg,
               addressLine1: addressLine1,
               addressLine2: addressLine2 ? addressLine2 : null,
-              pincode: pincode,
+              pinCode: pinCode,
               latitude: latitude,
               longitude: longitude,
             });
@@ -153,8 +153,8 @@ const gstRegistration = catchAsync(async (req, res, next) => {
 
       for (let i = 1; i <= noOfDirectors; i++) {
         const directorNo = `${i}`;
-        const panCardFile = req.files[`director${i}panCard`];
-        const pin = req.body[`director${i}pin`];
+        const panCardFile = req.files[`director${i}panPic`];
+        const pinCode = req.body[`director${i}pinCode`];
         const photoFile = req.files[`director${i}photo`];
         const aadhaarFrontFile = req.files[`director${i}aadhaarFront`];
         const aadhaarBackFile = req.files[`director${i}aadhaarBack`];
@@ -165,7 +165,7 @@ const gstRegistration = catchAsync(async (req, res, next) => {
         if (
           panCardFile &&
           photoFile &&
-          pin &&
+          pinCode &&
           aadhaarFrontFile &&
           aadhaarBackFile &&
           addressLine1 &&
@@ -180,8 +180,8 @@ const gstRegistration = catchAsync(async (req, res, next) => {
 
             updatedDirectorsDetails.push({
               directorNo: directorNo,
-              panCard: panCardImg,
-              pin: pin,
+              panPic: panCardImg,
+              pinCode: pinCode,
               photo: photoImg,
               aadhaarFront: aadhaarFrontImg,
               aadhaarBack: aadhaarBackImg,
@@ -207,10 +207,10 @@ const gstRegistration = catchAsync(async (req, res, next) => {
           // shopGmapPic: await uploadFile(req.files.shopGmapPic),
           residenceLatitude,
           residenceLongitude,
-          panCardImage: await uploadFile(req.files.panCardImg),
+          panPic: await uploadFile(req.files.panPic),
           aadhaarFront: await uploadFile(req.files.aadhaarFront),
           aadhaarBack: await uploadFile(req.files.aadhaarBack),
-          passportSizePhoto: await uploadFile(req.files.passportSizePhoto),
+          photo: await uploadFile(req.files.photo),
           bankDetails: await uploadFile(req.files.bankDetails),
         };
         break;
@@ -242,8 +242,8 @@ const gstRegistration = catchAsync(async (req, res, next) => {
     const newGst = await gstRegistration.create({
       uniqueId,
       customerName,
-      customerEmailId,
-      customerMobile,
+      email,
+      phoneNumber,
       businessName,
       businessAddressLine1,
       businessAddressLine2,
@@ -275,7 +275,7 @@ const gstRegistration = catchAsync(async (req, res, next) => {
 const updateGstDetails = catchAsync(async (req, res, next) => {
   try {
     const {
-      mobileNumber,
+      phoneNumber,
       status,
       applicationReferenceNumber,
       id,
@@ -286,14 +286,14 @@ const updateGstDetails = catchAsync(async (req, res, next) => {
 
     const user = req.user;
 
-    if (!mobileNumber) {
+    if (!phoneNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
     }
 
     const gstDetails = gstRegistrationDetails();
 
     const data = await gstDetails.findOne({
-      where: { customerMobile: mobileNumber, id: id },
+      where: { phoneNumber: phoneNumber, id: id },
     });
 
     if (!data) {
@@ -328,7 +328,7 @@ const updateGstDetails = catchAsync(async (req, res, next) => {
     const gstDocumentUrl = await uploadFile(gstDocument);
 
     let totalAmount = 1500;
-    let commissionToHeadOffice = 1000;
+    let commissionToHO = 1000;
     let commissionToFranchise = 500;
 
     data.status = finalStatus;
@@ -337,8 +337,8 @@ const updateGstDetails = catchAsync(async (req, res, next) => {
       applicationReferenceNumber || data.applicationReferenceNumber;
 
     data.totalAmount = totalAmount || data.totalAmount;
-    data.commissionToHeadOffice =
-      commissionToHeadOffice || data.commissionToHeadOffice;
+    data.commissionToHO =
+      commissionToHO || data.commissionToHO;
 
     data.commissionToFranchise =
       commissionToFranchise || data.commissionToFranchise;
@@ -364,13 +364,13 @@ const updateGstDetails = catchAsync(async (req, res, next) => {
       userName: franchiseData.franchiseName,
       userType: user.userType,
       service: "gst",
-      customerNumber: mobileNumber,
+      customerNumber: phoneNumber,
       serviceNumber: accountNo,
       serviceProvider: "gst",
       status: "success",
       amount: totalAmount,
       franchiseCommission: commissionToFranchise,
-      adminCommission: commissionToHeadOffice,
+      adminCommission: commissionToHO,
       walletBalance: newBalance,
     });
 

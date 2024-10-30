@@ -40,7 +40,7 @@ const businessLoanExisting = catchAsync(async (req, res, next) => {
         const {
             customerName,
             email,
-            mobileNumber,
+            phoneNumber,
             cibilScore,
             loanAmount,
             cibil,
@@ -98,7 +98,7 @@ const businessLoanExisting = catchAsync(async (req, res, next) => {
             workId,
             customerName,
             email,
-            mobileNumber,
+            phoneNumber,
             cibil,
             cibilScore: cibil === 'true' ? cibilScore : null,
             loanAmount,
