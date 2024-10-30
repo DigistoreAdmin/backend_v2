@@ -36,10 +36,10 @@ module.exports = {
       customerName: {
         type: Sequelize.STRING,
       },
-      emailID: {
+      email: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
       fatherName: {
@@ -135,7 +135,7 @@ module.exports = {
         type: Sequelize.ENUM("received","notReceived"),
         allowNull:true
       },
-      commissionToHeadOffice: {
+      commissionToHO: {
         type: Sequelize.DECIMAL,
        
       },

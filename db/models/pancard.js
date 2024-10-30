@@ -74,7 +74,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
         }
       }
     },
-    emailID: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -93,7 +93,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: {
@@ -247,7 +247,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       type: DataTypes.STRING,
       allowNull: allowNullV,
     },
-    commissionToHeadOffice: {
+    commissionToHO: {
       type: DataTypes.DECIMAL,
       allowNull:true
     },
