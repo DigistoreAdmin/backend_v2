@@ -40,8 +40,8 @@ const createVehicleInsurance = async (req, res) => {
       assignedOn,
       completedOn,
       customerName,
-      mobileNumber,
-      emailId,
+      phoneNumber,
+      email,
       insuranceType,
       commercialOrType2Vehicle,
       isPolicyExpired,
@@ -130,8 +130,8 @@ const createVehicleInsurance = async (req, res) => {
       assignedOn,
       completedOn,
       customerName,
-      mobileNumber,
-      emailId,
+      phoneNumber,
+      email,
       insuranceType,
       commercialOrType2Vehicle,
       isPolicyExpired,
@@ -173,7 +173,7 @@ const createVehicleInsurance = async (req, res) => {
 const updateInsuranceDetails = catchAsync(async (req, res) => {
   try {
     const {
-      mobileNumber,
+      phoneNumber,
       id,
       status,
       companyName,
@@ -190,12 +190,12 @@ const updateInsuranceDetails = catchAsync(async (req, res) => {
     const policyDocument = req?.files?.policyDocument;
 
     // Validate required fields
-    if (!mobileNumber) {
+    if (!phoneNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
     }
 
     const insurance = defineVehicleInsurance();
-    const data = await insurance.findOne({ where: { mobileNumber, id } });
+    const data = await insurance.findOne({ where: { phoneNumber, id } });
 
     if (!data) {
       return res.status(404).json({ message: "Record not found" });
@@ -239,7 +239,7 @@ const updateInsuranceDetails = catchAsync(async (req, res) => {
     }
 
     const commissionToFranchise = commission * 0.2;
-    const commissionToHeadOffice = commission * 0.8;
+    const commissionToHO = commission * 0.8;
 
     Object.assign(data, {
       status: finalStatus,
@@ -247,8 +247,8 @@ const updateInsuranceDetails = catchAsync(async (req, res) => {
       throughWhom: throughWhom || data.throughWhom,
       commissionToFranchise:
         commissionToFranchise || data.commissionToFranchise,
-      commissionToHeadOffice:
-        commissionToHeadOffice || data.commissionToHeadOffice,
+      commissionToHO:
+        commissionToHO || data.commissionToHO,
       acknowledgementFileUrl:
         acknowledgementFileUrl || data.acknowledgementFileUrl,
       odPremiumAmount: odPremiumAmount || data.odPremiumAmount,

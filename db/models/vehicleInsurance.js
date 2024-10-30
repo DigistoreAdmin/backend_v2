@@ -57,7 +57,7 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
           },
         },
       },
-      mobileNumber: {
+      phoneNumber: {
         type: DataTypes.BIGINT,
         validate: {
           isInt: {
@@ -69,7 +69,7 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
           },
         },
       },
-      emailId: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -185,7 +185,7 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
-      commissionToHeadOffice: {
+      commissionToHO: {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
