@@ -35,22 +35,22 @@ module.exports = sequelize.define(
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: {
         notNull: {
-          msg: 'Mobile number cannot be null',
+          msg: 'Phone number cannot be null',
         },
         notEmpty: {
-          msg: 'Mobile number cannot be empty',
+          msg: 'Phone number cannot be empty',
         },
         isNumeric: {
-          msg: 'Mobile number must contain only numbers',
+          msg: 'Phone number must contain only numbers',
         },
         len: {
           args: [10, 15],
-          msg: 'Mobile number must be between 10 and 15 digits',
+          msg: 'Phone number must be between 10 and 15 digits',
         },
       },
     },
@@ -101,7 +101,7 @@ module.exports = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    pincode: {
+    pinCode: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -146,7 +146,7 @@ module.exports = sequelize.define(
         },
       },
     },
-    panCard: {
+    panPic: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {

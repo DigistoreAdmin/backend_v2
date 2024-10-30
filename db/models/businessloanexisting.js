@@ -69,22 +69,22 @@ const businessLoanExistingDetails = (cibil) => {
           },
         },
       },
-      mobileNumber: {
+      phoneNumber: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Customer mobile number cannot be null',
+            msg: 'Phone number cannot be null',
           },
           notEmpty: {
-            msg: 'Customer mobile number cannot be empty',
+            msg: 'Phone number cannot be empty',
           },
           isNumeric: {
-            msg: 'Customer mobile number must contain only numbers',
+            msg: 'Phone number must contain only numbers',
           },
           len: {
             args: [10, 15],
-            msg: 'Customer mobile number must be between 10 and 15 digits',
+            msg: 'Phone number must be between 10 and 15 digits',
           },
         },
       },

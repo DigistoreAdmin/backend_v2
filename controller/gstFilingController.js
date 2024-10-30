@@ -36,10 +36,10 @@ const uploadBlob = async (file) => {
 const gstFiling = catchAsync(async (req, res, next) => {
 
     try {
-        const { customerName, mobileNumber, email, businessName,
+        const { customerName, phoneNumber, email, businessName,
             gstNumber, gstUsername, gstPassword
         } = req.body
-        if (!customerName || !mobileNumber || !email || !businessName || !gstNumber || !gstUsername || !gstPassword) {
+        if (!customerName || !phoneNumber || !email || !businessName || !gstNumber || !gstUsername || !gstPassword) {
             return next(new AppError("All required fields must be provided.", 400));
         }
 
@@ -80,7 +80,7 @@ const gstFiling = catchAsync(async (req, res, next) => {
         const newGstFiling = await gstFilings.create({
             uniqueId,
             customerName,
-            mobileNumber,
+            phoneNumber,
             email,
             businessName,
             gstNumber,
