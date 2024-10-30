@@ -33,8 +33,8 @@ const createPancard = async (req, res) => {
       isDuplicateOrChangePan,
       assignedId,
       customerName,
-      emailID,
-      mobileNumber,
+      email,
+      phoneNumber,
       fatherName,
       collegeID,
       coordinatorID,
@@ -124,8 +124,8 @@ const createPancard = async (req, res) => {
       uniqueId,
       assignedId,
       customerName,
-      emailID,
-      mobileNumber,
+      email,
+      phoneNumber,
       fatherName,
       proofOfIdentity: proofOfIdentityUrl,
       proofOfDOB: proofOfDOBUrl,
@@ -171,7 +171,7 @@ const createPancard = async (req, res) => {
 
 const updatePanDetails = catchAsync(async (req, res,next) => {
   try {
-    const { mobileNumber,id,status, acknowledgementNumber, reason, ePan,accountNo } =
+    const { phoneNumber,id,status, acknowledgementNumber, reason, ePan,accountNo } =
       req.body;
     console.log("req.body: ", req.body);
     const acknowledgementFile = req?.files?.acknowledgementFile;
@@ -179,14 +179,14 @@ const updatePanDetails = catchAsync(async (req, res,next) => {
     const user=req.user
 
 
-    if (!mobileNumber) {
+    if (!phoneNumber) {
       return res.status(400).json({ message: "Mobile number is required" });
     }
 
     const pancardUser = panCardUsers();
 
     const report = await pancardUser.findOne({
-      where: { mobileNumber: mobileNumber ,id:id},
+      where: { phoneNumber: phoneNumber ,id:id},
     });
 
     if (!report) {
@@ -225,7 +225,7 @@ const updatePanDetails = catchAsync(async (req, res,next) => {
 
     
     let totalAmount = 1500;
-    let commissionToHeadOffice = 1000;
+    let commissionToHO = 1000;
     let commissionToFranchise = 500;
 
     report.status = finalStatus;
@@ -237,8 +237,8 @@ const updatePanDetails = catchAsync(async (req, res,next) => {
     report.ePan = ePan || report.ePan;
     
     report.totalAmount = totalAmount || report.totalAmount;
-    report.commissionToHeadOffice =
-      commissionToHeadOffice || report.commissionToHeadOffice;
+    report.commissionToHO =
+      commissionToHO || report.commissionToHO;
 
       report.commissionToFranchise =
       commissionToFranchise || report.commissionToFranchise;
@@ -267,13 +267,13 @@ const updatePanDetails = catchAsync(async (req, res,next) => {
         userName: franchiseData.franchiseName,
         userType: user.userType,
         service: "pancard",
-        customerNumber: mobileNumber,
+        customerNumber: phoneNumber,
         serviceNumber: accountNo,
         serviceProvider: "pancard",
         status: "success",
         amount: totalAmount,
         franchiseCommission: commissionToFranchise,
-        adminCommission: commissionToHeadOffice,
+        adminCommission: commissionToHO,
         walletBalance: newBalance,
       });
   
