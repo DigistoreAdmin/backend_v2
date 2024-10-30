@@ -207,7 +207,7 @@ const gstRegistration = catchAsync(async (req, res, next) => {
           // shopGmapPic: await uploadFile(req.files.shopGmapPic),
           residenceLatitude,
           residenceLongitude,
-          panCardImage: await uploadFile(req.files.panCardImg),
+          panPic: await uploadFile(req.files.panPic),
           aadhaarFront: await uploadFile(req.files.aadhaarFront),
           aadhaarBack: await uploadFile(req.files.aadhaarBack),
           photo: await uploadFile(req.files.photo),
