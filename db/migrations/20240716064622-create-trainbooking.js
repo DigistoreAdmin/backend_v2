@@ -66,7 +66,7 @@ module.exports = {
       commissionToFranchise:{
         type:Sequelize.INTEGER,
       },
-      commissionToHeadOffice:{
+      commissionToHO:{
         type:Sequelize.INTEGER,
       },
       totalAmount:{

@@ -39,7 +39,7 @@ const  personalLoan = catchAsync( async(req,res,next)=>{
 try {
    const {
     customerName,
-    mobileNumber,
+    phoneNumber,
     email,
     cibilScore,
     loanAmount,
@@ -101,7 +101,7 @@ const newPersonalLoan = await personalLoan.create({
   uniqueId,
   workId,
   customerName,
-  mobileNumber,
+  phoneNumber,
   email,
   cibil,
   cibilScore:cibil === 'true' ? cibilScore : null,

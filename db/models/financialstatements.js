@@ -41,7 +41,7 @@ module.exports = sequelize.define(
       type: DataTypes.ENUM("proprietary","partnership","company"),  
       allowNull: false,
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
             validate: {

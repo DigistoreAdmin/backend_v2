@@ -36,7 +36,7 @@ const companyFormation = catchAsync(async (req, res, next) => {
   try {
     const {
       customerName,
-      mobileNumber,
+      phoneNumber,
       email,
       businessType,
       businessName,
@@ -49,7 +49,7 @@ const companyFormation = catchAsync(async (req, res, next) => {
 
     if (
       !customerName ||
-      !mobileNumber ||
+      !phoneNumber ||
       !email ||
       !businessType ||
       !businessName ||
@@ -144,7 +144,7 @@ const companyFormation = catchAsync(async (req, res, next) => {
     const newCompanyFormation = await companyFormations.create({
       uniqueId,
       customerName,
-      mobileNumber,
+      phoneNumber,
       email,
       businessType,
       businessName,

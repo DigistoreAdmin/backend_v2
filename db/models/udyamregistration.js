@@ -26,7 +26,7 @@ module.exports = sequelize.define(
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
             validate: {
@@ -70,7 +70,7 @@ module.exports = sequelize.define(
         },
       }
     },
-    addressLine1: {
+    businessAddressLine1: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -82,7 +82,7 @@ module.exports = sequelize.define(
         },
       }
     },
-    addressLine2: {
+    businessAddressLine2: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -228,7 +228,7 @@ module.exports = sequelize.define(
         },
       },
     },
-    pancard: {
+    panPic: {
       type: DataTypes.STRING,
       allowNull: true,
       validate: {

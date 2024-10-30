@@ -54,7 +54,7 @@ const definePersonalLoan = (salariedOrBusiness,cibil) => {
           },
         },
       },
-      mobileNumber: {
+      phoneNumber: {
         type: DataTypes.BIGINT,
         allowNull: false,
         validate: {

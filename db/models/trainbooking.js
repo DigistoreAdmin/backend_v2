@@ -159,7 +159,7 @@ module.exports = sequelize.define(
       type:DataTypes.INTEGER,
       allowNull:true
     },
-    commissionToHeadOffice:{
+    commissionToHO:{
       type:DataTypes.INTEGER,
       allowNull:true
     },
