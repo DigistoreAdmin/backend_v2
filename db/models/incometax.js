@@ -54,7 +54,7 @@ const incomeTaxFilingDetails = (
           },
         },
       },
-      emailId: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -253,33 +253,45 @@ const incomeTaxFilingDetails = (
         allowNull: true,
         type: DataTypes.ARRAY(DataTypes.STRING),
       },
-      status: {
-        allowNull: false,
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
-        defaultValue: "inQueue",
-      },
       workId: {
         type: DataTypes.STRING,
-        allowNull:false,
+        allowNull: false,
       },
       computationFile: {
         type: DataTypes.STRING,
-        allowNull:true,
+        allowNull: true,
       },
       incomeTaxAcknowledgement: {
         type: DataTypes.STRING,
-        allowNull:true,
-      },
-      franchiseCommission: {
-        type: DataTypes.DECIMAL,
         allowNull: true,
       },
-      HOCommission: {
-        type: DataTypes.DECIMAL,
+      commissionToFranchise: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      commissionToHO: {
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       totalAmount: {
         type: DataTypes.DECIMAL,
+        allowNull: true,
+      },
+      assignedId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      status: {
+        allowNull: false,
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed", "rejected"),
+        defaultValue: "inQueue",
+      },
+      assignedOn: {
+        allowNull: true,
+        type: DataTypes.DATE,
+      },
+      completedOn: {
+        type: DataTypes.DATE,
         allowNull: true,
       },
       createdAt: {
