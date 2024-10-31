@@ -145,7 +145,7 @@ const getPlacesByZone = catchAsync(async (req, res) => {
 
 const passportUpdate = catchAsync(async (req, res) => {
   try {
-    const { mobileNumber, passportAppointmentDate, username, password } =
+    const { phoneNumber, passportAppointmentDate, username, password } =
       req.body;
     const { passportFile } = req.files;
 
@@ -157,7 +157,7 @@ const passportUpdate = catchAsync(async (req, res) => {
     console.log("files:", req.files);
 
     // Check for required fields
-    if (!mobileNumber) {
+    if (!phoneNumber) {
       return res
         .status(404)
         .json({ message: "Missing required field: mobileNumber" });
@@ -168,7 +168,7 @@ const passportUpdate = catchAsync(async (req, res) => {
 
     // Find the passport record by mobile number
     const passportRecord = await passportDetails.findOne({
-      where: { mobileNumber },
+      where: { phoneNumber },
     });
 
     if (!passportRecord) {
