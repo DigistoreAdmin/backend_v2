@@ -38,7 +38,7 @@ const createCibilReport = (purpose) => {
           },
         },
       },
-      mobileNumber: {
+      phoneNumber: {
         type: DataTypes.BIGINT,
         allowNull: false,
         validate: {
@@ -57,7 +57,7 @@ const createCibilReport = (purpose) => {
           },
         },
       },
-      emailId: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
