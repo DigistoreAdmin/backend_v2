@@ -50,7 +50,7 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
           },
         },
       },
-      mobileNumber: {
+      phoneNumber: {
         type: DataTypes.BIGINT,
         allowNull: false,
         validate: {
@@ -69,7 +69,7 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
           },
         },
       },
-      customerEmail: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -300,7 +300,6 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
           },
         },
       },
-
       proofOfIdentity: {
         type: DataTypes.STRING,
         allowNull: false,

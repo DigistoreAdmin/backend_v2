@@ -30,7 +30,7 @@ const kswift = sequelize.define(
       type: DataTypes.ENUM('inQueue','inProgress','completed',"onHold","rejected"),
       default:'inQueue',
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: {
@@ -43,7 +43,7 @@ const kswift = sequelize.define(
         },
       },
     },
-    emailId: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {

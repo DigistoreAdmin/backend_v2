@@ -30,10 +30,10 @@ module.exports = {
       customerName: {
         type: Sequelize.STRING,
       },
-      customerEmail: {
+      email: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
       educationQualification: {
