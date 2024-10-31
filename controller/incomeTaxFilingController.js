@@ -56,7 +56,7 @@ const createIncomeTaxFiling = catchAsync(async (req, res, next) => {
 
   const {
     customerName,
-    emailId,
+    email,
     phoneNumber,
     panNumber,
     incomeTaxPassword,
@@ -197,7 +197,7 @@ const createIncomeTaxFiling = catchAsync(async (req, res, next) => {
   const newUser = await incomeTaxFilingDetail.create({
     uniqueId,
     customerName,
-    emailId,
+    email,
     phoneNumber,
     panNumber,
     incomeTaxPassword,
