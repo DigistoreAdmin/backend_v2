@@ -35,8 +35,8 @@ const uploadBlob = (file) => {
 const createCibilReport = catchAsync(async (req, res, next) => {
   const {
     customerName,
-    mobileNumber,
-    emailId,
+    phoneNumber,
+    email,
     purpose,
     cibilScore,
     status,
@@ -112,8 +112,8 @@ const createCibilReport = catchAsync(async (req, res, next) => {
   const newCibilReport = await cibilReportDetail.create({
     uniqueId,
     customerName,
-    mobileNumber,
-    emailId,
+    phoneNumber,
+    email,
     purpose,
     ...additionalData,
     status,
