@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../../config/database");
 
 const WorkTime = sequelize.define(
-  "workTimes",
+  "workTime",
   {
     workId: {
       type: DataTypes.STRING,
@@ -17,20 +17,24 @@ const WorkTime = sequelize.define(
       type: DataTypes.TIME,
       allowNull: true
     }, 
-    timeTaken: {
+    totalWorkTimeWithoutBreak: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    breakTimeStarted: {
       type: DataTypes.TIME,
       allowNull: true,
     },
-    breakStarted: {
-      type: DataTypes.TIME,
-      allowNull: true,
-    },
-    breakEnded: {
+    breakTimeEnded: {
       type: DataTypes.TIME,
       allowNull: true,
     },
     totalBreakTime: {
-      type: DataTypes.TIME,
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    totalWorkTimeWithBreak:{
+      type: DataTypes.STRING,
       allowNull: true,
     },
     createdAt: {
@@ -48,7 +52,7 @@ const WorkTime = sequelize.define(
   {
     paranoid: true,
     freezeTableName: true,
-    modelName: "workTimes",
+    modelName: "workTime",
   }
 );
 

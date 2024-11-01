@@ -2,7 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('workTimes', {
+    await queryInterface.createTable('workTime', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -18,17 +18,20 @@ module.exports = {
       endTime: {
         type: Sequelize.DATE
       },
-      timeTaken: {
+      totalWorkTimeWithoutBreak: {
+        type: Sequelize.STRING
+      },
+      breakTimeStarted: {
         type: Sequelize.DATE
       },
-      breakStarted: {
-        type: Sequelize.DATE
-      },
-      breakEnded: {
+      breakTimeEnded: {
         type: Sequelize.DATE
       },
       totalBreakTime: {
-        type: Sequelize.DATE
+        type: Sequelize.STRING
+      },
+      totalWorkTimeWithBreak:{
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
@@ -43,8 +46,8 @@ module.exports = {
       }, 
     });
   },
-  
+
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('workTimes');
+    await queryInterface.dropTable('workTime');
   }
 };
