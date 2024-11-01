@@ -1,4 +1,4 @@
-const train_booking = require("../db/models/trainbooking");
+const defineTrainBooking = require("../db/models/trainbooking");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const Franchise = require("../db/models/franchise");
@@ -24,7 +24,13 @@ const trainBooking = catchAsync(async (req, res, next) => {
     startDate,
     passengerDetails,
     status,
+    bookingType,
+    returnDate,
+    coachType,
+    ticketType
   } = req.body;
+
+  const train_booking = defineTrainBooking(bookingType)
 
   const trainBookingDetails = await train_booking.create({
     uniqueId,
@@ -38,6 +44,10 @@ const trainBooking = catchAsync(async (req, res, next) => {
     preference,
     passengerDetails,
     status,
+    bookingType,
+    returnDate:bookingType=="1"? null:returnDate,
+    coachType,
+    ticketType
   });
   if (!trainBookingDetails) {
     return next(new AppError("Booking failed", 500));
@@ -72,6 +82,7 @@ const trainBookingUpdate = catchAsync(async (req, res, next) => {
 
     if (!walletData) return next(new AppError("Wallet not found", 404));
 
+    const train_booking=defineTrainBooking(bookingType)
     const trainBookingUser = train_booking;
 
     const report = await trainBookingUser.findOne({
