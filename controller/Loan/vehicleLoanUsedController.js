@@ -36,8 +36,8 @@ const uploadBlob = (file) => {
 const createUsedVehicleLoan = catchAsync(async (req, res, next) => {
   const {
     customerName,
-    mobileNumber,
-    emailId,
+    phoneNumber,
+    email,
     typeofLoan,
     cibil,
     cibilScore,
@@ -162,8 +162,8 @@ const createUsedVehicleLoan = catchAsync(async (req, res, next) => {
     uniqueId,
     workId,
     customerName,
-    mobileNumber,
-    emailId,
+    phoneNumber,
+    email,
     typeofLoan,
     cibil,
     ...additionalData,
