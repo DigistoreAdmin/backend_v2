@@ -199,6 +199,38 @@ module.exports = sequelize.define(
         },
       },
     },
+    status: {
+      type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
+      allowNull: false,
+      defaultValue: "inQueue",
+    },
+    assignedId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isInt: {
+          msg: "Assigned ID must be an String",
+        },
+      },
+    },
+    assignedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      validate: {
+        isDate: {
+          msg: "Assigned On must be a valid date",
+        },
+      },
+    },
+    completedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      validate: {
+        isDate: {
+          msg: "Completed On must be a valid date",
+        },
+      },
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,

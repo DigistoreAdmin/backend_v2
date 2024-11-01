@@ -66,6 +66,19 @@ module.exports = {
       signature: {
         type: Sequelize.STRING,
       },
+      status: {
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed", "rejected"),
+        defaultValue: "inQueue",
+      },
+      assignedId: {
+        type: Sequelize.STRING,
+      },
+      assignedOn: {
+        type: Sequelize.DATE,
+      },
+      completedOn: {
+        type: Sequelize.DATE,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
