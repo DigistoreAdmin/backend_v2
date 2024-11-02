@@ -13,8 +13,8 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
   const allowNullVe = panType === "duplicateOrChangePancard" ? false : true;
   const allow = panType === "minorPancard" ? false : true;
   const allowNullV = panType === "NRIPancard" ? false : true;
-  const allowNullPOI = panType === "minorPancard" || "newPancard" || "duplicateOrChangePancard" ? false : true;
-  const allowNullPS = panType === "newPancard" || "duplicateOrChangePancard" || "NRIPancard" ? false : true;
+  const allowNullPOI = panType === "NRIPancard" ? true : false;
+  const allowNullPS = panType === "minorPancard" ? true : false;
   const allowS = panType === "NRIPancard" ? true : false;
   console.log("allows", allowS)
 
