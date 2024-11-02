@@ -29,12 +29,13 @@ const createPancard = async (req, res) => {
   try {
     const {
       panType,
+      assignedId,
       isCollege,
       isDuplicateOrChangePan,
-      assignedId,
       customerName,
       email,
       phoneNumber,
+      aadhaarNumber,
       fatherName,
       collegeID,
       coordinatorID,
@@ -42,9 +43,8 @@ const createPancard = async (req, res) => {
       reasonForDuplicate,
       panNumber,
       representativeName,
-      representativeAddress,
-      representativeRelatiion,
-      nriAddress,
+      representativeRelation,
+      abroadAddress,
       nameChange,
       addressChange,
       dobChange,
@@ -52,12 +52,17 @@ const createPancard = async (req, res) => {
     } = req.body;
 
     const {
-      signatureChange,
-      photoChange,
-      proofOfIdentity,
       proofOfDOB,
       proofOfAddress,
+      proofOfIdentity,
       representativeDocument,
+      photo,
+      signature,
+      aadhaarFront,
+      aadhaarBack,
+      representativeAadhaarBack,
+      representativeAadhaarFront,
+      representativeSignature,
     } = req.files;
 
     const uploadFile = async (file) => {
@@ -77,17 +82,20 @@ const createPancard = async (req, res) => {
     const proofOfIdentityUrl = await uploadFile(proofOfIdentity);
     const proofOfDOBUrl = await uploadFile(proofOfDOB);
     const proofOfAddressUrl = await uploadFile(proofOfAddress);
-    const signatureChangeUrl = await uploadFile(signatureChange);
-    const photoChangeUrl = await uploadFile(photoChange);
     const representativeDocumentUrl = await uploadFile(representativeDocument);
+    const photoUrl = await uploadFile(photo);
+    const signatureUrl = await uploadFile(signature);
+    const aadhaarFrontUrl = await uploadFile(aadhaarFront);
+    const aadhaarBackUrl = await uploadFile(aadhaarBack)
+    const representativeAadhaarBackUrl = await uploadFile(representativeAadhaarBack)
+    const representativeAadhaarFrontUrl = await uploadFile(representativeAadhaarFront)
+    const representativeSignatureUrl = await uploadFile(representativeSignature)
     
     const inputData = {
       nameChange:nameChange,
       addressChange:addressChange,
       dobChange:dobChange,
       changeFatherName:changeFatherName,
-      signatureChangeUrl:signatureChangeUrl,
-      photoChangeUrl:photoChangeUrl,
     };
 
     const processInputData = (data) => {
@@ -127,9 +135,7 @@ const createPancard = async (req, res) => {
       email,
       phoneNumber,
       fatherName,
-      proofOfIdentity: proofOfIdentityUrl,
-      proofOfDOB: proofOfDOBUrl,
-      proofOfAddress: proofOfAddressUrl,
+      aadhaarNumber,
       isCollege,
       collegeID,
       coordinatorID,
@@ -137,17 +143,24 @@ const createPancard = async (req, res) => {
       isDuplicateOrChangePan,
       reasonForDuplicate,
       panNumber,
+      abroadAddress,
       nameChange: processedData.nameChange,
       addressChange: processedData.addressChange,
       dobChange: processedData.dobChange,
       changeFatherName: processedData.changeFatherName,
-      signatureChange: processedData.signatureChangeUrl,
-      photoChange: processedData.photoChangeUrl,
       representativeName,
-      representativeAddress,
-      representativeRelatiion,
+      representativeRelation,
       representativeDocument: representativeDocumentUrl,
-      nriAddress,
+      proofOfIdentity: proofOfIdentityUrl,
+      proofOfDOB: proofOfDOBUrl,
+      proofOfAddress: proofOfAddressUrl,
+      photo: photoUrl,
+      signature: signatureUrl,
+      aadhaarFront: aadhaarFrontUrl,
+      aadhaarBack: aadhaarBackUrl,
+      representativeAadhaarFront: representativeAadhaarFrontUrl,
+      representativeAadhaarBack: representativeAadhaarBackUrl,
+      representativeSignature: representativeSignatureUrl,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
