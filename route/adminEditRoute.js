@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { deleteFranchise, updateStaffDetails, updateFranchiseDetails, updateWallet, verifyFranchise,
-    deleteStaff } = require("../controller/adminEditController.js")
+    deleteStaff ,staffAssign} = require("../controller/adminEditController.js")
 const { verifyToken, verifyRefreshToken } = require("../utils/token");
 const { restrictTo } = require('../controller/authController.js');
 
@@ -11,5 +11,6 @@ router.route('/updateFranchiseDetails').put(verifyToken, verifyRefreshToken, res
 router.route('/updateWallet').put(verifyToken, verifyRefreshToken, restrictTo("admin"), updateWallet)
 router.route('/verifyFranchise').put(verifyToken, verifyRefreshToken, restrictTo("admin"), verifyFranchise)
 router.route('/deleteStaff').delete(verifyToken, verifyRefreshToken, restrictTo("admin"), deleteStaff)
+router.route('/staffAssign').put(verifyToken, verifyRefreshToken, restrictTo("admin"), staffAssign)
 
 module.exports = router
