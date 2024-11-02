@@ -680,7 +680,7 @@ const getAllWorks = catchAsync(async (req, res, next) => {
       BusBooking.findAndCountAll(),
       fssaiRegistrations.findAndCountAll(),
       fssaiLicences.findAndCountAll(),
-      trainBooking.findAndCountAll(),
+      trainBooking().findAndCountAll(),
       udyamRegistrations.findAndCountAll(),
       financialstatements.findAndCountAll(),
       companyFormations.findAndCountAll(),
@@ -843,6 +843,213 @@ const getAllWorks = catchAsync(async (req, res, next) => {
   }
 });
 
+const getAllWorksByStaffId=catchAsync(async (req, res, next) => {
+  try {
+    let { page, pageLimit, search, sortBy, sortOrder, filter,assignedId } = req.query;
+
+    if(!assignedId){
+      return res.status(400).json({
+        error: "Please provide Assigned Id",
+      });
+    }
+
+    if (!page || !pageLimit) {
+      return res.status(400).json({
+        error: "page and pageLimit query parameters are required",
+      });
+    }
+
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
+
+    const [
+      pancardDetails,
+      passportDetails,
+      kSwiftDetails,
+      busBookingsDetails,
+      fssaiRegistrationDetails,
+      fssaiLicenceDetails,
+      trainBookingDetails,
+      udyamRegistrationDetails,
+      financialstatementDetails,
+      companyFormationDetails,
+      gstRegistrationsDetails,
+      gstFilingDetails,
+      incomeTaxFilingsDetails,
+      partnershipDeedPreparations,
+      packingLicenceDetails,
+      vehicleInsuranceDetails,
+      franchises
+    ] = await Promise.all([
+      panCardUsers().findAndCountAll(),
+      definePassportDetails().findAndCountAll(),
+      kswift.findAndCountAll(),
+      BusBooking.findAndCountAll(),
+      fssaiRegistrations.findAndCountAll(),
+      fssaiLicences.findAndCountAll(),
+      trainBooking().findAndCountAll(),
+      udyamRegistrations.findAndCountAll(),
+      financialstatements.findAndCountAll(),
+      companyFormations.findAndCountAll(),
+      gstRegistrationDetails().findAndCountAll(),
+      gstFilings.findAndCountAll(),
+      incomeTaxFilingDetails().findAndCountAll(),
+      partnerShipDeedTable.findAndCountAll(),
+      packingLicence.findAndCountAll(),
+      defineVehicleInsurance().findAndCountAll(),
+      Franchise.findAll(),
+    ]);
+
+    const franchiseMap = franchises.reduce((map, franchise) => {
+      map[franchise.franchiseUniqueId] = franchise.franchiseName;
+      return map;
+    }, {});
+
+    let combinedData = [
+      ...pancardDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Pan Card',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...passportDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Passport',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...kSwiftDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'K-Swift',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...busBookingsDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Bus Booking',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...fssaiRegistrationDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'FSSAI Registration',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...fssaiLicenceDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'FSSAI Licence',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...trainBookingDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Train Booking',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...udyamRegistrationDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Udyam Registration',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...financialstatementDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Financial Statement',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...companyFormationDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Company Formation',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...gstRegistrationsDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'GST Registration',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...gstFilingDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'GST Filing',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...incomeTaxFilingsDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'IncomeTax Filing',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...partnershipDeedPreparations.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Partnership Deed',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...packingLicenceDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Packing Licence',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+      ...vehicleInsuranceDetails.rows.map(item => ({
+        ...item.dataValues,
+        tableName: 'Vehicle Insurance',
+        franchiseName: franchiseMap[item.uniqueId],
+      })),
+    ];
+  
+     filter = filter ? (typeof filter === 'string' ? JSON.parse(filter) : filter) : {};
+    
+     filter.assignedId = assignedId;
+ 
+     console.log("Updated filter:", filter);
+     
+     Object.keys(filter).forEach(key => {
+       const filterValue = filter[key];
+       if (Array.isArray(filterValue)) {
+         if (filterValue.length !== 0) {
+           console.log('filterValue: ', filterValue);
+           combinedData = combinedData.filter(item => filterValue.includes(String(item[key])));
+         }
+       } else {
+         combinedData = combinedData.filter(item => String(item[key]) === String(filterValue));
+       }
+     });
+
+    if (search) {
+      combinedData = combinedData.filter(item =>
+        Object.values(item).some(value =>
+          String(value).toLowerCase().includes(search.toLowerCase())
+        )
+      );
+    }
+
+    combinedData.sort((a, b) => {
+      const sortField = sortBy || 'updatedAt';
+      const sortDirection = sortOrder === 'asc' ? 1 : -1;
+
+      if (a[sortField] < b[sortField]) return -1 * sortDirection;
+      if (a[sortField] > b[sortField]) return 1 * sortDirection;
+      return 0;
+    });
+
+    const totalItems = combinedData.length;
+    const paginatedData = combinedData.slice(offset, offset + limit);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    if (totalItems === 0) {
+      return res.status(404).json({
+        status: "fail",
+        message: "No data found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      currentPage: pageNumber,
+      totalPages,
+      totalItems,
+      data: paginatedData,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+})
+
 
 module.exports = {
   getPackingLicences,
@@ -861,6 +1068,7 @@ module.exports = {
   fetchFinancialStatements,
   fetchCompanyFormationDetails,
   getVehicleInsurance,
-  getAllWorks
+  getAllWorks,
+  getAllWorksByStaffId
 };
 
