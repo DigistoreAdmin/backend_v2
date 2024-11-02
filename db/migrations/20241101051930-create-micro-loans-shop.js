@@ -18,7 +18,7 @@ module.exports = {
       customerName: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
       shopName: {
@@ -36,7 +36,7 @@ module.exports = {
       aadhaarBack: {
         type: Sequelize.STRING,
       },
-      pan: {
+      panPic: {
         type: Sequelize.STRING,
       },
       bankStatement: {
@@ -77,6 +77,43 @@ module.exports = {
       },
       commissionCredit: {
         type: Sequelize.STRING,
+      },
+      loanStatus: {
+        type: Sequelize.JSONB,
+        defaultValue: {
+          documentSubmittedToBank: false,
+          bankVerified: false,
+          bankApprovalOrReject: false,
+          loanDispersed: false,
+          commissionCredited: false
+        },
+      },
+      rejectReason: {
+        type: Sequelize.STRING
+      },
+      bankDetails: {
+        type: Sequelize.STRING
+      },
+      loanGivenByBank: {
+        type: Sequelize.BIGINT
+      },
+      doneBy: {
+        type: Sequelize.STRING
+      },
+      serviceCharge: {
+        type: Sequelize.INTEGER
+      },
+      commissionToFranchise: {
+        type: Sequelize.INTEGER
+      },
+      commissionToHO: {
+        type: Sequelize.INTEGER
+      },
+      otherPayments: {
+        type: Sequelize.STRING
+      },
+      otherDocumentsByStaff: {
+        type: Sequelize.STRING
       },
       assignedId: {
         type: Sequelize.STRING,

@@ -38,7 +38,7 @@ const createMicroLoanShops = catchAsync(async (req, res) => {
     console.log(req.body);
     const {
       customerName,
-      mobileNumber,
+      phoneNumber,
       shopName,
       shopType,
       loanAmount,
@@ -62,7 +62,7 @@ const createMicroLoanShops = catchAsync(async (req, res) => {
       bankStatement,
       aadhaarFront,
       aadhaarBack,
-      pan,
+      panPic,
       shopPhoto,
     } = req.files;
     const firstYear = req.files[`firstYear`];
@@ -88,7 +88,7 @@ const createMicroLoanShops = catchAsync(async (req, res) => {
     const bankStatementUrl = await uploadFile(bankStatement);
     const aadhaarFrontUrl = await uploadFile(aadhaarFront);
     const aadhaarBackUrl = await uploadFile(aadhaarBack);
-    const panUrl = await uploadFile(pan);
+    const panPicUrl = await uploadFile(panPic);
     const otherDocumentsUrl = await uploadFile(otherDocuments);
     const shopPhotoUrl = await uploadFile(shopPhoto);
     const firstYearUrl = await uploadFile(firstYear);
@@ -133,14 +133,14 @@ const createMicroLoanShops = catchAsync(async (req, res) => {
         uniqueId,
         workId,
         customerName,
-        mobileNumber,
+        phoneNumber,
         shopName,
         shopType,
         loanAmount,
         aadhaarFront: aadhaarFrontUrl,
         aadhaarBack: aadhaarBackUrl,
         bankStatement: bankStatementUrl,
-        pan: panUrl,
+        panPic: panPicUrl,
         twoYearLicence: licenceData, 
         shopPhoto: shopPhotoUrl,
         otherDocuments: otherDocumentsUrl,

@@ -39,7 +39,7 @@ const microLoansShop = sequelize.define(
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: {
@@ -97,7 +97,7 @@ const microLoansShop = sequelize.define(
         },
       },
     },
-    pan: {
+    panPic: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -128,12 +128,12 @@ const microLoansShop = sequelize.define(
       allowNull: false,
     },
     //staff
-    emiAmount: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-    },
     staffStatus: {
       type: DataTypes.JSONB,
+      allowNull: true,
+    },
+    emiAmount: {
+      type: DataTypes.BIGINT,
       allowNull: true,
     },
     collectionPoint: {
@@ -164,6 +164,46 @@ const microLoansShop = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    loanStatus: {
+      type: DataTypes.JSONB,
+      allowNull: true
+    },
+    rejectReason: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    bankDetails: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    loanGivenByBank: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+    },
+    doneBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    serviceCharge: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    commissionToFranchise: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    commissionToHO: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    otherPayments: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    otherDocumentsByStaff: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     assignedId: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -187,7 +227,7 @@ const microLoansShop = sequelize.define(
       },
     },
     status: {
-      type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
+      type: DataTypes.ENUM("inQueue", "inProgress", "completed", "rejected"),
       allowNull: true,
       defaultValue: "inQueue",
     },
