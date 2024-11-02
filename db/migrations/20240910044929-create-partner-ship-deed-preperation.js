@@ -57,6 +57,19 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      assignedId: {
+        type: Sequelize.STRING,
+      },
+      status: {
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed", "rejected"),
+        defaultValue: "inQueue",
+      },
+      assignedOn: {
+        type: Sequelize.DATE,
+      },
+      completedOn: {
+        type: Sequelize.DATE,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -67,7 +80,6 @@ module.exports = {
       },
       deletedAt: {
         type: Sequelize.DATE,
-        allowNull: true,
       },
     });
   },

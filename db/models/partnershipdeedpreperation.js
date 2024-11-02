@@ -148,6 +148,23 @@ const PartnershipDeedPreparation = sequelize.define(
         },
       },
     },
+    assignedId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    status: {
+      allowNull: false,
+      type: DataTypes.ENUM("inQueue", "inProgress", "completed", "rejected"),
+      defaultValue: "inQueue",
+    },
+    assignedOn: {
+      allowNull: true,
+      type: DataTypes.DATE,
+    },
+    completedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,
