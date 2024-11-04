@@ -1,5 +1,5 @@
 "use strict";
-const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const { DataTypes, Op } = require("sequelize");
 const sequelize = require("../../config/database");
 
@@ -8,6 +8,20 @@ const getCurrentDate = () => {
   return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
     .toString()
     .padStart(2, "0")}${date.getFullYear()}`;
+};
+
+const algorithm = "aes-192-cbc";
+const secret = process.env.INCOMETAX_SECRET_KEY;
+const key = crypto.scryptSync(secret, "salt", 24);
+
+const encrypt = async (data) => {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+
+  let encrypted = cipher.update(data, "utf8", "hex");
+  encrypted += cipher.final("hex");
+
+  return iv.toString("hex") + ":" + encrypted;
 };
 
 const incomeTaxFilingDetails = (
@@ -340,16 +354,13 @@ const incomeTaxFilingDetails = (
       incomeTax.incomeTaxPassword &&
       typeof incomeTax.incomeTaxPassword === "string"
     ) {
-      incomeTax.incomeTaxPassword = await bcrypt.hash(
-        incomeTax.incomeTaxPassword,
-        8
-      );
+      incomeTax.incomeTaxPassword = await encrypt(incomeTax.incomeTaxPassword);
     }
     if (incomeTax.panNumber && typeof incomeTax.panNumber === "string") {
-      incomeTax.panNumber = await bcrypt.hash(incomeTax.panNumber, 8);
+      incomeTax.panNumber = await encrypt(incomeTax.panNumber);
     }
     if (incomeTax.gstPassword && typeof incomeTax.gstPassword === "string") {
-      incomeTax.gstPassword = await bcrypt.hash(incomeTax.gstPassword, 8);
+      incomeTax.gstPassword = await encrypt(incomeTax.gstPassword);
     }
   });
   return incomeTaxFiling;
