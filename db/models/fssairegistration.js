@@ -1,8 +1,15 @@
 'use strict';
-const { Model, DataTypes } = require('sequelize');
+const { Model, DataTypes, Op } = require('sequelize');
 const sequelize = require('../../config/database');
 
-module.exports = sequelize.define(
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
+
+const fssaiRegistrations = sequelize.define(
   'fssaiRegistrations',
   {
     uniqueId: {
@@ -22,6 +29,22 @@ module.exports = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
       type: DataTypes.INTEGER,
+    },
+    assignedId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    assignedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    completedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    workId: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     customerName: {
       type: DataTypes.STRING,
@@ -191,6 +214,29 @@ module.exports = sequelize.define(
     paranoid: true,
     freezeTableName: true,
     modelName: 'fssaiRegistrations',
+    hooks: {
+      beforeValidate: async (fssai) => {
+        const currentDate = getCurrentDate();
+        const code = "FSS";
+        const lastPan = await fssaiRegistrations.findOne({
+          where: {
+            workId: {
+              [Op.like]: `${currentDate}${code}%`,
+            },
+          },
+          order: [["createdAt", "DESC"]],
+        });
+
+        let newIncrement = "001";
+        if (lastPan) {
+          const lastIncrement = parseInt(lastPan.workId.slice(-3));
+          newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+        }
+
+        fssai.workId = `${currentDate}${code}${newIncrement}`;
+      },
+    },
   }
 );
 
+module.exports = fssaiRegistrations

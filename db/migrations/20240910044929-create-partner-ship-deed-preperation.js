@@ -13,6 +13,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      assignedId: {
+        type: Sequelize.STRING,
+      },
+      assignedOn: {
+        type: Sequelize.DATE,
+      },
+      completedOn: {
+        type: Sequelize.DATE,
+      },
+      workId: {
+        type: Sequelize.STRING,
+      },
       customerName: {
         type: Sequelize.STRING,
         allowNull: false,

@@ -1,8 +1,16 @@
 "use strict";
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes, Op } = require("sequelize");
 const sequelize = require("../../config/database");
 
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
+
 const definePassportDetails = (maritalStatus, passportRenewal) => {
+
   const isMarried = maritalStatus === "yes" ? false : true;
   const isRenewal = passportRenewal === "true" ? false : true;
   const passportDetails = sequelize.define(
@@ -32,6 +40,10 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
       },
       completedOn: {
         type: DataTypes.DATE,
+        allowNull: true,
+      },
+      workId: {
+        type: DataTypes.STRING,
         allowNull: true,
       },
       oldPassportNumber: {
@@ -375,6 +387,28 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
       paranoid: true,
       freezeTableName: true,
       modelName: "passport",
+      hooks: {
+        beforeValidate: async (passport) => {
+          const currentDate = getCurrentDate();
+          const code = "PAS";
+          const lastPan = await passportDetails.findOne({
+            where: {
+              workId: {
+                [Op.like]: `${currentDate}${code}%`,
+              },
+            },
+            order: [["createdAt", "DESC"]],
+          });
+  
+          let newIncrement = "001";
+          if (lastPan) {
+            const lastIncrement = parseInt(lastPan.workId.slice(-3));
+            newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+          }
+  
+          passport.workId = `${currentDate}${code}${newIncrement}`;
+        },
+      },
     }
   );
 
