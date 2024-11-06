@@ -29,11 +29,32 @@ const trainBooking = catchAsync(async (req, res, next) => {
     coachType,
     ticketType
   } = req.body;
-
+  
   const train_booking = defineTrainBooking(bookingType)
+  
+
+  const currentDate = new Date()
+      .toISOString()
+      .slice(0, 10)
+      .split("-")
+      .reverse()
+      .join("");
+    const count = await train_booking.count({
+      where: {
+        workId: {
+          [Op.like]: `${currentDate}TTB%`,
+        },
+      },
+    });
+    const workId = `${currentDate}TTB${(count + 1)
+      .toString()
+      .padStart(3, "0")}`;
+      
+
 
   const trainBookingDetails = await train_booking.create({
     uniqueId,
+    workId,
     customerName,
     phoneNumber,
     email,
@@ -82,10 +103,9 @@ const trainBookingUpdate = catchAsync(async (req, res, next) => {
 
     if (!walletData) return next(new AppError("Wallet not found", 404));
 
-    const train_booking=defineTrainBooking(bookingType)
-    const trainBookingUser = train_booking;
+    const train_booking=defineTrainBooking()
 
-    const report = await trainBookingUser.findOne({
+    const report = await train_booking.findOne({
       where: { phoneNumber: phoneNumber, id: id },
     });
 
@@ -107,22 +127,7 @@ const trainBookingUpdate = catchAsync(async (req, res, next) => {
       return null;
     };
 
-    const currentDate = new Date()
-      .toISOString()
-      .slice(0, 10)
-      .split("-")
-      .reverse()
-      .join("");
-    const count = await trainBookingUser.count({
-      where: {
-        workId: {
-          [Op.like]: `${currentDate}TTB%`,
-        },
-      },
-    });
-    const workId = `${currentDate}TTB${(count + 1)
-      .toString()
-      .padStart(3, "0")}`;
+    
 
     const ticketUrl = await uploadFile(ticket);
 
