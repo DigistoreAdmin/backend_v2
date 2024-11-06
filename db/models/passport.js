@@ -368,6 +368,10 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      rejectReason:{
+        type:DataTypes.STRING,
+        allowNull:true
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
