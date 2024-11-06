@@ -5,6 +5,7 @@ const intoStream = require('into-stream');
 const transationHistory = require('../db/models/transationhistory')
 const wallets = require('../db/models/wallet');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 const containerName = 'imagecontainer';
 const blobService = azureStorage.createBlobService(process.env.AZURE_STORAGE_CONNECTION_STRING);
@@ -25,9 +26,11 @@ const uploadBlob = async (file) => {
   });
 };
 
-const createPancard = async (req, res) => {
+const createPancard = async (req, res,next) => {
   try {
     const {
+      totalAmount = 0,
+      accountNo,
       panType,
       assignedId,
       isCollege,
@@ -50,6 +53,7 @@ const createPancard = async (req, res) => {
       dobChange,
       changeFatherName,
     } = req.body;
+    console.log('req.body: ', req.body);
 
     const {
       proofOfDOB,
@@ -64,6 +68,13 @@ const createPancard = async (req, res) => {
       representativeAadhaarFront,
       representativeSignature,
     } = req.files;
+
+    let minAmount = 150;
+    let maxAmount = 250;
+   let commissionToHO = 55;
+   let commissionToFranchise = totalAmount - minAmount;
+   let amount = totalAmount - commissionToFranchise;
+   
 
     const uploadFile = async (file) => {
       if (file) {
@@ -124,8 +135,49 @@ const createPancard = async (req, res) => {
     }
 
     const uniqueId = franchise.franchiseUniqueId;
-
+ 
     const PancardUser = panCardUsers(panType, isCollege, isDuplicateOrChangePan);
+
+
+    if (franchise.verified == "false") {
+      return next(new AppError("franchise not verified", 401));
+    }
+
+    
+    if(totalAmount < minAmount){
+      return next(new AppError("Insufficient amount" , 401));
+    }
+
+    if(totalAmount > maxAmount){
+      return next(new AppError("Amount Exeeded" , 401));
+    }
+
+
+   const walletData = await wallets.findOne({
+      where: { uniqueId: franchise.franchiseUniqueId },
+    });
+
+    
+    if (!walletData) return next(new AppError("Wallet not found", 404));
+
+
+    if(amount > walletData.balance){
+      return next(new AppError("Insufficient wallet balance", 401));
+      }
+
+      const newBalance =Math.round(walletData.balance-amount)
+      console.log('walletData.balance: ', walletData.balance);
+      console.log('newBalance: ', newBalance);
+      
+  
+      const updated = await wallets.update(
+        { balance: newBalance },
+        { where: { uniqueId: franchise.franchiseUniqueId } }
+      );
+
+
+  
+    const transactionId=generateRandomId()
 
     const newPancardUser = await PancardUser.create({
       panType,
@@ -144,6 +196,9 @@ const createPancard = async (req, res) => {
       reasonForDuplicate,
       panNumber,
       abroadAddress,
+      totalAmount,
+      commissionToFranchise,
+      commissionToHO,
       nameChange: processedData.nameChange,
       addressChange: processedData.addressChange,
       dobChange: processedData.dobChange,
@@ -164,10 +219,28 @@ const createPancard = async (req, res) => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    if (!newPancardUser) {
+
+
+    const newTransactionHistory = await transationHistory.create({
+      transactionId: transactionId,
+      uniqueId: franchise.franchiseUniqueId,
+      userName: franchise.franchiseName,
+      userType: user.userType,
+      service: "pancardRegistration",
+      customerNumber: phoneNumber,
+      serviceNumber: accountNo,
+      serviceProvider: "pancard",
+      status: "success",
+      amount: amount,
+      franchiseCommission: commissionToFranchise,
+      adminCommission: commissionToHO,
+      walletBalance: newBalance,
+    });
+
+    if (!newPancardUser && !newTransactionHistory && !updated) {
       return res.status(400).json({
         status: 'fail',
-        message: 'Invalid data',
+        message: 'pancard registration failed',
       });
     }
 
@@ -182,127 +255,106 @@ const createPancard = async (req, res) => {
   }
 };
 
-const updatePanDetails = catchAsync(async (req, res,next) => {
-  try {
-    const { phoneNumber,id,status, acknowledgementNumber, reason, ePan,accountNo } =
-      req.body;
-    console.log("req.body: ", req.body);
-    const acknowledgementFile = req?.files?.acknowledgementFile;
+const updatePanDetails = catchAsync(async (req, res, next) => {
+  const { phoneNumber, id, status, acknowledgementNumber, reason, ePan, amount } = req.body;
+  const acknowledgementFile = req?.files?.acknowledgementFile;
+  const user = req.user;
 
-    const user=req.user
+  if (!phoneNumber) {
+    return next(new AppError("Mobile number is required", 400));
+  }
 
+  const pancardUser = panCardUsers();
 
-    if (!phoneNumber) {
-      return res.status(400).json({ message: "Mobile number is required" });
-    }
+  const data = await pancardUser.findOne({
+    where: { phoneNumber, id },
+  });
 
-    const pancardUser = panCardUsers();
+  if (!data) {
+    return res.status(404).json({ message: "Record not found" });
+  }
 
-    const report = await pancardUser.findOne({
-      where: { phoneNumber: phoneNumber ,id:id},
-    });
+  const franchiseData = await Franchise.findOne({
+    where: { email: user.email },
+  });
 
-    if (!report) {
-      return res.status(404).json({ message: "Record not found" });
-    }
+  if (!franchiseData) {
+    return next(new AppError("Franchise not found", 404));
+  }
 
-    const franchiseData = await Franchise.findOne({
-      where: { email: user.email },
-    });
-    
-    if (!franchiseData) return next(new AppError("Franchise not found", 404));
-    
-    
-    const walletData = await wallets.findOne({
-      where: { uniqueId: franchiseData.franchiseUniqueId },
-    });
-    
-    if (!walletData) return next(new AppError("Wallet not found", 404));
-    
+  const walletData = await wallets.findOne({
+    where: { uniqueId: franchiseData.franchiseUniqueId },
+  });
 
-    const finalStatus = status === "completed" ? "completed" : "inProgress";
+  if (!walletData) {
+    return next(new AppError("Wallet not found", 404));
+  }
 
-    const uploadFile = async (file) => {
-      if (file) {
-        try {
-          return await uploadBlob(file);
-        } catch (error) {
-          console.error(`Error uploading file ${file.name}:`, error);
-          throw new Error("File upload failed");
-        }
+  const uploadFile = async (file) => {
+    if (file) {
+      try {
+        return await uploadBlob(file);
+      } catch (error) {
+        console.error(`Error uploading file ${file.name}:`, error);
+        throw new AppError("File upload failed", 500);
       }
-      return null;
-    };
+    }
+    return null;
+  };
 
-    const acknowledgementFileUrl = await uploadFile(acknowledgementFile);
+  const acknowledgementFileUrl = await uploadFile(acknowledgementFile);
 
-    
-    let totalAmount = 1500;
-    let commissionToHO = 1000;
-    let commissionToFranchise = 500;
+  try {
+    if (status === "rejected") {
+      const newBalance = Math.round(Number(walletData.balance) + Number(amount));
 
-    report.status = finalStatus;
-    report.acknowledgementFile =
-      acknowledgementFileUrl || report.acknowledgementFile;
-    report.acknowledgementNumber =
-      acknowledgementNumber || report.acknowledgementNumber;
-    report.reason = reason || report.reason;
-    report.ePan = ePan || report.ePan;
-    
-    report.totalAmount = totalAmount || report.totalAmount;
-    report.commissionToHO =
-      commissionToHO || report.commissionToHO;
-
-      report.commissionToFranchise =
-      commissionToFranchise || report.commissionToFranchise;
-
-  
-      if(totalAmount > walletData.balance){
-        return next(new AppError("Insufficient wallet balance", 401));
-        }
-  
-      await report.save();
-  
-      const newBalance =Math.round(walletData.balance-totalAmount)
-  
-      
-      // Update wallet balance
-      const updated = await wallets.update(
+      await wallets.update(
         { balance: newBalance },
         { where: { uniqueId: franchiseData.franchiseUniqueId } }
       );
-  
-      const transactionId=generateRandomId()
-  
-    const newTransactionHistory = await transationHistory.create({
-        transactionId: transactionId,
+
+      const transactionId = generateRandomId();
+
+      await transationHistory.create({
+        transactionId,
         uniqueId: franchiseData.franchiseUniqueId,
         userName: franchiseData.franchiseName,
         userType: user.userType,
-        service: "pancard",
+        service: "pancard-rejected",
         customerNumber: phoneNumber,
-        serviceNumber: accountNo,
         serviceProvider: "pancard",
-        status: "success",
-        amount: totalAmount,
-        franchiseCommission: commissionToFranchise,
-        adminCommission: commissionToHO,
+        status: "fail",
+        amount,
+        franchiseCommission: 0.00,
+        adminCommission: 0.00,
         walletBalance: newBalance,
       });
-  
-    if (newTransactionHistory && updated) {
-    return res.status(200).json({
-      message: `success`,
-      report,
-    });
-  }
+
+      await pancardUser.update(
+        { status: "rejected" },
+        { where: { phoneNumber, id } }
+      );
+
+      return res.status(200).json({ message: "PAN card rejected successfully" });
+    }
+
+    if (status === "completed") {
+      await pancardUser.update({
+        status: "completed",
+        acknowledgementFile: acknowledgementFileUrl,
+        acknowledgementNumber,
+        reason,
+        ePan,
+      }, { where: { phoneNumber, id } });
+
+      return res.status(200).json({ message: "PAN card updated successfully" });
+    }
+    return next(new AppError("Invalid status provided", 400));
   } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred", error: error.message });
+    return next(new AppError("An error occurred while updating PAN card details", 500));
   }
 });
+
 
 function generateRandomId() {
   const prefix = "DSP";
