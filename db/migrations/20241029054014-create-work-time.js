@@ -12,26 +12,38 @@ module.exports = {
       workId: {
         type: Sequelize.STRING
       },
+      staffName: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+      },
+      assignedId:{
+        type: Sequelize.ARRAY(Sequelize.STRING),
+      },
       startTime: {
-        type: Sequelize.DATE
+        type: Sequelize.ARRAY(Sequelize.DATE),
       },
       endTime: {
-        type: Sequelize.DATE
+        type: Sequelize.ARRAY(Sequelize.DATE),
       },
       totalWorkTimeWithoutBreak: {
-        type: Sequelize.STRING
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       breakTimeStarted: {
-        type: Sequelize.DATE
+        type: Sequelize.ARRAY(Sequelize.DATE),
       },
       breakTimeEnded: {
-        type: Sequelize.DATE
+        type: Sequelize.ARRAY(Sequelize.DATE),
       },
       totalBreakTime: {
-        type: Sequelize.STRING
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       totalWorkTimeWithBreak:{
-        type: Sequelize.STRING,
+        type: Sequelize.ARRAY(Sequelize.STRING),
+      },
+      reassigned: {
+        type: Sequelize.BOOLEAN,
+      },
+      reassignedTime: {
+        type: Sequelize.ARRAY(Sequelize.DATE),
       },
       createdAt: {
         allowNull: false,

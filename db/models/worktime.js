@@ -9,33 +9,46 @@ const WorkTime = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true
     },
+    staffName: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull:true,
+    },
+    assignedId:{
+      type: DataTypes.ARRAY(DataTypes.STRING),
+    },
     startTime: {
-      type: DataTypes.TIME,
+      type: DataTypes.ARRAY(DataTypes.DATE),
       allowNull:true
     },
     endTime: {
-      type: DataTypes.TIME,
+      type: DataTypes.ARRAY(DataTypes.DATE),
       allowNull: true
     }, 
     totalWorkTimeWithoutBreak: {
-      type: DataTypes.STRING,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
     breakTimeStarted: {
-      type: DataTypes.TIME,
+      type: DataTypes.ARRAY(DataTypes.DATE),
       allowNull: true,
     },
     breakTimeEnded: {
-      type: DataTypes.TIME,
+      type: DataTypes.ARRAY(DataTypes.DATE),
       allowNull: true,
     },
     totalBreakTime: {
-      type: DataTypes.STRING,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
     totalWorkTimeWithBreak:{
-      type: DataTypes.STRING,
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
+    },
+    reassigned: {
+      type: DataTypes.BOOLEAN,
+    },
+    reassignedTime: {
+      type: DataTypes.ARRAY(DataTypes.DATE),
     },
     createdAt: {
       allowNull: false,

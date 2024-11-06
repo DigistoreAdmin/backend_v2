@@ -1,9 +1,25 @@
 const workTime = require("../db/models/workTIme");
+const defineStaff = require("../db/models/staffs");
 const catchAsync = require("../utils/catchAsync");
 
 const staffWorkTime = catchAsync(async (req, res, next) => {
   try {
     const { workId, status } = req.body;
+
+    if(!workId) {
+      return res.status(400).json({ error: "workId is required"})
+    }
+
+    const user = req.user;
+    const Staff = defineStaff();
+
+    const staffExists = await Staff.findOne({
+      where: { email: user.email },
+    });
+
+    if (!staffExists) {
+      return next(new AppError("Staff not found", 404));
+    }
 
     const workIdExist = await workTime.findOne({
       where: { workId },
@@ -12,165 +28,148 @@ const staffWorkTime = catchAsync(async (req, res, next) => {
     if (!workIdExist) {
       const workTimeInstance = await workTime.create({
         workId,
-        startTime: new Date(),
+        startTime: [new Date()],
+        staffName: [staffExists.firstName],
+        assignedId: [staffExists.employeeId],
+        endTime: [],
+        totalWorkTimeWithoutBreak: [],
       });
       return res.status(201).json({ workTimeInstance });
     }
 
-    if (status === "completed") {
-  const endTime = new Date();
-  const totalWorkTimeWithoutBreak = endTime - workIdExist.startTime;
+    if (!workIdExist.staffName.includes(staffExists.firstName)) {
+      const startTime = new Date();
+      const updatedTime = [...(workIdExist.startTime || []), startTime];
+      const updatedStaffName = [...(workIdExist.staffName || []), staffExists.firstName];
+      const updatedAssignedId = [...(workIdExist.assignedId || []), staffExists.employeeId];
 
-  const hoursTaken1 = Math.floor(totalWorkTimeWithoutBreak / (1000 * 60 * 60));
-  const minutesTaken1 = Math.floor((totalWorkTimeWithoutBreak % (1000 * 60 * 60)) / (1000 * 60));
-  const secondsTaken1 = Math.floor((totalWorkTimeWithoutBreak % (1000 * 60)) / 1000);
-
-  let hoursBreak = 0, minutesBreak = 0, secondsBreak = 0;
-  if (workIdExist.totalBreakTime && typeof workIdExist.totalBreakTime === 'string') {
-    const breakTimeParts = workIdExist.totalBreakTime.match(/(\d+)\s*h|(\d+)\s*m|(\d+)\s*s/g);
-
-    if (breakTimeParts) {
-      breakTimeParts.forEach(part => {
-        const num = parseInt(part.match(/\d+/)[0], 10);
-        if (part.includes('h')) {
-          hoursBreak = num;
-        } else if (part.includes('m')) {
-          minutesBreak = num;
-        } else if (part.includes('s')) {
-          secondsBreak = num;
-        }
+      await workIdExist.update({
+        startTime: updatedTime,
+        staffName: updatedStaffName,
+        assignedId: updatedAssignedId,
       });
+
+      const reassignedStaff = await workTime.findOne({
+        where: { workId: workIdExist.workId },
+      });
+
+      return res.status(200).json({ reassignedStaff });
     }
-  }
 
-  const totalSecondsTaken = hoursTaken1 * 3600 + minutesTaken1 * 60 + secondsTaken1;
-  const totalSecondsBreak = hoursBreak * 3600 + minutesBreak * 60 + secondsBreak;
+    const index = workIdExist.staffName.indexOf(staffExists.firstName);
 
-  const totalSeconds = totalSecondsTaken - totalSecondsBreak;
+    if (status === "breakStarted") {
+      const breakTimeStarted = new Date();
+      const updatedBreakStart = [...(workIdExist.breakTimeStarted || []), breakTimeStarted];
 
-  const finalHours = Math.floor(totalSeconds / 3600);
-  const finalMinutes = Math.floor((totalSeconds % 3600) / 60);
-  const finalSeconds = totalSeconds % 60;
+      await workTime.update(
+        { breakTimeStarted: updatedBreakStart },
+        { where: { workId: workIdExist.workId } }
+      );
 
-  const totalTimeWithoutBreak = `${finalHours}h ${finalMinutes}m ${finalSeconds}s`;
+      const updatedBreak = await workTime.findOne({
+        where: { workId: workIdExist.workId }
+      });
+      return res.status(200).json({ updatedBreak });
+    }
 
-  let totalTimeWithBreak;
-  if (workIdExist.breakTimeStarted) {
-    const totalWorkTimeWithBreak = endTime - workIdExist.startTime;
+    if (status === "breakEnded") {
+      const breakTimeEnded = new Date();
+      const breakStartTimes = workIdExist.breakTimeStarted || [];
+      const lastBreakStart = new Date(breakStartTimes[breakStartTimes.length - 1]);
 
-    const hoursTaken2 = Math.floor(totalWorkTimeWithBreak / (1000 * 60 * 60));
-    const minutesTaken2 = Math.floor((totalWorkTimeWithBreak % (1000 * 60 * 60)) / (1000 * 60));
-    const secondsTaken2 = Math.floor((totalWorkTimeWithBreak % (1000 * 60)) / 1000);
+      const breakDuration = breakTimeEnded - lastBreakStart;
+      const hoursTaken = Math.floor(breakDuration / (1000 * 60 * 60));
+      const minutesTaken = Math.floor((breakDuration % (1000 * 60 * 60)) / (1000 * 60));
+      const secondsTaken = Math.floor((breakDuration % (1000 * 60)) / 1000);
+      const breakDurationFormatted = `${hoursTaken}h ${minutesTaken}m ${secondsTaken}s`;
 
-    totalTimeWithBreak = `${hoursTaken2}h ${minutesTaken2}m ${secondsTaken2}s`;
-  }
+      const updatedBreakEnd = [...(workIdExist.breakTimeEnded || []), breakTimeEnded];
+      const updatedTotalTime = [...(workIdExist.totalBreakTime || []), breakDurationFormatted];
 
-  const workComplete = await workTime.update(
-    {
-      endTime: endTime,
-      totalWorkTimeWithoutBreak: totalTimeWithoutBreak,
-      totalWorkTimeWithBreak: totalTimeWithBreak,
-    },
-    { where: { workId: workIdExist.workId } }
-  );
+      await workTime.update(
+        {
+          breakTimeEnded: updatedBreakEnd,
+          totalBreakTime: updatedTotalTime,
+        },
+        { where: { workId: workIdExist.workId } }
+      );
 
-  if (!workComplete) {
-    return res.status(400).json({ message: "Failed to update work time" });
-  }
+      const updatedBreak = await workTime.findOne({
+        where: { workId: workIdExist.workId }
+      });
 
-  const workCompleted = await workTime.findOne({
-    where: { workId: workIdExist.workId },
-  });
+      return res.status(200).json({ updatedBreak });
+    }
 
-  return res.status(200).json({ workCompleted });
-}
-
-
+    if (status === "completed") {
+      const endTime = new Date();
+      if (isNaN(endTime.getTime())) {
+        return res.status(400).json({ error: 'Invalid end time' });
+      }
+    
+      if (!workIdExist.endTime[index] || !workIdExist.totalWorkTimeWithoutBreak[index]) {
+        const startTime = workIdExist.startTime[index];
+        if (isNaN(new Date(startTime).getTime())) {
+          return res.status(400).json({ error: 'Invalid start time' });
+        }
+    
+        const totalTimeWithBreaks = endTime - new Date(startTime);
+    
+        let breakDuration = 0;
+        if (workIdExist.breakTimeStarted && workIdExist.breakTimeStarted.length > 0) {
+          for (let i = 0; i < workIdExist.breakTimeStarted.length; i++) {
+            const breakStart = new Date(workIdExist.breakTimeStarted[i]);
+            const breakEnd = new Date(workIdExist.breakTimeEnded[i]);
+    
+            if (isNaN(breakStart.getTime()) || isNaN(breakEnd.getTime())) {
+              return res.status(400).json({ error: 'Invalid break time' });
+            }
+    
+            if (breakStart >= new Date(startTime) && breakEnd <= endTime) {
+              breakDuration += breakEnd - breakStart;
+            }
+          }
+        }
+    
+        const totalTimeWithoutBreaks = totalTimeWithBreaks - breakDuration;
+        const hoursTaken1 = Math.floor(totalTimeWithoutBreaks / (1000 * 60 * 60));
+        const minutesTaken1 = Math.floor((totalTimeWithoutBreaks % (1000 * 60 * 60)) / (1000 * 60));
+        const secondsTaken1 = Math.floor((totalTimeWithoutBreaks % (1000 * 60)) / 1000);
+        const totalTimeWithoutBreak = `${hoursTaken1}h ${minutesTaken1}m ${secondsTaken1}s`;
+    
+        let totalTimeWithBreak = null;
+        if (breakDuration > 0) {
+          const hoursTaken = Math.floor(totalTimeWithBreaks / (1000 * 60 * 60));
+          const minutesTaken = Math.floor((totalTimeWithBreaks % (1000 * 60 * 60)) / (1000 * 60));
+          const secondsTaken = Math.floor((totalTimeWithBreaks % (1000 * 60)) / 1000);
+          totalTimeWithBreak = `${hoursTaken}h ${minutesTaken}m ${secondsTaken}s`;
+        }
+    
+        const updatedEndTime = [...(workIdExist.endTime || []), new Date(endTime)];
+        const updatedTotalTimeWithoutBreak = [...workIdExist.totalWorkTimeWithoutBreak, totalTimeWithoutBreak];
+        const updatedTotalTimeWithBreak = [...(workIdExist.totalWorkTimeWithBreak || []), totalTimeWithBreak];
+    
+        await workIdExist.update({
+          endTime: updatedEndTime,
+          totalWorkTimeWithoutBreak: updatedTotalTimeWithoutBreak,
+          totalWorkTimeWithBreak: updatedTotalTimeWithBreak,
+          totalBreakTime: workIdExist.totalBreakTime ? workIdExist.totalBreakTime : [...(workIdExist.totalBreakTime || []), totalTimeWithBreak],
+        });
+      }
+    
+      await workIdExist.save();
+      return res.status(200).json({ totalWorkTimeWithBreak: workIdExist });
+    }
+    
+    
+    
 
     return res.status(200).json({ workIdExist });
   } catch (error) {
     console.log(error.message);
-    return res
-      .status(500)
-      .json({ message: "An error occurred", error: error.message });
+    return res.status(500).json({ message: "An error occurred", error: error.message });
   }
 });
 
-const breakTime = catchAsync(async (req, res, next) => {
-  try {
-    const { workId, status } = req.body;
-
-    const workIdExist = await workTime.findOne({
-      where: { workId },
-    });
-
-    if (!workIdExist) {
-      return res.status(400).json({ message: "WorkId not found" });
-    }
-
-    let breakTimeStarted;
-    let breakTimeEnded;
-    let totalBreakTime = workIdExist.totalBreakTime || "0h 0m 0s";
-    let totalBreakMilliseconds = breakTimeToMilliseconds(totalBreakTime);
-
-    if (status === "breakStarted") {
-      breakTimeStarted = new Date();
-    }
-
-    if (status === "breakEnded") {
-      breakTimeEnded = new Date();
-      const breakTimeTaken = breakTimeEnded - workIdExist.breakTimeStarted;
-
-      totalBreakMilliseconds += breakTimeTaken;
-
-      const newBreakTime = millisecondsToBreakTime(totalBreakMilliseconds);
-      totalBreakTime = newBreakTime;
-    }
-
-    await workTime.update(
-      {
-        breakTimeStarted: breakTimeStarted,
-        breakTimeEnded: breakTimeEnded,
-        totalBreakTime: totalBreakTime,
-      },
-      {
-        where: { workId: workIdExist.workId },
-      }
-    );
-
-    const workTimeUpdated = await workTime.findOne({
-      where: { workId: workIdExist.workId },
-    });
-
-    return res.status(200).json({ workTimeUpdated });
-  } catch (error) {
-    console.log(error.message);
-    return res
-      .status(500)
-      .json({ message: "An error occurred", error: error.message });
-  }
-});
-
-function breakTimeToMilliseconds(breakTime) {
-  const timeParts = breakTime.match(/(\d+)h (\d+)m (\d+)s/);
-  if (!timeParts) return 0;
-
-  const hours = parseInt(timeParts[1]) || 0;
-  const minutes = parseInt(timeParts[2]) || 0;
-  const seconds = parseInt(timeParts[3]) || 0;
-
-  return (hours * 60 * 60 + minutes * 60 + seconds) * 1000;
-}
-
-function millisecondsToBreakTime(milliseconds) {
-  const totalSeconds = Math.floor(milliseconds / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return `${hours}h ${minutes}m ${seconds}s`;
-}
-
-
-
-module.exports = { staffWorkTime, breakTime };
+module.exports = { staffWorkTime };
