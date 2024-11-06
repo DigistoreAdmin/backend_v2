@@ -24,6 +24,9 @@ module.exports = {
       completedOn: {
         type: Sequelize.DATE,
       },
+      workId: {
+        type: Sequelize.STRING,
+      },
       oldPassportNumber: {
         type: Sequelize.STRING,
       },
