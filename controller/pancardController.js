@@ -256,19 +256,24 @@ const createPancard = async (req, res,next) => {
 };
 
 const updatePanDetails = catchAsync(async (req, res, next) => {
-  const { phoneNumber, id, status, acknowledgementNumber, reason, ePan, amount } = req.body;
+  const { workId, status, acknowledgementNumber, reason, ePan} = req.body;
+  console.log(' req.body: ',  req.body);
+
+  let amount=150;
   const acknowledgementFile = req?.files?.acknowledgementFile;
   const user = req.user;
 
-  if (!phoneNumber) {
-    return next(new AppError("Mobile number is required", 400));
+  if (!workId) {
+    return next(new AppError("workId is required", 400));
   }
 
   const pancardUser = panCardUsers();
 
   const data = await pancardUser.findOne({
-    where: { phoneNumber, id },
+    where: { workId },
   });
+
+  const phoneNumber=data.phoneNumber
 
   if (!data) {
     return res.status(404).json({ message: "Record not found" });
@@ -332,7 +337,7 @@ const updatePanDetails = catchAsync(async (req, res, next) => {
 
       await pancardUser.update(
         { status: "rejected" },
-        { where: { phoneNumber, id } }
+        { where: {workId } }
       );
 
       return res.status(200).json({ message: "PAN card rejected successfully" });
@@ -345,7 +350,7 @@ const updatePanDetails = catchAsync(async (req, res, next) => {
         acknowledgementNumber,
         reason,
         ePan,
-      }, { where: { phoneNumber, id } });
+      }, { where: { workId } });
 
       return res.status(200).json({ message: "PAN card updated successfully" });
     }
