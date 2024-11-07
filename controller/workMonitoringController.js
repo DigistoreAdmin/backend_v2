@@ -37,26 +37,28 @@ const staffWorkTime = catchAsync(async (req, res, next) => {
       return res.status(201).json({ workTimeInstance });
     }
 
-    if (!workIdExist.staffName.includes(staffExists.firstName)) {
-      const startTime = new Date();
-      const updatedTime = [...(workIdExist.startTime || []), startTime];
-      const updatedStaffName = [...(workIdExist.staffName || []), staffExists.firstName];
-      const updatedAssignedId = [...(workIdExist.assignedId || []), staffExists.employeeId];
-
-      await workIdExist.update({
-        startTime: updatedTime,
-        staffName: updatedStaffName,
-        assignedId: updatedAssignedId,
-      });
-
-      const reassignedStaff = await workTime.findOne({
-        where: { workId: workIdExist.workId },
-      });
-
-      return res.status(200).json({ reassignedStaff });
+    if(workIdExist.reassigned === true) {
+      if (!workIdExist.assignedId.includes(staffExists.employeeId)) {
+        const startTime = new Date();
+        const updatedTime = [...(workIdExist.startTime || []), startTime];
+        // const updatedStaffName = [...(workIdExist.staffName || []), staffExists.firstName];
+        const updatedAssignedId = [...(workIdExist.assignedId || []), staffExists.employeeId];
+  
+        await workIdExist.update({
+          startTime: updatedTime,
+          // staffName: updatedStaffName,
+          assignedId: updatedAssignedId,
+        });
+  
+        const reassignedStaff = await workTime.findOne({
+          where: { workId: workIdExist.workId },
+        });
+  
+        return res.status(200).json({ reassignedStaff });
+      }
     }
 
-    const index = workIdExist.staffName.indexOf(staffExists.firstName);
+    const index = workIdExist.assignedId.indexOf(staffExists.employeeId);
 
     if (status === "breakStarted") {
       const breakTimeStarted = new Date();
