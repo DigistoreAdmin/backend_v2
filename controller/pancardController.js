@@ -336,7 +336,7 @@ const updatePanDetails = catchAsync(async (req, res, next) => {
       });
 
       await pancardUser.update(
-        { status: "rejected" },
+        { status: "rejected", reason },
         { where: {workId } }
       );
 
@@ -348,7 +348,6 @@ const updatePanDetails = catchAsync(async (req, res, next) => {
         status: "completed",
         acknowledgementFile: acknowledgementFileUrl,
         acknowledgementNumber,
-        reason,
         ePan,
       }, { where: { workId } });
 
