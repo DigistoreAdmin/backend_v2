@@ -143,7 +143,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       ePan:{
-        type: Sequelize.ENUM("received","notReceived"),
+        type: Sequelize.BOOLEAN,
       },
       commissionToHO: {
         type: Sequelize.DECIMAL,
