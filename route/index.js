@@ -57,6 +57,7 @@ const flightBookingRoute = require("../route/rechapi-routes/flightTicketRoute")
 const rechapiPhoneRechargeRoute = require("../route/rechapi-routes/phoneRechargeRoute")
 const rechapiBillPaymentRoute = require("../route/rechapi-routes/billPaymentRoute")
 const busBookingRechapi = require("../route/rechapi-routes/busBookingRoute")
+const checkIntentStatusRoute = require("../route/upiPaymentRoute/checkIntentStatusRoute")
 
 
 
@@ -120,7 +121,7 @@ router.use("/v1/flightBooking", flightBookingRoute)
 router.use("/v1/rechapiPhoneRechargeRoute",rechapiPhoneRechargeRoute)
 router.use("/v1/rechapiBillPaymentRoute",rechapiBillPaymentRoute)
 router.use("/v1/bus",busBookingRechapi )
-
+router.use("/v1/upiPayment", checkIntentStatusRoute)
 
 
 module.exports = router;
