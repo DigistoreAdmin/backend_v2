@@ -51,17 +51,15 @@ const contactRoute = require("../route/contactRoute");
 const medicalInsuranceRoute = require("../route/medicalInsuranceRoute");
 const microLoanRoute = require("../route/Loan/microLoanRoute");
 const microLoanShopRoute = require("../route/Loan/microLoanShopRoute");
-const staffUpdateLoanRoute=require("../route/Loan/staffUpdateRouter")
-const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute")
-const flightBookingRoute = require("../route/rechapi-routes/flightTicketRoute")
-const rechapiPhoneRechargeRoute = require("../route/rechapi-routes/phoneRechargeRoute")
-const rechapiBillPaymentRoute = require("../route/rechapi-routes/billPaymentRoute")
-const busBookingRechapi = require("../route/rechapi-routes/busBookingRoute")
-
-
+const staffUpdateLoanRoute = require("../route/Loan/staffUpdateRouter");
+const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute");
+const flightBookingRoute = require("../route/rechapi-routes/flightTicketRoute");
+const rechapiPhoneRechargeRoute = require("../route/rechapi-routes/phoneRechargeRoute");
+const rechapiBillPaymentRoute = require("../route/rechapi-routes/billPaymentRoute");
+const busBookingRechapi = require("../route/rechapi-routes/busBookingRoute");
+const upiPaymentCreateOrder = require("../route/upiPaymentRoute/createOrderRoute");
 
 const router = express.Router();
-
 
 router.use("/v1/auth", authRouter);
 router.use("/v1/users", userRouter);
@@ -101,10 +99,16 @@ router.use("/v1/companyFormationRoute", companyFormationRoute);
 router.use("/v1/personalLoanRoute", personalLoanRoute);
 router.use("/v1/businessLoanNewSecured", businessLoanNewSecuredRoute);
 router.use("/v1/businessLoanNewUnsecuredRoute", businessLoanNewUnsecured);
-router.use("/v1/BusinessLoanUnsecuredExisting",BusinessLoanUnsecuredExistingRouter);
+router.use(
+  "/v1/BusinessLoanUnsecuredExisting",
+  BusinessLoanUnsecuredExistingRouter
+);
 router.use("/v1/students", collegeTeamRoute);
 router.use("/v1/staffUpdateRouter", staffUpdateRouter);
-router.use("/v1/partnerShipDeedPreperationRoute",partnerShipDeedPreperationRoute);
+router.use(
+  "/v1/partnerShipDeedPreperationRoute",
+  partnerShipDeedPreperationRoute
+);
 router.use("/v1/updateAccess", BlockRoute);
 router.use("/v1/fetchLoanRouter", fetchLoanRouter);
 router.use("/v1/fetchServicesRouter", fetchServicesRouter);
@@ -114,13 +118,12 @@ router.use("/v1/contactRoute", contactRoute);
 router.use("/v1/medicalRoute", medicalInsuranceRoute);
 router.use("/v1/microLoanRoute", microLoanRoute);
 router.use("/v1/microLoanShopRoute", microLoanShopRoute);
-router.use("/v1/staffUpdateLoanRoute", staffUpdateLoanRoute)
-router.use("/v1/insurance", vehicleInsuranceRoute)
-router.use("/v1/flightBooking", flightBookingRoute)
-router.use("/v1/rechapiPhoneRechargeRoute",rechapiPhoneRechargeRoute)
-router.use("/v1/rechapiBillPaymentRoute",rechapiBillPaymentRoute)
-router.use("/v1/bus",busBookingRechapi )
-
-
+router.use("/v1/staffUpdateLoanRoute", staffUpdateLoanRoute);
+router.use("/v1/insurance", vehicleInsuranceRoute);
+router.use("/v1/flightBooking", flightBookingRoute);
+router.use("/v1/rechapiPhoneRechargeRoute", rechapiPhoneRechargeRoute);
+router.use("/v1/rechapiBillPaymentRoute", rechapiBillPaymentRoute);
+router.use("/v1/bus", busBookingRechapi);
+router.use("/v1/upiPaymentCreateOrder", upiPaymentCreateOrder);
 
 module.exports = router;
