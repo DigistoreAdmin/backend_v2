@@ -328,8 +328,9 @@ const passportUpdateComplete = catchAsync(async (req, res) => {
     username ? (passportRecord.username = username) : null;
     password ? (passportRecord.password = password) : null;
     passportFileUrl ? (passportRecord.passportFile = passportFileUrl) : null;
+    passportRecord.status="completed"
 
-    await passportRecord.save();
+    const completedPassport= await passportRecord.save();
 
     await transationHistories.update(
       {
@@ -340,7 +341,7 @@ const passportUpdateComplete = catchAsync(async (req, res) => {
 
     res.status(200).json({
       message: "Passport completed successfully",
-      passportRecord,
+      completedPassport,
     });
   } catch (error) {
     console.log(error);
