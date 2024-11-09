@@ -55,12 +55,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     assignedOn: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     completedOn: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     customerName: {
       type: DataTypes.STRING,

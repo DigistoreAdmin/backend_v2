@@ -291,21 +291,24 @@ const staffPanCardReject = catchAsync(async (req, res, next) => {
 
   const pancardUser = panCardUsers();
   const data = await pancardUser.findOne({ where: { workId } });
+
   if (!data) {
     return res.status(404).json({ message: "Record not found" });
   }
 
   const transaction = await transationHistory.findOne({ where: { transactionId: workId } });
+
   if (!transaction) {
     return res.status(404).json({ message: "Transaction not found" });
   }
 
-  const franchiseData = await Franchise.findOne({ where: { email: req.user.email } });
-  if (!franchiseData) {
-    return next(new AppError("Franchise not found", 404));
+  const franchiseUniqueId=data.uniqueId
+
+  if (!franchiseUniqueId) {
+    return res.status(404).json({ message: "uniqueId not found" });
   }
 
-  const walletData = await wallets.findOne({ where: { uniqueId: franchiseData.franchiseUniqueId } });
+  const walletData = await wallets.findOne({ where: { uniqueId: franchiseUniqueId } });
   if (!walletData) {
     return next(new AppError("Wallet not found", 404));
   }
@@ -315,7 +318,7 @@ const staffPanCardReject = catchAsync(async (req, res, next) => {
   try {
     await wallets.update(
       { balance: newBalance },
-      { where: { uniqueId: franchiseData.franchiseUniqueId } }
+      { where: { uniqueId: franchiseUniqueId } }
     );
 
     await transationHistory.update(
@@ -344,7 +347,6 @@ const staffPanCardReject = catchAsync(async (req, res, next) => {
 const staffPanCardComplete = catchAsync(async (req, res, next) => {
   const { workId, acknowledgementNumber } = req.body;
   const acknowledgementFile = req?.files?.acknowledgementFile;
-  const user = req.user;
 
   if (!workId) {
     return next(new AppError("workId is required", 400));
@@ -355,16 +357,6 @@ const staffPanCardComplete = catchAsync(async (req, res, next) => {
 
   if (!data) {
     return res.status(404).json({ message: "Record not found" });
-  }
-
-  const franchiseData = await Franchise.findOne({ where: { email: user.email } });
-  if (!franchiseData) {
-    return next(new AppError("Franchise not found", 404));
-  }
-
-  const walletData = await wallets.findOne({ where: { uniqueId: franchiseData.franchiseUniqueId } });
-  if (!walletData) {
-    return next(new AppError("Wallet not found", 404));
   }
 
   const uploadFile = async (file) => {
