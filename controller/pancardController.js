@@ -38,6 +38,8 @@ const uploadBlob = async (file) => {
 
 const createPancard = async (req, res,next) => {
   try {
+    const user = req.user;
+
     const {
       totalAmount = 0,
       accountNo,
@@ -63,7 +65,7 @@ const createPancard = async (req, res,next) => {
       dobChange,
       changeFatherName,
     } = req.body;
-    console.log('req.body: ', req.body);
+   
 
     const {
       proofOfDOB,
@@ -84,7 +86,40 @@ const createPancard = async (req, res,next) => {
    let commissionToHO = 55;
    let commissionToFranchise = totalAmount - minAmount;
    let amount = 150;
+
    
+   const franchise = await Franchise.findOne({ where: { email: user.email } });
+   
+   if (!franchise) {
+     return res.status(404).json({
+       status: 'fail',
+       message: 'Franchise not found',
+      });
+    }
+    
+  const uniqueId = franchise.franchiseUniqueId;
+
+  if (!franchise.verified) {
+    return next(new AppError("franchise not verified", 401));
+  }
+
+  const walletData = await wallets.findOne({
+    where: { uniqueId},
+  });
+
+  if (!walletData) return next(new AppError("Wallet not found", 404));
+
+  if(amount > walletData.balance){
+    return next(new AppError("Insufficient wallet balance", 401));
+    }
+
+    if(totalAmount < minAmount){
+      return next(new AppError("Insufficient amount" , 401));
+    }
+
+    if(totalAmount > maxAmount){
+      return next(new AppError("Amount Exeeded" , 401));
+    }
 
     const uploadFile = async (file) => {
       if (file) {
@@ -133,57 +168,15 @@ const createPancard = async (req, res,next) => {
 
     const processedData = processInputData(inputData);
 
-    const user = req.user;
-
-    const franchise = await Franchise.findOne({ where: { email: user.email } });
-
-    if (!franchise) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Franchise not found',
-      });
-    }
-
-    const uniqueId = franchise.franchiseUniqueId;
- 
     const PancardUser = panCardUsers(panType, isCollege, isDuplicateOrChangePan);
 
-
-    if (!franchise.verified) {
-      return next(new AppError("franchise not verified", 401));
-    }
-
-    
-    if(totalAmount < minAmount){
-      return next(new AppError("Insufficient amount" , 401));
-    }
-
-    if(totalAmount > maxAmount){
-      return next(new AppError("Amount Exeeded" , 401));
-    }
-
-
-   const walletData = await wallets.findOne({
-      where: { uniqueId: franchise.franchiseUniqueId },
-    });
-
-    
-    if (!walletData) return next(new AppError("Wallet not found", 404));
-
-
-    if(amount > walletData.balance){
-      return next(new AppError("Insufficient wallet balance", 401));
-      }
-
-      const newBalance =Math.round(walletData.balance-amount)
+   const newBalance =Math.round(walletData.balance-amount)
       
       const updated = await wallets.update(
         { balance: newBalance },
         { where: { uniqueId: franchise.franchiseUniqueId } }
       );
 
-
-  
       const currentDate = getCurrentDate();
       const code = "PAN";
       const lastPan = await PancardUser.findOne({
@@ -262,7 +255,7 @@ const createPancard = async (req, res,next) => {
       adminCommission: commissionToHO,
       walletBalance: newBalance,
     });
-
+    
     if (!newPancardUser && !newTransactionHistory && !updated) {
       return res.status(400).json({
         status: 'fail',
