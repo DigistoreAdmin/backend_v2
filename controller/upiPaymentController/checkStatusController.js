@@ -24,8 +24,8 @@ const checkStatus = catchAsync(async (req, res, next) => {
     where: { uniqueId: Data.franchiseUniqueId },
   });
 
-  if (!Data) {
-    return res.status(404).json({ error: "Franchise not found" });
+  if (!walletData) {
+    return res.status(404).json({ error: "wallet not found" });
   }
 
   const clientId = process.env.CLIENT_ID;
