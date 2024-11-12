@@ -6,9 +6,19 @@ const transationHistory = require('../db/models/transationhistory')
 const wallets = require('../db/models/wallet');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const { Op} = require('sequelize');
+const transationHistories = require('../db/models/transationhistory');
 
 const containerName = 'imagecontainer';
 const blobService = azureStorage.createBlobService(process.env.AZURE_STORAGE_CONNECTION_STRING);
+
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
+
 
 const uploadBlob = async (file) => {
   return new Promise((resolve, reject) => {
@@ -28,6 +38,8 @@ const uploadBlob = async (file) => {
 
 const createPancard = async (req, res,next) => {
   try {
+    const user = req.user;
+
     const {
       totalAmount = 0,
       accountNo,
@@ -53,7 +65,7 @@ const createPancard = async (req, res,next) => {
       dobChange,
       changeFatherName,
     } = req.body;
-    console.log('req.body: ', req.body);
+   
 
     const {
       proofOfDOB,
@@ -73,8 +85,41 @@ const createPancard = async (req, res,next) => {
     let maxAmount = 250;
    let commissionToHO = 55;
    let commissionToFranchise = totalAmount - minAmount;
-   let amount = totalAmount - commissionToFranchise;
+   let amount = 150;
+
    
+   const franchise = await Franchise.findOne({ where: { email: user.email } });
+   
+   if (!franchise) {
+     return res.status(404).json({
+       status: 'fail',
+       message: 'Franchise not found',
+      });
+    }
+    
+  const uniqueId = franchise.franchiseUniqueId;
+
+  if (!franchise.verified) {
+    return next(new AppError("franchise not verified", 401));
+  }
+
+  const walletData = await wallets.findOne({
+    where: { uniqueId},
+  });
+
+  if (!walletData) return next(new AppError("Wallet not found", 404));
+
+  if(amount > walletData.balance){
+    return next(new AppError("Insufficient wallet balance", 401));
+    }
+
+    if(totalAmount < minAmount){
+      return next(new AppError("Insufficient amount" , 401));
+    }
+
+    if(totalAmount > maxAmount){
+      return next(new AppError("Amount Exeeded" , 401));
+    }
 
     const uploadFile = async (file) => {
       if (file) {
@@ -123,63 +168,36 @@ const createPancard = async (req, res,next) => {
 
     const processedData = processInputData(inputData);
 
-    const user = req.user;
-
-    const franchise = await Franchise.findOne({ where: { email: user.email } });
-
-    if (!franchise) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Franchise not found',
-      });
-    }
-
-    const uniqueId = franchise.franchiseUniqueId;
- 
     const PancardUser = panCardUsers(panType, isCollege, isDuplicateOrChangePan);
 
-
-    if (franchise.verified == "false") {
-      return next(new AppError("franchise not verified", 401));
-    }
-
-    
-    if(totalAmount < minAmount){
-      return next(new AppError("Insufficient amount" , 401));
-    }
-
-    if(totalAmount > maxAmount){
-      return next(new AppError("Amount Exeeded" , 401));
-    }
-
-
-   const walletData = await wallets.findOne({
-      where: { uniqueId: franchise.franchiseUniqueId },
-    });
-
-    
-    if (!walletData) return next(new AppError("Wallet not found", 404));
-
-
-    if(amount > walletData.balance){
-      return next(new AppError("Insufficient wallet balance", 401));
-      }
-
-      const newBalance =Math.round(walletData.balance-amount)
-      console.log('walletData.balance: ', walletData.balance);
-      console.log('newBalance: ', newBalance);
+   const newBalance =Math.round(walletData.balance-amount)
       
-  
       const updated = await wallets.update(
         { balance: newBalance },
         { where: { uniqueId: franchise.franchiseUniqueId } }
       );
 
-
-  
-    const transactionId=generateRandomId()
+      const currentDate = getCurrentDate();
+      const code = "PAN";
+      const lastPan = await PancardUser.findOne({
+        where: {
+          workId: {
+            [Op.like]: `${currentDate}${code}%`,
+          },
+        },
+        order: [["createdAt", "DESC"]],
+      });
+      let increment = "001";
+      if (lastPan) {
+        const lastIncrement = parseInt(lastPan.workId.slice(-3));
+        increment = (lastIncrement + 1).toString().padStart(3, "0");
+      }
+      
+    const workId = `${currentDate}${code}${increment}`;
+      
 
     const newPancardUser = await PancardUser.create({
+      workId,
       panType,
       uniqueId,
       assignedId,
@@ -196,7 +214,7 @@ const createPancard = async (req, res,next) => {
       reasonForDuplicate,
       panNumber,
       abroadAddress,
-      totalAmount,
+      totalAmount:amount,
       commissionToFranchise,
       commissionToHO,
       nameChange: processedData.nameChange,
@@ -222,21 +240,22 @@ const createPancard = async (req, res,next) => {
 
 
     const newTransactionHistory = await transationHistory.create({
-      transactionId: transactionId,
+      transactionId: workId,
       uniqueId: franchise.franchiseUniqueId,
       userName: franchise.franchiseName,
       userType: user.userType,
-      service: "pancardRegistration",
+      service: "pancard-create",
       customerNumber: phoneNumber,
       serviceNumber: accountNo,
       serviceProvider: "pancard",
-      status: "success",
+      commissionType:"cash",
+      status: "pending",
       amount: amount,
       franchiseCommission: commissionToFranchise,
       adminCommission: commissionToHO,
       walletBalance: newBalance,
     });
-
+    
     if (!newPancardUser && !newTransactionHistory && !updated) {
       return res.status(400).json({
         status: 'fail',
@@ -255,39 +274,82 @@ const createPancard = async (req, res,next) => {
   }
 };
 
-const updatePanDetails = catchAsync(async (req, res, next) => {
-  const { phoneNumber, id, status, acknowledgementNumber, reason, ePan, amount } = req.body;
-  const acknowledgementFile = req?.files?.acknowledgementFile;
-  const user = req.user;
+const staffPanCardReject = catchAsync(async (req, res, next) => {
+  const { workId, reason } = req.body;
+  const amount = 150;
 
-  if (!phoneNumber) {
-    return next(new AppError("Mobile number is required", 400));
+  if (!workId) {
+    return next(new AppError("workId is required", 400));
   }
 
   const pancardUser = panCardUsers();
-
-  const data = await pancardUser.findOne({
-    where: { phoneNumber, id },
-  });
+  const data = await pancardUser.findOne({ where: { workId } });
 
   if (!data) {
     return res.status(404).json({ message: "Record not found" });
   }
 
-  const franchiseData = await Franchise.findOne({
-    where: { email: user.email },
-  });
+  const transaction = await transationHistory.findOne({ where: { transactionId: workId } });
 
-  if (!franchiseData) {
-    return next(new AppError("Franchise not found", 404));
+  if (!transaction) {
+    return res.status(404).json({ message: "Transaction not found" });
   }
 
-  const walletData = await wallets.findOne({
-    where: { uniqueId: franchiseData.franchiseUniqueId },
-  });
+  const franchiseUniqueId=data.uniqueId
 
+  if (!franchiseUniqueId) {
+    return res.status(404).json({ message: "uniqueId not found" });
+  }
+
+  const walletData = await wallets.findOne({ where: { uniqueId: franchiseUniqueId } });
   if (!walletData) {
     return next(new AppError("Wallet not found", 404));
+  }
+
+  const newBalance = Math.round(Number(walletData.balance) + amount);
+
+  try {
+    await wallets.update(
+      { balance: newBalance },
+      { where: { uniqueId: franchiseUniqueId } }
+    );
+
+    await transationHistory.update(
+      {
+        service: "pancard-rejected",
+        status: "fail",
+        walletBalance: newBalance,
+        franchiseCommission: 0.0,
+        adminCommission: 0.0,
+      },
+      { where: { transactionId: workId } }
+    );
+
+    await pancardUser.update(
+      { status: "rejected", reason },
+      { where: { workId } }
+    );
+
+    return res.status(200).json({ message: "PAN card rejected successfully" });
+  } catch (error) {
+    return next(new AppError("An error occurred while PAN card rejection", 500));
+  }
+});
+
+
+const staffPanCardComplete = catchAsync(async (req, res, next) => {
+  const { workId, acknowledgementNumber } = req.body;
+  const acknowledgementFile = req?.files?.acknowledgementFile;
+
+  if (!workId) {
+    return next(new AppError("workId is required", 400));
+  }
+
+  const pancardUser = panCardUsers();
+  const data = await pancardUser.findOne({ where: { workId } });
+
+  if (!data) {
+    return res.status(404).json({ message: "Record not found" });
   }
 
   const uploadFile = async (file) => {
@@ -305,61 +367,51 @@ const updatePanDetails = catchAsync(async (req, res, next) => {
   const acknowledgementFileUrl = await uploadFile(acknowledgementFile);
 
   try {
-    if (status === "rejected") {
-      const newBalance = Math.round(Number(walletData.balance) + Number(amount));
+    await transationHistory.update(
+      { status: "success" , service:"pancard-create",},
+      { where: { transactionId: workId } }
+    );
 
-      await wallets.update(
-        { balance: newBalance },
-        { where: { uniqueId: franchiseData.franchiseUniqueId } }
-      );
-
-      const transactionId = generateRandomId();
-
-      await transationHistory.create({
-        transactionId,
-        uniqueId: franchiseData.franchiseUniqueId,
-        userName: franchiseData.franchiseName,
-        userType: user.userType,
-        service: "pancard-rejected",
-        customerNumber: phoneNumber,
-        serviceProvider: "pancard",
-        status: "fail",
-        amount,
-        franchiseCommission: 0.00,
-        adminCommission: 0.00,
-        walletBalance: newBalance,
-      });
-
-      await pancardUser.update(
-        { status: "rejected" },
-        { where: { phoneNumber, id } }
-      );
-
-      return res.status(200).json({ message: "PAN card rejected successfully" });
-    }
-
-    if (status === "completed") {
-      await pancardUser.update({
+    await pancardUser.update(
+      {
         status: "completed",
-        acknowledgementFile: acknowledgementFileUrl,
+        acknowledgementFileUrl,
         acknowledgementNumber,
-        reason,
-        ePan,
-      }, { where: { phoneNumber, id } });
+      },
+      { where: { workId } }
+    );
 
-      return res.status(200).json({ message: "PAN card updated successfully" });
-    }
-    return next(new AppError("Invalid status provided", 400));
+    return res.status(200).json({ message: "PAN card completed successfully" });
   } catch (error) {
-    return next(new AppError("An error occurred while updating PAN card details", 500));
+    return next(new AppError("An error occurred while PAN card completion", 500));
+  }
+});
+
+const staffPanCardVerify = catchAsync(async (req, res, next) => {
+  const { workId} = req.body;
+
+  if (!workId) {
+    return next(new AppError("workId is required", 400));
+  }
+
+  const pancardUser = panCardUsers();
+  const data = await pancardUser.findOne({ where: { workId } });
+
+  if (!data) {
+    return res.status(404).json({ message: "Record not found" });
+  }
+
+  try {
+    await pancardUser.update(
+      { ePan: true },
+      { where: { workId } }
+    );
+
+    return res.status(200).json({ message: "PAN card verified successfully" });
+  } catch (error) {
+    return next(new AppError("An error occurred while verifying the PAN card", 500));
   }
 });
 
 
-function generateRandomId() {
-  const prefix = "DSP";
-  const timestamp = Date.now().toString(); 
-  return prefix + timestamp;
-}
-
-module.exports = { createPancard, updatePanDetails };
+module.exports = { createPancard ,staffPanCardReject,staffPanCardComplete,staffPanCardVerify};

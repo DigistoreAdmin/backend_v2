@@ -18,13 +18,6 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
   const allowS = panType === "NRIPancard" ? true : false;
   console.log("allows", allowS)
 
-  const getCurrentDate = () => {
-    const date = new Date();
-    return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}${date.getFullYear()}`;
-  };
-
   const PancardUser = sequelize.define('pancardUser', {
     id: {
       allowNull: false,
@@ -62,12 +55,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     assignedOn: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     completedOn: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     customerName: {
       type: DataTypes.STRING,
@@ -263,7 +254,8 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       allowNull:true
     },
     ePan:{
-      type: DataTypes.ENUM("received","notReceived"),
+      type: DataTypes.BOOLEAN,
+      defaultValue:"false",
       allowNull:true
     },
     commissionToHO: {
@@ -295,28 +287,6 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     paranoid: true,
     freezeTableName: true,
     modelName: 'pancardUser',
-    hooks: {
-      beforeValidate: async (pan) => {
-        const currentDate = getCurrentDate();
-        const code = "PAN";
-        const lastPan = await PancardUser.findOne({
-          where: {
-            workId: {
-              [Op.like]: `${currentDate}${code}%`,
-            },
-          },
-          order: [["createdAt", "DESC"]],
-        });
-
-        let newIncrement = "001";
-        if (lastPan) {
-          const lastIncrement = parseInt(lastPan.workId.slice(-3));
-          newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
-        }
-
-        pan.workId = `${currentDate}${code}${newIncrement}`;
-      },
-    },
   });
 
   return PancardUser;
