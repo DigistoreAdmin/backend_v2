@@ -56,20 +56,25 @@ const reassign = catchAsync(async (req, res, next) => {
   }
 
   const workIdExist = await WorkTime.findOne({
-    where: { workId },
+    where: { workId:workId },
   });
+  console.log('workIdExist: ', workIdExist);
 
   if (!workIdExist) {
     return next(new AppError("WorkId not found", 404));
   }
 
-  const updatedReassignedTime = [...(workIdExist.reassignedTime || []), new Date()];
-  const updatedStaffNames = [...(workIdExist.staffName || []), staffName];
+  const newEmployeeRecord = {
+    staffName,
+    assignedId,
+    reassigned: true,
+    reassignedTime: new Date(),
+  };
 
-  await WorkTime.update(
-    { reassigned: true, reassignedTime: updatedReassignedTime ,  staffName: updatedStaffNames},
-    { where: { workId } }
-  );
+  // Update the employeeRecords by adding the new record
+  const updatedEmployeeRecords = [...workIdExist.employeeRecords, newEmployeeRecord];
+
+  await workIdExist.update({ employeeRecords: updatedEmployeeRecords });
 
   const gstRegistration = gstRegistrationDetails();
   const passport = definePassportDetails();
