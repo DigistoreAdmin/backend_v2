@@ -82,6 +82,11 @@ const createAndPayOrder = catchAsync(async (req, res, next) => {
     );
 
     // Check if create-order was successful
+
+    console.log(
+      "createOrderResponse.data.status: ",
+      createOrderResponse.data.status
+    );
     if (createOrderResponse.data.status === "false") {
       return next(new AppError("Order ID already exist", 500));
     }
@@ -91,8 +96,9 @@ const createAndPayOrder = catchAsync(async (req, res, next) => {
       `https://acepay.dev.acepe.co.in/api/pg/v1/pay-order?&amount=${amountConverted}&orderId=${orderId}&timestamp=${timestamp}&payerVpa=${payerVpa}&payerName=${payerName}&remarks=${remarks}&checksum=${checksum}`
     );
 
-    if (payOrderResponse.data.status === "success") {
+    if (payOrderResponse.data.status === "true") {
       const serviceCharge = amountConverted * 0.01;
+      console.log("serviceCharge: ", serviceCharge);
       payOrderResponse.data.serviceCharge = serviceCharge;
     }
     return res.status(200).json({
