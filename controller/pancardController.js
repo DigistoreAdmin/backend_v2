@@ -375,7 +375,7 @@ const staffPanCardComplete = catchAsync(async (req, res, next) => {
     await pancardUser.update(
       {
         status: "completed",
-        acknowledgementFileUrl,
+        acknowledgementFile:acknowledgementFileUrl,
         acknowledgementNumber,
       },
       { where: { workId } }
