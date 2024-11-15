@@ -134,7 +134,7 @@ module.exports = {
       },
       
       acknowledgementNumber:{
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
       acknowledgementFile:{
         type: Sequelize.STRING,
