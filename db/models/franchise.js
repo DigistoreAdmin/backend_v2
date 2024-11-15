@@ -506,7 +506,7 @@ module.exports = Franchise;
 
 var algorithm = "aes-192-cbc"; //algorithm to use
 var secret = process.env.FRANCHISE_SECRET_KEY;
-console.log('secret: ', secret);
+// console.log('secret: ', secret);
 const key = crypto.scryptSync(secret, 'salt', 24); //create key
 
 

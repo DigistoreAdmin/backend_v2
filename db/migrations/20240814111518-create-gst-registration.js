@@ -21,7 +21,7 @@ module.exports = {
       applicationReferenceNumber: {
         type: Sequelize.STRING,
       },
-      commissionToHeadOffice: {
+      commissionToHO: {
         type: Sequelize.DECIMAL,
       },
       commissionToFranchise: {
@@ -31,12 +31,12 @@ module.exports = {
         type: Sequelize.DECIMAL,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","rejected"),
       },
-      customerEmailId: {
+      email: {
         type: Sequelize.STRING,
       },
-      customerMobile: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
       businessName: {
@@ -63,7 +63,7 @@ module.exports = {
       typeOfBusiness: {
         type: Sequelize.ENUM("proprietary", "partnership", "company"),
       },
-      panCardImage: {
+      panPic: {
         type: Sequelize.STRING,
       },
       aadhaarFront: {
@@ -81,7 +81,7 @@ module.exports = {
       rentAgreement: {
         type: Sequelize.STRING,
       },
-      passportSizePhoto: {
+      photo: {
         type: Sequelize.STRING,
       },
       bankDetails: {

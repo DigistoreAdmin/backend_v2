@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("cibilReport", {
+    await queryInterface.createTable("cibilReports", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -16,10 +16,10 @@ module.exports = {
       customerName: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
-      emailId: {
+      email: {
         type: Sequelize.STRING,
       },
       purpose: {
@@ -42,6 +42,15 @@ module.exports = {
       },
       panCardBack: {
         type: Sequelize.STRING,
+      },
+      amount: {
+        type: Sequelize.DECIMAL,
+      },
+      workId:{
+        type: Sequelize.STRING,
+      },
+      loanType: {
+        type: Sequelize.ENUM("businessLoanUnsecuredNew","businessLoanUnscuredExisting","BusinessLoanNewSecured","businessLoanExisting","housingLoan","loanAgainstProperty","RefinanceOrUsedVehicle","newVehicle","personalLoan","microLoansShop","microLoan"),
       },
       status: {
         type: Sequelize.ENUM("approve", "pending", "reject", "process"),
@@ -70,6 +79,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("cibilReport");
+    await queryInterface.dropTable("cibilReports");
   },
 };

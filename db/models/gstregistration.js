@@ -43,7 +43,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         allowNull: false,
         defaultValue: "inQueue",
       },
@@ -59,15 +59,15 @@ const gstRegistrationDetails = (typeOfBusiness) => {
           },
         },
       },
-      customerEmailId: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Customer email cannot be null',
+            msg: 'Email id cannot be null',
           },
           notEmpty: {
-            msg: 'Customer email cannot be empty',
+            msg: 'Email id cannot be empty',
           },
           isEmail: {
             msg: 'Invalid email address',
@@ -78,22 +78,22 @@ const gstRegistrationDetails = (typeOfBusiness) => {
           },
         },
       },
-      customerMobile: {
+      phoneNumber: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Customer mobile number cannot be null',
+            msg: 'Phone number cannot be null',
           },
           notEmpty: {
-            msg: 'Customer mobile number cannot be empty',
+            msg: 'Phone number cannot be empty',
           },
           isNumeric: {
-            msg: 'Customer mobile number must contain only numbers',
+            msg: 'Phone number must contain only numbers',
           },
           len: {
             args: [10, 15],
-            msg: 'Customer mobile number must be between 10 and 15 digits',
+            msg: 'Phone number must be between 10 and 15 digits',
           },
         },
       },
@@ -113,7 +113,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      commissionToHeadOffice: {
+      commissionToHO: {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
@@ -221,7 +221,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
           },
         },
       },
-      panCardImage: {
+      panPic: {
         type: DataTypes.STRING,
         allowNull: proprietaryNullVal,
         validate: {
@@ -270,12 +270,12 @@ const gstRegistrationDetails = (typeOfBusiness) => {
           },
         },
       },
-      passportSizePhoto: {
+      photo: {
         type: DataTypes.STRING,
         allowNull: proprietaryNullVal,
         validate: {
           isUrl: {
-            msg: 'Passport size photo must be a valid URL',
+            msg: 'Photo must be a valid URL',
           },
         },
       },
@@ -356,13 +356,13 @@ const gstRegistrationDetails = (typeOfBusiness) => {
             // Validate each item in the array
             value.forEach((partner) => {
               const {
-                panCard, photo, aadhaarFront, aadhaarBack, addressLine1, pincode, latitude, longitude
+                panPic, photo, aadhaarFront, aadhaarBack, addressLine1, pinCode, latitude, longitude
               } = partner;
 
-              // Check photo, panCard, aadhaarFront, aadhaarBack URLs
+              // Check photo, panPic, aadhaarFront, aadhaarBack URLs
               const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
-              if (!urlRegex.test(photo) || !urlRegex.test(aadhaarFront) || !urlRegex.test(aadhaarBack) || !urlRegex.test(panCard)) {
-                throw new Error('Photo, Pancard, Aadhaar Front, and Aadhaar Back must be valid URLs');
+              if (!urlRegex.test(photo) || !urlRegex.test(aadhaarFront) || !urlRegex.test(aadhaarBack) || !urlRegex.test(panPic)) {
+                throw new Error('Photo, panPic, Aadhaar Front, and Aadhaar Back must be valid URLs');
               }
 
               // Check address (non-empty string)
@@ -372,7 +372,7 @@ const gstRegistrationDetails = (typeOfBusiness) => {
 
               // Check pincode (valid format)
               const pincodeRegex = /^\d{6}$/; // Adjust this regex if your pincode format is different
-              if (!pincodeRegex.test(pincode)) {
+              if (!pincodeRegex.test(pinCode)) {
                 throw new Error('Pincode must be a 6-digit number');
               }
 
@@ -445,14 +445,14 @@ const gstRegistrationDetails = (typeOfBusiness) => {
 
             // Validate each item in the array
             value.forEach((director) => {
-              const { panCard, photo, aadhaarBack, aadhaarFront, addressLine1, latitude, longitude, pin } = director;
-              if (!panCard || !photo || !addressLine1 || !latitude || !longitude || !pin || !aadhaarBack || !aadhaarFront) {
+              const { panPic, photo, aadhaarBack, aadhaarFront, addressLine1, latitude, longitude, pinCode } = director;
+              if (!panPic || !photo || !addressLine1 || !latitude || !longitude || !pinCode || !aadhaarBack || !aadhaarFront) {
                 throw new Error('Direcors fields are missing');
               }
 
-              // Check photo and panCard URLs
+              // Check photo and panPic URLs
               const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
-              if (!urlRegex.test(photo) || !urlRegex.test(panCard) || !urlRegex.test(aadhaarBack) || !urlRegex.test(aadhaarFront)) {
+              if (!urlRegex.test(photo) || !urlRegex.test(panPic) || !urlRegex.test(aadhaarBack) || !urlRegex.test(aadhaarFront)) {
                 throw new Error('Photo ,aadhaarBack,aadhaarFront, PAN Card must be valid URLs');
               }
 

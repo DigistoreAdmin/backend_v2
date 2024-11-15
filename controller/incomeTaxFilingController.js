@@ -2,6 +2,8 @@ const catchAsync = require("../utils/catchAsync");
 const Franchise = require("../db/models/franchise");
 const AppError = require("../utils/appError");
 const incomeTaxFilingDetails = require("../db/models/incometax");
+const wallets = require("../db/models/wallet")
+const transationHistory = require("../db/models/transationhistory")
 
 const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
@@ -54,7 +56,7 @@ const createIncomeTaxFiling = catchAsync(async (req, res, next) => {
 
   const {
     customerName,
-    emailId,
+    email,
     phoneNumber,
     panNumber,
     incomeTaxPassword,
@@ -195,7 +197,7 @@ const createIncomeTaxFiling = catchAsync(async (req, res, next) => {
   const newUser = await incomeTaxFilingDetail.create({
     uniqueId,
     customerName,
-    emailId,
+    email,
     phoneNumber,
     panNumber,
     incomeTaxPassword,
@@ -217,4 +219,152 @@ const createIncomeTaxFiling = catchAsync(async (req, res, next) => {
   });
 });
 
-module.exports = createIncomeTaxFiling;
+const incometaxUpdate = catchAsync(async (req, res,next) => {
+  try {
+    const { phoneNumber, status, id, accountNo } = req.body;
+
+    const incomeTaxAcknowledgement = req?.files?.incomeTaxAcknowledgement;
+    const computationFile = req?.files?.computationFile;
+
+    if(!req.files){
+      return res.status(400).json({ message: "Files not uploaded" });
+    }
+
+    const user=req.user
+
+
+    if (!phoneNumber && !id) {
+      return res.status(400).json({ message: "input fields are required" });
+    }
+
+    const incomeTaxFilingDetail = incomeTaxFilingDetails();
+
+    const data = await incomeTaxFilingDetail.findOne({
+      where: {
+        phoneNumber: phoneNumber,
+        id: id,
+      },
+    });
+
+    if (!data) {
+      return res.status(404).json({
+        message: "Record not found",
+      });
+    }
+
+    const franchiseData = await Franchise.findOne({
+      where: { email: user.email },
+    });
+    
+    if (!franchiseData) return next(new AppError("Franchise not found", 404));
+    
+    
+    const walletData = await wallets.findOne({
+      where: { uniqueId: franchiseData.franchiseUniqueId },
+    });
+    
+    if (!walletData) return next(new AppError("Wallet not found", 404));
+
+    const uploadFile = async (file) => {
+      if (file) {
+        try {
+          return await uploadBlob(file);
+        } catch (error) {
+          console.error(Error`uploading file ${file.name}:`, error);
+          throw new Error("File upload failed");
+        }
+      }
+      return null;
+    };
+
+    if (data.typeofTransaction === "salaried"){
+      console.log("Transaction", data.typeofTransaction)
+      totalAmount = 500;
+      franchiseCommission = 100;
+      HOCommission = 400;
+    }
+
+    if(data.typeofTransaction === "business"){
+      totalAmount = 5000;
+      franchiseCommission = 1000;
+      HOCommission = 4000;
+    }
+    else if(data.typeofTransaction === "capitalGain"){
+      totalAmount = 5000;
+      franchiseCommission = 1000;
+      HOCommission = 4000;
+    }
+
+    if(data.typeofTransaction === "other"){
+      totalAmount = 1500;
+      franchiseCommission = 300;
+      HOCommission = 1200;
+    }
+
+    const incomeTaxAcknowledgementUrl = await uploadFile(
+      incomeTaxAcknowledgement
+    );
+    const computationFileUrl = await uploadFile(computationFile);
+
+    const finalStatus = status === "completed" ? "completed" : "inProgress";
+
+    data.status = finalStatus;
+    data.franchiseCommission = franchiseCommission || data.franchiseCommission;
+    data.HOCommission = HOCommission || data.HOCommission;
+    data.totalAmount = totalAmount || data.totalAmount;
+    data.incomeTaxAcknowledgement = incomeTaxAcknowledgementUrl || data.incomeTaxAcknowledgement;
+    data.computationFile = computationFileUrl || data.computationFile;
+
+    
+    if(totalAmount > walletData.balance){
+      return next(new AppError("Insufficient wallet balance", 401));
+      }
+
+    await data.save();
+
+    const newBalance =Math.round(walletData.balance-totalAmount)
+
+    const updated = await wallets.update(
+      { balance: newBalance },
+      { where: { uniqueId: franchiseData.franchiseUniqueId } }
+    );
+
+    const transactionId=generateRandomId()
+
+    const newTransactionHistory = await transationHistory.create({
+      transactionId: transactionId,
+      uniqueId: franchiseData.franchiseUniqueId,
+      userName: franchiseData.franchiseName,
+      userType: user.userType,
+      service: "incomeTax",
+      customerNumber: phoneNumber,
+      serviceNumber: accountNo,
+      serviceProvider: "incomeTax",
+      status: "success",
+      amount: totalAmount,
+      franchiseCommission: franchiseCommission,
+      adminCommission: HOCommission,
+      walletBalance: newBalance,
+    });
+
+    if (newTransactionHistory && updated) {
+      return res.status(200).json({
+        message: "success",
+        data,
+      });
+      }
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred error", error: error.message });
+  }
+});
+
+function generateRandomId() {
+  const prefix = "DSP";
+  const timestamp = Date.now().toString(); 
+  return prefix + timestamp;
+}
+
+module.exports = {createIncomeTaxFiling, incometaxUpdate};

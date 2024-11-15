@@ -37,8 +37,8 @@ const kswiftBooking = catchAsync(async (req, res) => {
   try {
     const {
       customerName,
-      mobileNumber,
-      emailId,
+      phoneNumber,
+      email,
       businessName,
       businessAddressLine1,
       businessAddressLine2,
@@ -68,8 +68,8 @@ const kswiftBooking = catchAsync(async (req, res) => {
     const newKswiftBooking = await kswift.create({
       uniqueId,
       customerName,
-      mobileNumber,
-      emailId,
+      phoneNumber,
+      email,
       businessName,
       businessAddressLine1,
       businessAddressLine2,

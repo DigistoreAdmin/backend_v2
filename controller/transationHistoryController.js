@@ -6,7 +6,7 @@ const Franchise = require("../db/models/franchise");
 
 const transationHistoryAdmin = catchAsync(async (req, res, next) => {
   try {
-    const { sort, filter, search, page, pageLimit } = req.query;
+    const { sort, filter, search, page, pageLimit ,startDate,endDate} = req.query;
 
     if (!page || !pageLimit) {
       return res
@@ -95,6 +95,16 @@ const transationHistoryAdmin = catchAsync(async (req, res, next) => {
       }
     }
 
+    if (startDate && endDate) {
+      where[Op.and] = where[Op.and] || [];
+      
+      where[Op.and].push({
+        createdAt: {
+          [Op.between]: [startDate, endDate]
+        }
+      });
+    }
+
     let order = [["createdAt", "DESC"]];
     const sortOrder = sort ? JSON.parse(sort) : [];
 
@@ -135,7 +145,7 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
   try {
     const user = req.user;
 
-    const { search, filter, sort, page, pageLimit } = req.query;
+    const { search, filter, sort, page, pageLimit ,startDate,endDate} = req.query;
 
     if (!page || !pageLimit) {
       return res
@@ -150,6 +160,7 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
     const offset = (pageNumber - 1) * limit;
 
     const franchise = await Franchise.findOne({ where: { email: user.email } });
+    
     if (!franchise) {
       return res.status(404).json({ message: "Franchise not found" });
     }
@@ -225,6 +236,17 @@ const transactionHistoryFranchise = catchAsync(async (req, res, next) => {
         });
       }
     }
+
+    if (startDate && endDate) {
+      where[Op.and] = where[Op.and] || [];
+      
+      where[Op.and].push({
+        createdAt: {
+          [Op.between]: [startDate, endDate]
+        }
+      });
+    }
+
 
     //sorting based on feild value and order
     let order = [["createdAt", "DESC"]];

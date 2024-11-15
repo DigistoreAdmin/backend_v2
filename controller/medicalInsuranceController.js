@@ -37,7 +37,7 @@ const medicalInsuranceCreate = catchAsync(async (req, res, next) => {
   const {
     customerName,
     phoneNumber,
-    emailId,
+    email,
     individualOrFamily,
     dob,
     preferredHospital,
@@ -54,7 +54,7 @@ const medicalInsuranceCreate = catchAsync(async (req, res, next) => {
     completedOn,
   } = req.body;
 
-  const { aadharFront, aadharBack, pan, bank } = req.files || {};
+  const { aadhaarFront, aadhaarBack, panPic, bank } = req.files || {};
   console.log("Request Body:", req.body);
   console.log("Request Files:", req.files);
 
@@ -73,9 +73,9 @@ const medicalInsuranceCreate = catchAsync(async (req, res, next) => {
   };
   // Upload files
   const fileUrls = await Promise.all([
-    uploadFile(aadharFront),
-    uploadFile(aadharBack),
-    uploadFile(pan),
+    uploadFile(aadhaarFront),
+    uploadFile(aadhaarBack),
+    uploadFile(panPic),
     uploadFile(bank),
   ]);
 
@@ -174,16 +174,13 @@ const medicalInsuranceCreate = catchAsync(async (req, res, next) => {
     workId,
     customerName,
     phoneNumber,
-    emailId,
+    email,
     ...additionalData,
-    aadharFront: fileUrls[0],
-    aadharBack: fileUrls[1],
-    pan: fileUrls[2],
+    aadhaarFront: fileUrls[0],
+    aadhaarBack: fileUrls[1],
+    panPic: fileUrls[2],
     bank: fileUrls[3],
-    assignedId,
     status,
-    assignedOn,
-    completedOn,
     createdAt: new Date(),
     updatedAt: new Date(),
   });

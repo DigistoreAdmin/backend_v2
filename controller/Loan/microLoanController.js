@@ -38,7 +38,7 @@ const createMicroLoan = catchAsync(async (req, res) => {
 
     const {
       customerName,
-      mobileNumber,
+      phoneNumber,
       address,
       pinCode,
       income,
@@ -57,7 +57,7 @@ const createMicroLoan = catchAsync(async (req, res) => {
       status,
     } = req.body;
 
-    const { otherDocuments, bankStatement, aadhaarFront, aadhaarBack, pan } =
+    const { otherDocuments, bankStatement, aadhaarFront, aadhaarBack, panPic } =
       req.files;
 
     if (!req.files) {
@@ -81,7 +81,7 @@ const createMicroLoan = catchAsync(async (req, res) => {
     const bankStatementUrl = await uploadFile(bankStatement);
     const aadhaarFrontUrl = await uploadFile(aadhaarFront);
     const aadhaarBackUrl = await uploadFile(aadhaarBack);
-    const panUrl = await uploadFile(pan);
+    const panUrl = await uploadFile(panPic);
     const otherDocumentsUrl = await uploadFile(otherDocuments);
 
     const user = req.user;
@@ -116,7 +116,7 @@ const createMicroLoan = catchAsync(async (req, res) => {
       uniqueId,
       workId,
       customerName,
-      mobileNumber,
+      phoneNumber,
       address,
       pinCode,
       income,
@@ -124,7 +124,7 @@ const createMicroLoan = catchAsync(async (req, res) => {
       aadhaarFront: aadhaarFrontUrl,
       aadhaarBack: aadhaarBackUrl,
       bankStatement: bankStatementUrl,
-      pan: panUrl,
+      panPic: panUrl,
       otherDocuments: otherDocumentsUrl,
       emiAmount,
       collectionPoint,

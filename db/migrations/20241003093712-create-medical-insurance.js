@@ -20,7 +20,7 @@ module.exports = {
       phoneNumber: {
         type: Sequelize.BIGINT,
       },
-      emailId: {
+      email: {
         type: Sequelize.STRING,
       },
       individualOrFamily: {
@@ -50,13 +50,13 @@ module.exports = {
       familyDetails: {
         type: Sequelize.JSONB,
       },
-      aadharFront: {
+      aadhaarFront: {
         type: Sequelize.STRING,
       },
-      aadharBack: {
+      aadhaarBack: {
         type: Sequelize.STRING,
       },
-      pan: {
+      panPic: {
         type: Sequelize.STRING,
       },
       bank: {
@@ -72,7 +72,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","rejected"),
         defaultValue: "inQueue",
       },
       assignedOn: {

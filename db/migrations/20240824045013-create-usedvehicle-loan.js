@@ -18,10 +18,10 @@ module.exports = {
       customerName: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
-      emailId: {
+      email: {
         type: Sequelize.STRING,
       },
       typeofLoan: {
@@ -69,8 +69,45 @@ module.exports = {
       acknowledgment: {
         type: Sequelize.STRING,
       },
+      loanStatus: {
+        type: Sequelize.JSONB,
+        defaultValue: {
+          documentSubmittedToBank: false,
+          bankVerified: false,
+          bankApprovalOrReject: false,
+          loanDispersed: false,
+          commissionCredited: false
+        },
+      },
+      rejectReason: {
+        type: Sequelize.STRING
+      },
+      bankDetails: {
+        type: Sequelize.STRING
+      },
+      loanGivenByBank: {
+        type: Sequelize.BIGINT
+      },
+      doneBy: {
+        type: Sequelize.STRING
+      },
+      serviceCharge: {
+        type: Sequelize.INTEGER
+      },
+      commissionToFranchise: {
+        type: Sequelize.INTEGER
+      },
+      commissionToHO: {
+        type: Sequelize.INTEGER
+      },
+      otherPayments: {
+        type: Sequelize.STRING
+      },
+      otherDocumentsByStaff: {
+        type: Sequelize.STRING
+      },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "Completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","rejected"),
         defaultValue: "inQueue",
       },
       assignedId: {
@@ -83,15 +120,12 @@ module.exports = {
         type: Sequelize.DATE,
       },
       createdAt: {
-        allowNull: false,
         type: Sequelize.DATE,
       },
       updatedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
       },
       deletedAt: {
-        allowNull: false,
         type: Sequelize.DATE,
       },
     });

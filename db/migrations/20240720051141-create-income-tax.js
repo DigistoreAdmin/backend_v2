@@ -18,7 +18,7 @@ module.exports = {
       customerName: {
         type: Sequelize.STRING,
       },
-      emailId: {
+      email: {
         type: Sequelize.STRING,
       },
       phoneNumber: {
@@ -126,9 +126,6 @@ module.exports = {
       otherDetails: {
         type: Sequelize.ARRAY(STRING),
       },
-      status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed"),
-      },
       workId: {
         type: Sequelize.STRING,
       },
@@ -138,14 +135,26 @@ module.exports = {
       incomeTaxAcknowledgement: {
         type: Sequelize.STRING,
       },
-      franchiseCommission: {
-        type: Sequelize.DECIMAL,
+      commissionToFranchise: {
+        type: Sequelize.INTEGER,
       },
-      HOCommission: {
-        type: Sequelize.DECIMAL,
+      commissionToHO: {
+        type: Sequelize.INTEGER,
       },
       totalAmount: {
         type: Sequelize.DECIMAL,
+      },
+      assignedId:{
+        type: Sequelize.INTEGER
+      },
+      status:{
+        type:Sequelize.ENUM("inQueue","inProgress","completed","rejected")
+      },
+      assignedOn:{
+        type: Sequelize.DATE
+      },
+      completedOn:{
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,

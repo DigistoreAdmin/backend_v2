@@ -1,9 +1,9 @@
 'use strict';
-const { Model, DataTypes } = require('sequelize');
+const { Model, DataTypes ,Op} = require('sequelize');
 const sequelize = require('../../config/database');
 
 const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
-  console.log(panType);
+  console.log("panType", panType);
 
   const allowNullForNewPan = panType === "newPancard" ? false : true
   const allowN = isCollege === 'true' ? false : true;
@@ -13,6 +13,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
   const allowNullVe = panType === "duplicateOrChangePancard" ? false : true;
   const allow = panType === "minorPancard" ? false : true;
   const allowNullV = panType === "NRIPancard" ? false : true;
+  const allowNullPOI = panType === "NRIPancard" ? true : false;
+  const allowNullPS = panType === "minorPancard" ? true : false;
+  const allowS = panType === "NRIPancard" ? true : false;
+  console.log("allows", allowS)
 
   const PancardUser = sequelize.define('pancardUser', {
     id: {
@@ -35,8 +39,12 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    workId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     status: {
-      type: DataTypes.ENUM('inQueue', 'inProgress', 'completed','onHold','reject'),
+      type: DataTypes.ENUM('inQueue', 'inProgress', 'completed','onHold','rejected'),
       allowNull: false,
       defaultValue: 'inQueue',
     },
@@ -47,12 +55,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     assignedOn: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     completedOn: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     customerName: {
       type: DataTypes.STRING,
@@ -63,7 +69,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
         }
       }
     },
-    emailID: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -82,7 +88,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: {
@@ -109,9 +115,9 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
         }
       }
     },
-    proofOfIdentity: {
+    aadhaarNumber: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: allowS,
     },
     proofOfDOB: {
       type: DataTypes.STRING,
@@ -120,6 +126,22 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     proofOfAddress: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    photo: {
+      type: DataTypes.STRING,
+      allowNull: allowNullPS,
+    },
+    signature: {
+      type: DataTypes.STRING,
+      allowNull: allowNullPS,
+    },
+    aadhaarFront: {
+      type: DataTypes.STRING,
+      allowNull: allowNullPOI,
+    },
+    aadhaarBack: {
+      type: DataTypes.STRING,
+      allowNull: allowNullPOI,
     },
 
     // Fields specific to 'new' PAN
@@ -158,11 +180,6 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       }
     },
 
-    panNumber: {
-      type: DataTypes.STRING,
-      allowNull: allowNullVe,
-    },
-
     // Fields specific to 'duplicate' PAN
     reasonForDuplicate: {
       type: DataTypes.STRING,
@@ -171,6 +188,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
 
     // Fields specific to 'change' PAN
 
+    panNumber: {
+      type: DataTypes.STRING,
+      allowNull: allowsNew,
+    },
     nameChange: {
       type: DataTypes.STRING,
       allowNull: allowsNew,
@@ -183,18 +204,43 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       type: DataTypes.STRING,
       allowNull: allowsNew,
     },
-    signatureChange: {
-      type: DataTypes.STRING,
-      allowNull: allowsNew,
-    },
-    photoChange: {
-      type: DataTypes.STRING,
-      allowNull: allowsNew,
-    },
     changeFatherName:{
       type: DataTypes.STRING,
       allowNull: allowsNew,
     },
+
+    // Fields specific to 'minor' PAN
+    representativeName: {
+      type: DataTypes.STRING,
+      allowNull: allow,
+    },
+      representativeRelation:{
+        type: DataTypes.STRING,
+        allowNull: allow,
+      },
+      representativeAadhaarFront: {
+        type: DataTypes.STRING,
+        allowNull: allow,
+      },
+      representativeAadhaarBack: {
+        type: DataTypes.STRING,
+        allowNull: allow,
+      },
+      representativeSignature: {
+        type: DataTypes.STRING,
+        allowNull: allow,
+      },
+
+    // Field specific to 'NRI' PAN
+    abroadAddress: {
+      type: DataTypes.STRING,
+      allowNull: allowNullV,
+    },
+    proofOfIdentity: {
+      type: DataTypes.STRING,
+      allowNull: allowNullV,
+    },
+    
     acknowledgementNumber:{
       type: DataTypes.INTEGER,
       allowNull:true
@@ -208,33 +254,21 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       allowNull:true
     },
     ePan:{
-      type: DataTypes.ENUM("received","notReceived"),
+      type: DataTypes.BOOLEAN,
+      defaultValue:"false",
       allowNull:true
     },
-   
-
-    // Fields specific to 'minor' PAN
-    representativeName: {
-      type: DataTypes.STRING,
-      allowNull: allow,
+    commissionToHO: {
+      type: DataTypes.DECIMAL,
+      allowNull:true
     },
-    representativeAddress: {
-        type: DataTypes.STRING,
-        allowNull:allow,
-      },
-      representativeRelatiion:{
-        type: DataTypes.STRING,
-        allowNull: allow,
-      },
-      representativeDocument: {
-        type: DataTypes.STRING,
-        allowNull: allow,
-      },
-
-    // Field specific to 'NRI' PAN
-    nriAddress: {
-      type: DataTypes.STRING,
-      allowNull: allowNullV,
+    commissionToFranchise: {
+      type: DataTypes.DECIMAL,
+      allowNull:true
+    },
+    totalAmount: {
+      type: DataTypes.DECIMAL,
+      allowNull:true
     },
     createdAt: {
       allowNull: false,
@@ -252,7 +286,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
   }, {
     paranoid: true,
     freezeTableName: true,
-    modelName: 'pancardUser'
+    modelName: 'pancardUser',
   });
 
   return PancardUser;

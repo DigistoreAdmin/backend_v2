@@ -12,6 +12,18 @@ module.exports = {
       uniqueId: {
         type: Sequelize.STRING
       },
+      assignedId: {
+        type: Sequelize.STRING,
+      },
+      assignedOn: {
+        type: Sequelize.DATE,
+      },
+      completedOn: {
+        type: Sequelize.DATE,
+      },
+      workId: {
+        type: Sequelize.STRING,
+      },
       customerName: {
         type: Sequelize.STRING
       },
@@ -21,7 +33,7 @@ module.exports = {
       businessType: {
         type: Sequelize.ENUM("proprietary","partnership","company")
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT
       },
       email: {

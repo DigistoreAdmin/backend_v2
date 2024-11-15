@@ -326,10 +326,10 @@ const creatFranchise = catchAsync(async (req, res, next) => {
 });
 
 const updateFranchise = catchAsync(async (req, res, next) => {
+
   try {
+
     const {
-      franchiseUniqueId,
-      email,
       franchiseAddressLine1,
       franchiseAddressLine2,
       state,
@@ -340,32 +340,16 @@ const updateFranchise = catchAsync(async (req, res, next) => {
       ward,
       digitalElements,
       panCenter,
-
+      businessType,
     } = req.body;
 
-    const transaction = await sequelize.transaction();
-    
-      const shopPic = req?.files?.shopPic
+    const users = req.user;
 
-    const uploadFile = async (file) => {
-      if (file) {
-        try {
-          return await uploadBlob(file);
-        } catch (error) {
-          console.error(`Error uploading file ${file.name}:`, error);
-          // return null;
-        }
-      } else {
-        console.error('File is missing:', file);
-        // return null;
-      }
-    };
-
-    const shopPicUrl = await uploadFile(shopPic);
+    console.log("ser.franchiseUniqueId", users.email)
+    console.log("User", users)
 
     const franchise = await Franchise.findOne({
-      where: { franchiseUniqueId },
-      transaction,
+      where: { email: users.email },
     });
 
     if (!franchise) {
@@ -374,9 +358,31 @@ const updateFranchise = catchAsync(async (req, res, next) => {
         .json({ success: false, message: "Franchise not found" });
     }
 
+    const franchiseUniqueId = franchise.franchiseUniqueId
+
+    console.log("Franchisse", franchiseUniqueId)
+    console.log("email", franchise.email)
+    
+    //   const shopPic = req?.files?.shopPic
+
+    // const uploadFile = async (file) => {
+    //   if (file) {
+    //     try {
+    //       return await uploadBlob(file);
+    //     } catch (error) {
+    //       console.error(`Error uploading file ${file.name}:`, error);
+    //       // return null;
+    //     }
+    //   } else {
+    //     console.error('File is missing:', file);
+    //     // return null;
+    //   }
+    // };
+
+    // const shopPicUrl = await uploadFile(shopPic);
+
     const updatedFranchise = await Franchise.update(
       {
-        email,
         franchiseAddressLine1,
         franchiseAddressLine2,
         state,
@@ -387,47 +393,28 @@ const updateFranchise = catchAsync(async (req, res, next) => {
         ward,
         digitalElements,
         panCenter,
-        shopPic: shopPicUrl,
+        businessType,
+        // shopPic: shopPicUrl,
       },
       {
-        where: { franchiseUniqueId },
+        where: { franchiseUniqueId: franchiseUniqueId },
       },
-      transaction,
     );
 
     if (!updatedFranchise) {
-      await transaction.rollback();
       throw new AppError("Failed to update the franchise", 400);
     }
 
-    const updateUser = await user.update(
-      {
-        email,
-      },
-      {
-        where: {
-          email: franchise.email,
-          phoneNumber: franchise.phoneNumber,
-        },
-      },
-      transaction,
-    )
-
-    if (!updateUser){
-      await transaction.rollback();
-      throw new AppError("Failed to update user details", 400);
-    }
-
     const updatedFranchises = await Franchise.findOne({
-      where: { franchiseUniqueId },
+      where: { franchiseUniqueId: franchiseUniqueId },
     });
 
-    await transaction.commit();
     return res.status(200).json({
       success: true,
       message: "Franchise updated successfully",
       updatedFranchises,
     });
+
   } catch (error) {
     console.error("Error:", error);
     return next(new AppError(error.message, 500));

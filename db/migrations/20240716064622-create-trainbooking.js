@@ -33,6 +33,18 @@ module.exports = {
       startDate: {
         type: Sequelize.DATE
       },
+      bookingType:{
+        type: Sequelize.ENUM("1","2")
+      },
+      returnDate:{
+        type: Sequelize.DATE,
+      },
+      ticketType:{
+        type: Sequelize.ENUM("General","Ladies","Lower berth","Person with disability","Duty pass","Tatkal","Premium tatkal"),
+      },
+      coachType:{
+        type: Sequelize.ENUM("Anubhuti Class(EA)","AC First Class(1A)","Vistadome AC(EV)","Exec. Chair Car(EC)","AC 2 Tier(2A)","First Class(FC)","AC 3 Tier(3A)","AC 3 Economy(3E)","Vistadome Chair Car(VC)","AC Chair Car(CC)","Sleeper(SL)","Vistadome Non AC(VS)","Second Sitting(2S)",),
+      },
       preference: {
         type: Sequelize.STRING
       },
@@ -40,7 +52,7 @@ module.exports = {
         type: Sequelize.JSONB
       },
       status: {
-        type: Sequelize.ENUM("inQueue","inProgress","completed")
+        type: Sequelize.ENUM("inQueue","inProgress","completed","rejected")
       },
       assignedId: {
         type: Sequelize.STRING
@@ -66,7 +78,7 @@ module.exports = {
       commissionToFranchise:{
         type:Sequelize.INTEGER,
       },
-      commissionToHeadOffice:{
+      commissionToHO:{
         type:Sequelize.INTEGER,
       },
       totalAmount:{

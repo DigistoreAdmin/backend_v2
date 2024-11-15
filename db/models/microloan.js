@@ -39,7 +39,7 @@ const microLoans = sequelize.define(
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: {
@@ -86,7 +86,7 @@ const microLoans = sequelize.define(
         },
       },
     },
-    pan: {
+    panPic: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -164,7 +164,7 @@ const microLoans = sequelize.define(
       },
     },
     status: {
-      type: DataTypes.ENUM("inQueue", "inProgress", "Completed"),
+      type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
       allowNull: true,
       defaultValue: "inQueue",
     },

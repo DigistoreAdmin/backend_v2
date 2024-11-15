@@ -1,8 +1,15 @@
 'use strict';
-const { Model, DataTypes } = require('sequelize');
+const { Model, DataTypes, Op } = require('sequelize');
 const sequelize = require('../../config/database');
 
-module.exports = sequelize.define(
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
+
+const fssaiLicences = sequelize.define(
   'fssaiLicences',
   {
     uniqueId: {
@@ -23,6 +30,22 @@ module.exports = sequelize.define(
       primaryKey: true,
       type: DataTypes.INTEGER,
     },
+    assignedId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    assignedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    completedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    workId: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     customerName: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -35,22 +58,22 @@ module.exports = sequelize.define(
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: {
         notNull: {
-          msg: 'Mobile number cannot be null',
+          msg: 'Phone number cannot be null',
         },
         notEmpty: {
-          msg: 'Mobile number cannot be empty',
+          msg: 'Phone number cannot be empty',
         },
         isNumeric: {
-          msg: 'Mobile number must contain only numbers',
+          msg: 'Phone number must contain only numbers',
         },
         len: {
           args: [10, 15],
-          msg: 'Mobile number must be between 10 and 15 digits',
+          msg: 'Phone number must be between 10 and 15 digits',
         },
       },
     },
@@ -101,7 +124,7 @@ module.exports = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    pincode: {
+    pinCode: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -146,7 +169,7 @@ module.exports = sequelize.define(
         },
       },
     },
-    panCard: {
+    panPic: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -191,5 +214,29 @@ module.exports = sequelize.define(
     paranoid: true,
     freezeTableName: true,
     modelName: 'fssaiLicences',
+    hooks: {
+      beforeValidate: async (fssai) => {
+        const currentDate = getCurrentDate();
+        const code = "FSL";
+        const lastPan = await fssaiLicences.findOne({
+          where: {
+            workId: {
+              [Op.like]: `${currentDate}${code}%`,
+            },
+          },
+          order: [["createdAt", "DESC"]],
+        });
+
+        let newIncrement = "001";
+        if (lastPan) {
+          const lastIncrement = parseInt(lastPan.workId.slice(-3));
+          newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+        }
+
+        fssai.workId = `${currentDate}${code}${newIncrement}`;
+      },
+    },
   }
 )
+
+module.exports = fssaiLicences;

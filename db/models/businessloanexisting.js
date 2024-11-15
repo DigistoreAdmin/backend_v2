@@ -4,8 +4,8 @@ const sequelize = require('../../config/database');
 
 const businessLoanExistingDetails = (cibil) => {
 
-  const cibilNullVal = cibil === 'approved' ? false : true
-  const cibilAcknowledgementNullVal = cibil === 'noCibil' ? false : true
+  const cibilNullVal = cibil === 'true' ? false : true
+  const cibilAcknowledgementNullVal = cibil === 'false' ? false : true
 
   const businessLoanExisting = sequelize.define(
     'businessLoanExisting',
@@ -69,22 +69,22 @@ const businessLoanExistingDetails = (cibil) => {
           },
         },
       },
-      mobileNumber: {
+      phoneNumber: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           notNull: {
-            msg: 'Customer mobile number cannot be null',
+            msg: 'Phone number cannot be null',
           },
           notEmpty: {
-            msg: 'Customer mobile number cannot be empty',
+            msg: 'Phone number cannot be empty',
           },
           isNumeric: {
-            msg: 'Customer mobile number must contain only numbers',
+            msg: 'Phone number must contain only numbers',
           },
           len: {
             args: [10, 15],
-            msg: 'Customer mobile number must be between 10 and 15 digits',
+            msg: 'Phone number must be between 10 and 15 digits',
           },
         },
       },
@@ -104,7 +104,7 @@ const businessLoanExistingDetails = (cibil) => {
         },
       },
       cibil: {
-        type: DataTypes.ENUM("approved", "noCibil"),
+        type: DataTypes.BOOLEAN,
         allowNull: false,
         validate: {
           notNull: {
@@ -365,7 +365,7 @@ const businessLoanExistingDetails = (cibil) => {
         allowNull: true,
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         allowNull: false,
         defaultValue: "inQueue"
       },

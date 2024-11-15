@@ -48,7 +48,7 @@ const medicalInsuranceData = (individualOrFamily) => {
           },
         },
       },
-      emailId: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -119,15 +119,15 @@ const medicalInsuranceData = (individualOrFamily) => {
         },
       },
       //documents of nominee
-      aadharFront: {
+      aadhaarFront: {
         type: DataTypes.STRING,
         allowNull: allowNullIndividual,
       },
-      aadharBack: {
+      aadhaarBack: {
         type: DataTypes.STRING,
         allowNull: allowNullIndividual,
       },
-      pan: {
+      panPic: {
         type: DataTypes.STRING,
         allowNull: allowNullIndividual,
       },
@@ -145,20 +145,20 @@ const medicalInsuranceData = (individualOrFamily) => {
       },
       assignedId: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       status: {
-        allowNull: false,
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        allowNull: true,
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         defaultValue: "inQueue",
       },
       assignedOn: {
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.DATE,
       },
       completedOn: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       createdAt: {
         allowNull: false,

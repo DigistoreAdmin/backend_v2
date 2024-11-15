@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "completed","onHold","reject"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed","onHold","rejected"),
       },
       assignedId: {
         type: Sequelize.STRING,
@@ -24,16 +24,19 @@ module.exports = {
       completedOn: {
         type: Sequelize.DATE,
       },
+      workId: {
+        type: Sequelize.STRING,
+      },
       oldPassportNumber: {
         type: Sequelize.STRING,
       },
       customerName: {
         type: Sequelize.STRING,
       },
-      customerEmail: {
+      email: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
       educationQualification: {
@@ -111,6 +114,9 @@ module.exports = {
       passportFile: {
         type: Sequelize.STRING,
       },
+      rejectReason:{
+        type:Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -124,6 +130,7 @@ module.exports = {
       },
     });
   },
+  
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable("passport");
   },

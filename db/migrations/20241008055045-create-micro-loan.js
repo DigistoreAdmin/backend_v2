@@ -18,7 +18,7 @@ module.exports = {
       customerName: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
       address: {
@@ -39,7 +39,7 @@ module.exports = {
       aadhaarBack: {
         type: Sequelize.STRING,
       },
-      pan: {
+      panPic: {
         type: Sequelize.STRING,
       },
       bankStatement: {
@@ -82,7 +82,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
       status: {
-        type: Sequelize.ENUM("inQueue", "inProgress", "Completed"),
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed", "rejected"),
         defaultValue: "inQueue",
       },
       createdAt: {

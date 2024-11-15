@@ -12,13 +12,25 @@ module.exports = {
       uniqueId: {
         type: Sequelize.STRING,
       },
+      assignedId: {
+        type: Sequelize.STRING,
+      },
+      assignedOn: {
+        type: Sequelize.DATE,
+      },
+      completedOn: {
+        type: Sequelize.DATE,
+      },
+      workId: {
+        type: Sequelize.STRING,
+      },
       customerName: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
-      emailId: {
+      email: {
         type: Sequelize.STRING,
       },
       businessName: {
@@ -29,6 +41,16 @@ module.exports = {
       },
       businessAddressLine2: {
         type: Sequelize.STRING,
+      },
+      status: {
+        type: Sequelize.ENUM(
+          "inQueue",
+          "inProgress",
+          "completed",
+          "onHold",
+          "rejected"
+        ),
+        default: "inQueue",
       },
       pinCode: {
         type: Sequelize.INTEGER,

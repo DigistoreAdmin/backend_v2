@@ -44,7 +44,7 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
         allowNull: true,
       },
       status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed"),
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
         allowNull:false,
         defaultValue: "inQueue",
       },
@@ -57,7 +57,7 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
           },
         },
       },
-      mobileNumber: {
+      phoneNumber: {
         type: DataTypes.BIGINT,
         validate: {
           isInt: {
@@ -69,7 +69,7 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
           },
         },
       },
-      emailId: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -96,6 +96,20 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
           "standAlone"
         ),
         allowNull: false,
+      },
+      anyClaims: {
+        type: DataTypes.BOOLEAN,
+        allowNull:false,
+        validate: {
+          isIn: {
+            args: [[true, false]],
+            msg: "anyClaims value must be true or false",
+          }
+        }
+      },
+      previousPolicyDocument: {
+        type:DataTypes.STRING,
+        allowNull:true,
       },
       rcFront: {
         type: DataTypes.STRING,
@@ -171,7 +185,7 @@ const defineVehicleInsurance = (commercialOrType2Vehicle, isPolicyExpired) => {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },
-      commissionToHeadOffice: {
+      commissionToHO: {
         type: DataTypes.DECIMAL,
         allowNull: true,
       },

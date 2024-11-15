@@ -12,10 +12,22 @@ module.exports = {
       uniqueId: {
         type: Sequelize.STRING
       },
+      assignedId: {
+        type: Sequelize.STRING,
+      },
+      assignedOn: {
+        type: Sequelize.DATE,
+      },
+      completedOn: {
+        type: Sequelize.DATE,
+      },
+      workId: {
+        type: Sequelize.STRING,
+      },
       customerName: {
         type: Sequelize.STRING
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT
       },
       email: {
@@ -24,10 +36,10 @@ module.exports = {
       businessName: {
         type: Sequelize.STRING
       },
-      addressLine1: {
+      businessAddressLine1: {
         type: Sequelize.STRING
       },
-      addressLine2: {
+      businessAddressLine2: {
         type: Sequelize.STRING
       },
       pinCode: {
@@ -69,7 +81,7 @@ module.exports = {
       aadhaarBack: {
         type: Sequelize.STRING
       },
-      pancard: {
+      panPic: {
         type: Sequelize.STRING
       },
       createdAt: {

@@ -14,8 +14,11 @@ module.exports = {
       uniqueId: {
         type:Sequelize.STRING,
       },
+      workId: {
+        type: Sequelize.STRING,
+      },
       status:{
-        type: Sequelize.ENUM('inQueue','inProgress','completed',"onHold","reject"),
+        type: Sequelize.ENUM('inQueue','inProgress','completed',"onHold","rejected"),
         default:'inQueue',
       },
       assignedId:{
@@ -33,22 +36,34 @@ module.exports = {
       customerName: {
         type: Sequelize.STRING,
       },
-      emailID: {
+      email: {
         type: Sequelize.STRING,
       },
-      mobileNumber: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
       },
       fatherName: {
         type: Sequelize.STRING,
       },
-      proofOfIdentity: {
+      aadhaarNumber: {
+        type: Sequelize.STRING,
+      },
+      aadhaarFront: {
+        type: Sequelize.STRING,
+      },
+      aadhaarBack: {
         type: Sequelize.STRING,
       },
       proofOfDOB: {
         type: Sequelize.STRING,
       },
       proofOfAddress: {
+        type: Sequelize.STRING,
+      },
+      photo: {
+        type: Sequelize.STRING,
+      },
+      signature: {
         type: Sequelize.STRING,
       },
 
@@ -88,12 +103,6 @@ module.exports = {
       dobChange: {
         type: Sequelize.STRING,
       },
-      signatureChange: {
-        type: Sequelize.STRING,
-      },
-      photoChange: {
-        type: Sequelize.STRING,
-      },
       changeFatherName:{
         type: Sequelize.STRING,
       },
@@ -102,39 +111,54 @@ module.exports = {
       representativeName: {
         type: Sequelize.STRING,
       },
-      representativeAddress: {
+      representativeRelation:{
         type: Sequelize.STRING,
       },
-      representativeRelatiion:{
+      representativeAadhaarFront: {
         type: Sequelize.STRING,
       },
-      representativeDocument: {
+      representativeAadhaarBack: {
         type: Sequelize.STRING,
       },
+      representativeSignature: {
+        type: Sequelize.STRING,
+      },
+
+
       // Field specific to 'NRI' PAN
-      nriAddress: {
+      abroadAddress: {
         type: Sequelize.STRING,
       },
+      proofOfIdentity: {
+        type: Sequelize.STRING,
+      },
+      
       acknowledgementNumber:{
         type: Sequelize.INTEGER,
-        allowNull:true
       },
       acknowledgementFile:{
         type: Sequelize.STRING,
-        allowNull:true
       },
       reason:{
         type: Sequelize.STRING,
-        allowNull:true
       },
       ePan:{
-        type: Sequelize.ENUM("received","notReceived"),
-        allowNull:true
+        type: Sequelize.BOOLEAN,
+      },
+      commissionToHO: {
+        type: Sequelize.DECIMAL,
+       
+      },
+      commissionToFranchise: {
+        type: Sequelize.DECIMAL,
+        
+      },
+      totalAmount: {
+        type: Sequelize.DECIMAL,
       },
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
-        allowNull: false,
       },
       updatedAt: {
         type: Sequelize.DATE,

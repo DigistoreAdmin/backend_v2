@@ -17,7 +17,9 @@ const {
   fetchUdyamRegistrationDetails,
   fetchFinancialStatements,
   fetchCompanyFormationDetails,
-  getVehicleInsurance
+  getVehicleInsurance,
+  getAllWorks,
+  getAllWorksByStaffId
 } = require("../controller/fetchServicesController");
 
 
@@ -65,4 +67,9 @@ route.route("/getUdyamRegistration").get(verifyToken, verifyRefreshToken,fetchUd
 route.route("/getFinancialStatements").get(verifyToken, verifyRefreshToken,fetchFinancialStatements);
 route.route("/getCompanyFormationDetails").get(verifyToken, verifyRefreshToken,fetchCompanyFormationDetails);
 route.route("/getVehicleInsurance").get(verifyToken, verifyRefreshToken, getVehicleInsurance);
+
+
+route.route("/getAllWorks").get(verifyToken,verifyRefreshToken,getAllWorks)
+route.route("/getAllWorksByStaffId").get(verifyToken,verifyRefreshToken,getAllWorksByStaffId)
+
 module.exports = route;

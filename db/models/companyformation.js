@@ -1,7 +1,15 @@
 "use strict";
-const { Model,DataTypes } = require("sequelize");
+const { Model,DataTypes, Op } = require("sequelize");
 const sequelize=require('../../config/database')
-module.exports = sequelize.define(
+
+const getCurrentDate = () => {
+  const date = new Date();
+  return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}${date.getFullYear()}`;
+};
+
+const CompanyFormations = sequelize.define(
   "companyFormations",{
     id:{
       allowNull: false,
@@ -12,6 +20,22 @@ module.exports = sequelize.define(
     uniqueId:{
       type:DataTypes.STRING,
       allowNull: false,
+    },
+    assignedId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    assignedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    completedOn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    workId: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     customerName: {
       type: DataTypes.STRING,
@@ -25,7 +49,7 @@ module.exports = sequelize.define(
         },
       },
     },
-    mobileNumber: {
+    phoneNumber: {
       type: DataTypes.BIGINT,
       allowNull: false,
             validate: {
@@ -230,5 +254,29 @@ module.exports = sequelize.define(
     paranoid: true,
     freezeTableName: true,
     modelName: "companyFormations",
+    hooks: {
+      beforeValidate: async (company) => {
+        const currentDate = getCurrentDate();
+        const code = "CFO";
+        const lastPan = await CompanyFormations.findOne({
+          where: {
+            workId: {
+              [Op.like]: `${currentDate}${code}%`,
+            },
+          },
+          order: [["createdAt", "DESC"]],
+        });
+
+        let newIncrement = "001";
+        if (lastPan) {
+          const lastIncrement = parseInt(lastPan.workId.slice(-3));
+          newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
+        }
+
+        company.workId = `${currentDate}${code}${newIncrement}`;
+      },
+    },
   }
 )
+
+module.exports = CompanyFormations;

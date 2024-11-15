@@ -291,7 +291,7 @@ const login = catchAsync(async (req, res, next) => {
         return next(new AppError("phoneNumber not exist", 401));
       }
       const { accessToken, refreshToken } = await Tokens.generateTokens({
-        email: existingUser.emailId,
+        email: existingUser.email,
         userType: data.userType,
       });
       const { password, ...sanitizedDataValues } = existingUser.dataValues;
@@ -439,5 +439,5 @@ module.exports = {
   restrictTo,
   verifyOTP,
   logout,
-  changePassword
+  changePassword,
 };
