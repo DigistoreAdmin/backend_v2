@@ -12,7 +12,7 @@ module.exports = sequelize.define(
       type: DataTypes.INTEGER,
     },
     route: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     response: {
