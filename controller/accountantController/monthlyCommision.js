@@ -15,11 +15,16 @@ const getMonthlyCommissions = catchAsync(async (req, res) => {
                 [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('franchiseCommission')), 0), 'total_franchise_commission'],
                 [Sequelize.fn('COALESCE', Sequelize.fn('SUM', Sequelize.col('adminCommission')), 0), 'total_admin_commission'],
             ],
-            where: Sequelize.where(
-                Sequelize.fn('DATE_TRUNC', 'month', Sequelize.col('createdAt')),
-                '=',
-                Sequelize.literal(`TO_DATE('${year}-${month}', 'YYYY-MM')`)
-            ),
+            where: {
+                status: 'success', // Add this condition to filter by status
+                [Sequelize.Op.and]: [
+                    Sequelize.where(
+                        Sequelize.fn('DATE_TRUNC', 'month', Sequelize.col('createdAt')),
+                        '=',
+                        Sequelize.literal(`TO_DATE('${year}-${month}', 'YYYY-MM')`)
+                    )
+                ]
+            },
             raw: true,
         });
 
