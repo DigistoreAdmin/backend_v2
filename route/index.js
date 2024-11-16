@@ -62,7 +62,7 @@ const checkIntentStatusRoute = require("../route/upiPaymentRoute/checkIntentStat
 const checkStatusRoute =require("../route/upiPaymentRoute/checkStatusRoute")
 const payOrderRoute = require("../route/upiPaymentRoute/payOrderRoute")
 const upiIntentRoute = require("../route/upiPaymentRoute/upiIntentRoute")
-
+const getMonthlyCommissionsRoute=require("./accountantRoute/monthlyCommisionRoute")
 
 
 
@@ -136,7 +136,7 @@ router.use("/v1/upiPayment", checkIntentStatusRoute)
 router.use("/v1/checkStatusRoute",checkStatusRoute)
 router.use("/v1/payOrder",payOrderRoute )
 router.use("/v1/upiIntent",upiIntentRoute )
-
+router.use("/v1/MonthlyCommissions",getMonthlyCommissionsRoute)
 
 
 
