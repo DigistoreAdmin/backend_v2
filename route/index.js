@@ -51,6 +51,7 @@ const contactRoute = require("../route/contactRoute");
 const medicalInsuranceRoute = require("../route/medicalInsuranceRoute");
 const microLoanRoute = require("../route/Loan/microLoanRoute");
 const microLoanShopRoute = require("../route/Loan/microLoanShopRoute");
+const reassignRoute=require("../route/reAssignRoute")
 const staffMonitoringRoute = require("./workMonitoringRoute")
 const staffUpdateLoanRoute = require("../route/Loan/staffUpdateRouter");
 const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute");
@@ -63,6 +64,7 @@ const checkIntentStatusRoute = require("../route/upiPaymentRoute/checkIntentStat
 const checkStatusRoute =require("../route/upiPaymentRoute/checkStatusRoute")
 const payOrderRoute = require("../route/upiPaymentRoute/payOrderRoute")
 const upiIntentRoute = require("../route/upiPaymentRoute/upiIntentRoute")
+
 
 
 
@@ -127,6 +129,7 @@ router.use("/v1/contactRoute", contactRoute);
 router.use("/v1/medicalRoute", medicalInsuranceRoute);
 router.use("/v1/microLoanRoute", microLoanRoute);
 router.use("/v1/microLoanShopRoute", microLoanShopRoute);
+router.use("/v1/reassignRoute", reassignRoute)
 router.use ("/v1/workMonitoring", staffMonitoringRoute)
 router.use("/v1/staffUpdateLoanRoute", staffUpdateLoanRoute);
 router.use("/v1/insurance", vehicleInsuranceRoute);
