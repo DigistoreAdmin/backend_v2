@@ -8,6 +8,36 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const crypto = require("crypto")
 
+const kswift = require("../db/models/kswift");
+const trainBooking = require("../db/models/trainbooking")
+const udyamRegistrations = require("../db/models/udyamregistration");
+const financialstatements = require("../db/models/financialstatements");
+const companyFormations = require("../db/models/companyformation")
+const BusBooking = require("../db/models/busbooking");
+const fssaiRegistrations = require("../db/models/fssairegistration");
+const fssaiLicences = require("../db/models/fssailicence");
+const gstRegistrationDetails = require("../db/models/gstregistration");
+const gstFilings = require("../db/models/gstfiling");
+const incomeTaxFilingDetails = require("../db/models/incometax");
+const partnerShipDeedTable = require("../db/models/partnershipdeedpreperation");
+const packingLicence = require("../db/models/packinglicences");
+const defineVehicleInsurance = require("../db/models/vehicleInsurance")
+const loanAgainstProperty = require("../db/models/loanAgainstProperty");
+const defineBusinessLoanUnscuredExisting = require("../db/models/BusinessLoanUnsecuredExisting");
+const defineHousingLoan = require("../db/models/HousingLoan");
+const defineBusinessLoanNewSecured = require("../db/models/businessLoanNewSecured");
+const newVehicleLoan = require("../db/models/newvehicleloan");
+const usedVehicleLoan = require("../db/models/vehicleloanused");
+const definePersonalLoan = require("../db/models/personalloan");
+const defineBusinessLoanUnsecuredNew = require("../db/models/businessloanunsecurednew");
+const businessLoanExistingDetails = require("../db/models/businessloanexisting")
+const definePancardUser = require("../db/models/pancard");
+const definePassportDetails = require("../db/models/passport");
+const microLoans = require("../db/models/microloan");
+const medicalInsuranceData = require("../db/models/medicalinsurance");
+const microLoanShop = require("../db/models/microloansshop");
+
+
 const { Op, where } = require("sequelize");
 const bcrypt = require("bcrypt");
 const azureStorage = require('azure-storage');
@@ -510,6 +540,81 @@ const verifyFranchise = catchAsync(async (req, res, next) => {
   });
 })
 
+const staffAssign = catchAsync(async (req, res, next) => {
+
+  const { workId, assignedId } = req.body;
+  const gstRegistration = await gstRegistrationDetails();
+  const passport = await definePassportDetails();
+  const incomeTaxTable = await incomeTaxFilingDetails();
+  const vehicleInsurance = await defineVehicleInsurance();
+  const panCard = await definePancardUser();
+  const loanAgainstPropertyDetails = await loanAgainstProperty();
+  const defineBusinessLoanUnsecuredExistingDetails = await defineBusinessLoanUnscuredExisting();
+  const defineHousingLoanDetails = await defineHousingLoan();
+  const defineBusinessLoanNewSecuredDetails = await defineBusinessLoanNewSecured();
+  const newVehicleLoanDetails = await newVehicleLoan();
+  const usedVehicleLoanDetails = await usedVehicleLoan();
+  const definePersonalLoanDetails = await definePersonalLoan();
+  const defineBusinessLoanUnsecuredNewDetails = await defineBusinessLoanUnsecuredNew();
+  const businessLoanExistingDetailsDetails = await businessLoanExistingDetails();
+  const medicalInsurance = await medicalInsuranceData();
+  const trainBookingDetails=await trainBooking();
+
+
+  const tables = [
+    kswift, 
+    fssaiRegistrations,
+    fssaiLicences,
+    udyamRegistrations, 
+    financialstatements, 
+    companyFormations,
+    packingLicence, 
+    partnerShipDeedTable, 
+    gstRegistration,
+    gstFilings, 
+    passport,
+    BusBooking,
+    trainBookingDetails,
+    panCard,
+    microLoans,
+    medicalInsurance,
+    microLoanShop,
+    incomeTaxTable,
+    vehicleInsurance,
+    loanAgainstPropertyDetails,
+    defineBusinessLoanUnsecuredExistingDetails,
+    defineBusinessLoanNewSecuredDetails,
+    defineHousingLoanDetails,
+    newVehicleLoanDetails,
+    usedVehicleLoanDetails,
+    definePersonalLoanDetails,
+    defineBusinessLoanUnsecuredNewDetails,
+    businessLoanExistingDetailsDetails,
+];
+
+
+  const results = await Promise.all(
+    tables.map((table) => table.findOne({ where: { workId } }))
+  );
+
+  const index = results.findIndex((record) => record !== null);
+
+  if (index === -1) {
+    return next(new AppError("Service not found", 404));
+  }
+
+  await tables[index].update(
+    { assignedId: assignedId, assignedOn: new Date() },
+    { where: { workId } }
+  );
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Staff assigned successfully',
+  });
+});
+
+
 function generateRandomNumber() {
   const randomNumber =
     Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
@@ -551,6 +656,6 @@ const deleteStaff = catchAsync(async (req, res, next) => {
 
 module.exports = {
   updateStaffDetails, deleteFranchise, updateFranchiseDetails, updateWallet, verifyFranchise,
-  deleteStaff
+  deleteStaff,staffAssign
 };
 

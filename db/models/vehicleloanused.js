@@ -44,20 +44,20 @@ const usedvehicleLoan = (typeofLoan, cibil) => {
           },
         },
       },
-      mobileNumber: {
+      phoneNumber: {
         type: DataTypes.BIGINT,
         allowNull: false,
         validate: {
           isInt: {
-            msg: "Mobile number must be an integer",
+            msg: "Phone number must be an integer",
           },
           len: {
             args: [10, 10],
-            msg: "Mobile number must be 10 digits",
+            msg: "Phone number must be 10 digits",
           },
         },
       },
-      emailId: {
+      email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
@@ -201,6 +201,51 @@ const usedvehicleLoan = (typeofLoan, cibil) => {
           },
         },
       },
+      loanStatus: {
+        type: DataTypes.JSONB,
+        allowNull: true
+      },
+      rejectReason: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      bankDetails: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      loanGivenByBank: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+      },
+      doneBy: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      serviceCharge: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      commissionToFranchise: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      commissionToHO: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      otherPayments: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      otherDocumentsByStaff: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      status: {
+        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
+        allowNull: false,
+        defaultValue: "inQueue",
+      },
       assignedId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -227,11 +272,6 @@ const usedvehicleLoan = (typeofLoan, cibil) => {
             msg: "Completed On must be a valid date",
           },
         },
-      },
-      status: {
-        type: DataTypes.ENUM("inQueue", "inProgress", "completed","rejected"),
-        allowNull: false,
-        defaultValue: "inQueue",
       },
       createdAt: {
         type: DataTypes.DATE,

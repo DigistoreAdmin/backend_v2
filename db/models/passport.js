@@ -1,8 +1,9 @@
 "use strict";
-const { Model, DataTypes } = require("sequelize");
+const { Model, DataTypes, Op } = require("sequelize");
 const sequelize = require("../../config/database");
 
 const definePassportDetails = (maritalStatus, passportRenewal) => {
+
   const isMarried = maritalStatus === "yes" ? false : true;
   const isRenewal = passportRenewal === "true" ? false : true;
   const passportDetails = sequelize.define(
@@ -32,6 +33,10 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
       },
       completedOn: {
         type: DataTypes.DATE,
+        allowNull: true,
+      },
+      workId: {
+        type: DataTypes.STRING,
         allowNull: true,
       },
       oldPassportNumber: {
@@ -355,6 +360,10 @@ const definePassportDetails = (maritalStatus, passportRenewal) => {
       passportFile: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      rejectReason:{
+        type:DataTypes.STRING,
+        allowNull:true
       },
       createdAt: {
         allowNull: false,

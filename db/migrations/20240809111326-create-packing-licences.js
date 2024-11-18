@@ -12,6 +12,18 @@ module.exports = {
       uniqueId: {
         type: Sequelize.STRING,
       },
+      assignedId: {
+        type: Sequelize.STRING,
+      },
+      assignedOn: {
+        type: Sequelize.DATE,
+      },
+      completedOn: {
+        type: Sequelize.DATE,
+      },
+      workId: {
+        type: Sequelize.STRING,
+      },
       customerName: {
         type: Sequelize.STRING,
       },
@@ -65,6 +77,19 @@ module.exports = {
       },
       signature: {
         type: Sequelize.STRING,
+      },
+      status: {
+        type: Sequelize.ENUM("inQueue", "inProgress", "completed", "rejected"),
+        defaultValue: "inQueue",
+      },
+      assignedId: {
+        type: Sequelize.STRING,
+      },
+      assignedOn: {
+        type: Sequelize.DATE,
+      },
+      completedOn: {
+        type: Sequelize.DATE,
       },
       createdAt: {
         allowNull: false,

@@ -45,13 +45,25 @@ module.exports = {
       fatherName: {
         type: Sequelize.STRING,
       },
-      proofOfIdentity: {
+      aadhaarNumber: {
+        type: Sequelize.STRING,
+      },
+      aadhaarFront: {
+        type: Sequelize.STRING,
+      },
+      aadhaarBack: {
         type: Sequelize.STRING,
       },
       proofOfDOB: {
         type: Sequelize.STRING,
       },
       proofOfAddress: {
+        type: Sequelize.STRING,
+      },
+      photo: {
+        type: Sequelize.STRING,
+      },
+      signature: {
         type: Sequelize.STRING,
       },
 
@@ -91,12 +103,6 @@ module.exports = {
       dobChange: {
         type: Sequelize.STRING,
       },
-      signatureChange: {
-        type: Sequelize.STRING,
-      },
-      photoChange: {
-        type: Sequelize.STRING,
-      },
       changeFatherName:{
         type: Sequelize.STRING,
       },
@@ -105,35 +111,39 @@ module.exports = {
       representativeName: {
         type: Sequelize.STRING,
       },
-      representativeAddress: {
+      representativeRelation:{
         type: Sequelize.STRING,
       },
-      representativeRelatiion:{
+      representativeAadhaarFront: {
         type: Sequelize.STRING,
       },
-      representativeDocument: {
+      representativeAadhaarBack: {
+        type: Sequelize.STRING,
+      },
+      representativeSignature: {
         type: Sequelize.STRING,
       },
 
+
       // Field specific to 'NRI' PAN
-      nriAddress: {
+      abroadAddress: {
         type: Sequelize.STRING,
       },
+      proofOfIdentity: {
+        type: Sequelize.STRING,
+      },
+      
       acknowledgementNumber:{
-        type: Sequelize.INTEGER,
-        allowNull:true
+        type: Sequelize.STRING,
       },
       acknowledgementFile:{
         type: Sequelize.STRING,
-        allowNull:true
       },
       reason:{
         type: Sequelize.STRING,
-        allowNull:true
       },
       ePan:{
-        type: Sequelize.ENUM("received","notReceived"),
-        allowNull:true
+        type: Sequelize.BOOLEAN,
       },
       commissionToHO: {
         type: Sequelize.DECIMAL,
@@ -149,7 +159,6 @@ module.exports = {
       createdAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
-        allowNull: false,
       },
       updatedAt: {
         type: Sequelize.DATE,

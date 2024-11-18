@@ -24,6 +24,9 @@ module.exports = {
       completedOn: {
         type: Sequelize.DATE,
       },
+      workId: {
+        type: Sequelize.STRING,
+      },
       oldPassportNumber: {
         type: Sequelize.STRING,
       },
@@ -110,6 +113,9 @@ module.exports = {
       },
       passportFile: {
         type: Sequelize.STRING,
+      },
+      rejectReason:{
+        type:Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,

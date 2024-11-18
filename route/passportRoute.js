@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const {
   createPassport,
-  passportUpdate,
+  passportUpdateReject,
+  passportUpdateComplete
 } = require("../controller/passportController");
 const { verifyToken, verifyRefreshToken } = require("../utils/token");
 
@@ -10,7 +11,11 @@ router
   .post(verifyToken, verifyRefreshToken, createPassport);
 
 router
-  .route("/passportUpdate")
-  .put(verifyToken, verifyRefreshToken, passportUpdate);
+  .route("/passportUpdateReject")
+  .put(verifyToken, verifyRefreshToken, passportUpdateReject);
+
+  router
+  .route("/passportUpdateComplete")
+  .put(verifyToken, verifyRefreshToken, passportUpdateComplete);
 
 module.exports = router;

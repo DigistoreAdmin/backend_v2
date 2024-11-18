@@ -3,7 +3,7 @@ const { Model, DataTypes ,Op} = require('sequelize');
 const sequelize = require('../../config/database');
 
 const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
-  console.log(panType);
+  console.log("panType", panType);
 
   const allowNullForNewPan = panType === "newPancard" ? false : true
   const allowN = isCollege === 'true' ? false : true;
@@ -13,13 +13,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
   const allowNullVe = panType === "duplicateOrChangePancard" ? false : true;
   const allow = panType === "minorPancard" ? false : true;
   const allowNullV = panType === "NRIPancard" ? false : true;
-
-  const getCurrentDate = () => {
-    const date = new Date();
-    return `${date.getDate().toString().padStart(2, "0")}${(date.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}${date.getFullYear()}`;
-  };
+  const allowNullPOI = panType === "NRIPancard" ? true : false;
+  const allowNullPS = panType === "minorPancard" ? true : false;
+  const allowS = panType === "NRIPancard" ? true : false;
+  console.log("allows", allowS)
 
   const PancardUser = sequelize.define('pancardUser', {
     id: {
@@ -58,12 +55,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     assignedOn: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     completedOn: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: DataTypes.NOW,
     },
     customerName: {
       type: DataTypes.STRING,
@@ -120,9 +115,9 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
         }
       }
     },
-    proofOfIdentity: {
+    aadhaarNumber: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: allowS,
     },
     proofOfDOB: {
       type: DataTypes.STRING,
@@ -131,6 +126,22 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     proofOfAddress: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    photo: {
+      type: DataTypes.STRING,
+      allowNull: allowNullPS,
+    },
+    signature: {
+      type: DataTypes.STRING,
+      allowNull: allowNullPS,
+    },
+    aadhaarFront: {
+      type: DataTypes.STRING,
+      allowNull: allowNullPOI,
+    },
+    aadhaarBack: {
+      type: DataTypes.STRING,
+      allowNull: allowNullPOI,
     },
 
     // Fields specific to 'new' PAN
@@ -169,11 +180,6 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       }
     },
 
-    panNumber: {
-      type: DataTypes.STRING,
-      allowNull: allowNullVe,
-    },
-
     // Fields specific to 'duplicate' PAN
     reasonForDuplicate: {
       type: DataTypes.STRING,
@@ -182,6 +188,10 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
 
     // Fields specific to 'change' PAN
 
+    panNumber: {
+      type: DataTypes.STRING,
+      allowNull: allowsNew,
+    },
     nameChange: {
       type: DataTypes.STRING,
       allowNull: allowsNew,
@@ -194,20 +204,45 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       type: DataTypes.STRING,
       allowNull: allowsNew,
     },
-    signatureChange: {
-      type: DataTypes.STRING,
-      allowNull: allowsNew,
-    },
-    photoChange: {
-      type: DataTypes.STRING,
-      allowNull: allowsNew,
-    },
     changeFatherName:{
       type: DataTypes.STRING,
       allowNull: allowsNew,
     },
+
+    // Fields specific to 'minor' PAN
+    representativeName: {
+      type: DataTypes.STRING,
+      allowNull: allow,
+    },
+      representativeRelation:{
+        type: DataTypes.STRING,
+        allowNull: allow,
+      },
+      representativeAadhaarFront: {
+        type: DataTypes.STRING,
+        allowNull: allow,
+      },
+      representativeAadhaarBack: {
+        type: DataTypes.STRING,
+        allowNull: allow,
+      },
+      representativeSignature: {
+        type: DataTypes.STRING,
+        allowNull: allow,
+      },
+
+    // Field specific to 'NRI' PAN
+    abroadAddress: {
+      type: DataTypes.STRING,
+      allowNull: allowNullV,
+    },
+    proofOfIdentity: {
+      type: DataTypes.STRING,
+      allowNull: allowNullV,
+    },
+    
     acknowledgementNumber:{
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull:true
     },
     acknowledgementFile:{
@@ -219,33 +254,9 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
       allowNull:true
     },
     ePan:{
-      type: DataTypes.ENUM("received","notReceived"),
+      type: DataTypes.BOOLEAN,
+      defaultValue:"false",
       allowNull:true
-    },
-   
-
-    // Fields specific to 'minor' PAN
-    representativeName: {
-      type: DataTypes.STRING,
-      allowNull: allow,
-    },
-    representativeAddress: {
-        type: DataTypes.STRING,
-        allowNull:allow,
-      },
-      representativeRelatiion:{
-        type: DataTypes.STRING,
-        allowNull: allow,
-      },
-      representativeDocument: {
-        type: DataTypes.STRING,
-        allowNull: allow,
-      },
-
-    // Field specific to 'NRI' PAN
-    nriAddress: {
-      type: DataTypes.STRING,
-      allowNull: allowNullV,
     },
     commissionToHO: {
       type: DataTypes.DECIMAL,
@@ -276,28 +287,6 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     paranoid: true,
     freezeTableName: true,
     modelName: 'pancardUser',
-    hooks: {
-      beforeValidate: async (pan) => {
-        const currentDate = getCurrentDate();
-        const code = "PAN";
-        const lastPan = await PancardUser.findOne({
-          where: {
-            workId: {
-              [Op.like]: `${currentDate}${code}%`,
-            },
-          },
-          order: [["createdAt", "DESC"]],
-        });
-
-        let newIncrement = "001";
-        if (lastPan) {
-          const lastIncrement = parseInt(lastPan.workId.slice(-3));
-          newIncrement = (lastIncrement + 1).toString().padStart(3, "0");
-        }
-
-        pan.workId = `${currentDate}${code}${newIncrement}`;
-      },
-    },
   });
 
   return PancardUser;
