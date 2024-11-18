@@ -34,7 +34,7 @@ const decryptData = (encryptedData) => {
 };
 
 const getAllFranchises = catchAsync(async (req, res, next) => {
-  const { sort, filter, search, page, pageLimit } = req.query;
+  const { sort, filter, search, page, pageLimit, startDate, endDate } = req.query;
   const order = sort ? [[sort, "DESC"]] : [["createdAt", "DESC"]];
   const where = {};
 
@@ -61,7 +61,11 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
       where[Op.or].push({ phoneNumber: { [Op.eq]: phoneNumber } });
     }
   }
-
+  if (startDate && endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    where.createdAt = { [Op.between]: [start, end] };
+  }
   if (!page || !pageLimit) {
     return res.status(400).json({ error: "page and pageLimit are required" });
   }
@@ -106,6 +110,7 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
     return next(new AppError(error.message, 500));
   }
 });
+
 
 const getFranchise = catchAsync(async (req, res) => {
   const { franchiseUniqueId } = req.query;

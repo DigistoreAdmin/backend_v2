@@ -5,50 +5,55 @@ const sequelize = require("../../config/database");
 const WorkTime = sequelize.define(
   "workTime",
   {
+    id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
     workId: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    staffName: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull:true,
-    },
-    assignedId:{
-      type: DataTypes.ARRAY(DataTypes.STRING),
-    },
-    startTime: {
-      type: DataTypes.ARRAY(DataTypes.DATE),
-      allowNull:true
-    },
-    endTime: {
-      type: DataTypes.ARRAY(DataTypes.DATE),
-      allowNull: true
-    }, 
-    totalWorkTimeWithoutBreak: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: true,
-    },
-    breakTimeStarted: {
-      type: DataTypes.ARRAY(DataTypes.DATE),
-      allowNull: true,
-    },
-    breakTimeEnded: {
-      type: DataTypes.ARRAY(DataTypes.DATE),
-      allowNull: true,
-    },
-    totalBreakTime: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: true,
-    },
-    totalWorkTimeWithBreak:{
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: true,
-    },
-    reassigned: {
-      type: DataTypes.BOOLEAN,
-    },
-    reassignedTime: {
-      type: DataTypes.ARRAY(DataTypes.DATE),
+    employeeRecords: {
+      type: DataTypes.ARRAY(DataTypes.JSON),
+      defaultValue: [
+        {
+          staffName: {
+            type: DataTypes.STRING,
+          },
+          assignedId: {
+            type: DataTypes.STRING,
+          },
+          startTime: {
+            type: DataTypes.STRING,
+          },
+          endTime: {
+            type: DataTypes.STRING,
+          },
+          breakTimeStarted: {
+            type: DataTypes.ARRAY(DataTypes.STRING)
+          },
+          breakTimeEnded: {
+            type: DataTypes.ARRAY(DataTypes.DATE),
+          },
+          breakTime: {
+            type: DataTypes.ARRAY(DataTypes.STRING),
+          },
+          totalBreakTime: {
+            type: DataTypes.STRING,
+          },
+          totalTimeTaken: {
+            type: DataTypes.STRING,
+          },
+          reassigned: {
+            type: DataTypes.BOOLEAN,
+          },
+          reassignedTime: {
+            type: DataTypes.STRING,
+          },
+        },
+      ],
     },
     createdAt: {
       allowNull: false,

@@ -114,6 +114,9 @@ module.exports = {
       passportFile: {
         type: Sequelize.STRING,
       },
+      rejectReason:{
+        type:Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
