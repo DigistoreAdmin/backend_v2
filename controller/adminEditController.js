@@ -558,6 +558,7 @@ const staffAssign = catchAsync(async (req, res, next) => {
   const defineBusinessLoanUnsecuredNewDetails = await defineBusinessLoanUnsecuredNew();
   const businessLoanExistingDetailsDetails = await businessLoanExistingDetails();
   const medicalInsurance = await medicalInsuranceData();
+  const trainBookingDetails=await trainBooking();
 
 
   const tables = [
@@ -573,7 +574,7 @@ const staffAssign = catchAsync(async (req, res, next) => {
     gstFilings, 
     passport,
     BusBooking,
-    trainBooking,
+    trainBookingDetails,
     panCard,
     microLoans,
     medicalInsurance,
