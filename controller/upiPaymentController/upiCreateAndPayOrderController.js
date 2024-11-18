@@ -56,13 +56,27 @@ const createAndPayOrder = catchAsync(async (req, res, next) => {
   const clientSecret = process.env.CLIENT_SECRET;
   const checksumString = `${orderId}${clientId}${timestamp}${clientSecret}`;
   const checksum = hashWithSHA512(checksumString);
-
-  // Validate inputs
+  if (
+    !orderId ||
+    !amount ||
+    !currency ||
+    !customerEmail ||
+    !customerPhone ||
+    !terminalType ||
+    !expiryTime ||
+    !payerVpa ||
+    !payerName ||
+    !remarks
+  ) {
+    return next(new AppError("Missing required fields in request body", 400));
+  }
   if (!isAlphanumericAndUnique(orderId)) {
+    // Validate inputs
     return next(
       new AppError("Invalid Order ID. Must be unique and alphanumeric.", 400)
     );
   }
+  
   if (!validateExpiryTime(Number(expiryTime))) {
     return next(
       new AppError(
