@@ -5,6 +5,35 @@ const Franchise = require("../db/models/franchise");
 const { Op } = require("sequelize");
 const wallets = require("../db/models/wallet");
 const transationHistory = require("../db/models/transationhistory");
+const intoStream = require("into-stream");
+const azurestorage = require("azure-storage");
+const blobService = azurestorage.createBlobService(
+  process.env.AZURE_STORAGE_CONNECTION_STRING
+);
+const containerName = "imagecontainer";
+
+
+const uploadBlob = (file) => {
+  return new Promise((resolve, reject) => {
+      const blobName = file.name;
+      const stream = intoStream(file.data);
+      const streamLength = file.data.length;
+
+      blobService.createBlockBlobFromStream(
+          containerName,
+          blobName,
+          stream,
+          streamLength,
+          (err) => {
+              if (err) {
+                  return reject(`Error uploading file ${blobName}: ${err.message}`);
+              }
+              const blobUrl = blobService.getUrl(containerName, blobName);
+              resolve(blobUrl);
+          }
+      );
+  });
+};
 
 const trainBooking = catchAsync(async (req, res, next) => {
   const user = req.user;
@@ -151,7 +180,7 @@ const trainBookingUpdate = catchAsync(async (req, res, next) => {
 
     let totalAmount = parseInt(amount) + serviceCharge;
 
-    report.workId = workId || report.workId;
+    // report.workId = workId || report.workId;
     report.status = finalStatus;
     report.ticket = ticketUrl || report.ticket;
     report.amount = amount || report.amount;
@@ -161,6 +190,7 @@ const trainBookingUpdate = catchAsync(async (req, res, next) => {
     report.commissionToHO =
       commissionToHO || report.commissionToHO;
     report.totalAmount = totalAmount || report.totalAmount;
+    // report.completedOn=new Date()
 
     if (totalAmount > walletData.balance) {
       return next(new AppError("Insufficient wallet balance", 401));
