@@ -51,6 +51,8 @@ const contactRoute = require("../route/contactRoute");
 const medicalInsuranceRoute = require("../route/medicalInsuranceRoute");
 const microLoanRoute = require("../route/Loan/microLoanRoute");
 const microLoanShopRoute = require("../route/Loan/microLoanShopRoute");
+const reassignRoute=require("../route/reAssignRoute")
+const staffMonitoringRoute = require("./workMonitoringRoute")
 const staffUpdateLoanRoute = require("../route/Loan/staffUpdateRouter");
 const vehicleInsuranceRoute = require("../route/vehicleInsuranceRoute");
 const flightBookingRoute = require("../route/rechapi-routes/flightTicketRoute");
@@ -58,11 +60,19 @@ const rechapiPhoneRechargeRoute = require("../route/rechapi-routes/phoneRecharge
 const rechapiBillPaymentRoute = require("../route/rechapi-routes/billPaymentRoute");
 const busBookingRechapi = require("../route/rechapi-routes/busBookingRoute");
 const upiPaymentCreateOrder = require("../route/upiPaymentRoute/createOrderRoute");
+const franchiseCommissionRoute=require("../route/accountantRoute/franchiseCommisionRoute")
+const getMonthlyCommissionsRoute=require("./accountantRoute/monthlyCommisionRoute")
 const checkIntentStatusRoute = require("../route/upiPaymentRoute/checkIntentStatusRoute");
 const checkStatusRoute = require("../route/upiPaymentRoute/checkStatusRoute");
 const payOrderRoute = require("../route/upiPaymentRoute/payOrderRoute");
 const upiIntentRoute = require("../route/upiPaymentRoute/upiIntentRoute");
 const sixMonthAnalysisRoute = require("../route/accountantRoute/sixMontAnalysisRoute");
+const createAndpayOrder = require("../route/upiPaymentRoute/createAndPayOrderRoute");
+
+
+
+
+
 
 const router = express.Router();
 
@@ -123,6 +133,8 @@ router.use("/v1/contactRoute", contactRoute);
 router.use("/v1/medicalRoute", medicalInsuranceRoute);
 router.use("/v1/microLoanRoute", microLoanRoute);
 router.use("/v1/microLoanShopRoute", microLoanShopRoute);
+router.use("/v1/reassignRoute", reassignRoute)
+router.use ("/v1/workMonitoring", staffMonitoringRoute)
 router.use("/v1/staffUpdateLoanRoute", staffUpdateLoanRoute);
 router.use("/v1/insurance", vehicleInsuranceRoute);
 router.use("/v1/flightBooking", flightBookingRoute);
@@ -130,10 +142,17 @@ router.use("/v1/rechapiPhoneRechargeRoute", rechapiPhoneRechargeRoute);
 router.use("/v1/rechapiBillPaymentRoute", rechapiBillPaymentRoute);
 router.use("/v1/bus", busBookingRechapi);
 router.use("/v1/upiPaymentCreateOrder", upiPaymentCreateOrder);
+router.use("/v1/sixMonthAnalysisRoute", sixMonthAnalysisRoute);
+router.use("/v1/franchiseCommissionRoute",franchiseCommissionRoute)
+router.use("/v1/MonthlyCommissions",getMonthlyCommissionsRoute)
 router.use("/v1/upiPayment", checkIntentStatusRoute);
 router.use("/v1/checkStatusRoute", checkStatusRoute);
 router.use("/v1/payOrder", payOrderRoute);
+router.use("/v1/createAndpayOrderRoute", createAndpayOrder);
 router.use("/v1/upiIntent", upiIntentRoute);
-router.use("/v1/sixMonthAnalysisRoute", sixMonthAnalysisRoute);
+
+
+
+
 
 module.exports = router;
