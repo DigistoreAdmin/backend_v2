@@ -341,6 +341,14 @@ const staffPanCardComplete = catchAsync(async (req, res, next) => {
   const { workId, acknowledgementNumber } = req.body;
   const acknowledgementFile = req?.files?.acknowledgementFile;
 
+  if (!acknowledgementNumber) {
+    return next(new AppError("Acknowledgement Number is required", 400));
+  }
+
+  if (!acknowledgementFile) {
+    return next(new AppError("Acknowledgement File is required", 400));
+  }
+
   if (!workId) {
     return next(new AppError("workId is required", 400));
   }
@@ -375,7 +383,7 @@ const staffPanCardComplete = catchAsync(async (req, res, next) => {
     await pancardUser.update(
       {
         status: "completed",
-        acknowledgementFileUrl,
+        acknowledgementFile:acknowledgementFileUrl,
         acknowledgementNumber,
       },
       { where: { workId } }

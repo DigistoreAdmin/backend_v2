@@ -18,6 +18,18 @@ const incomeTaxFilingDetails = require("../db/models/incometax");
 const partnerShipDeedTable = require("../db/models/partnershipdeedpreperation");
 const packingLicence = require("../db/models/packinglicences");
 const defineVehicleInsurance = require("../db/models/vehicleInsurance");
+const loanAgainstProperty = require("../db/models/loanAgainstProperty");
+const defineBusinessLoanUnscuredExisting = require("../db/models/BusinessLoanUnsecuredExisting");
+const defineHousingLoan = require("../db/models/HousingLoan");
+const defineBusinessLoanNewSecured = require("../db/models/businessLoanNewSecured");
+const newVehicleLoan = require("../db/models/newvehicleloan");
+const usedVehicleLoan = require("../db/models/vehicleloanused");
+const definePersonalLoan = require("../db/models/personalloan");
+const defineBusinessLoanUnsecuredNew = require("../db/models/businessloanunsecurednew");
+const businessLoanExistingDetails = require("../db/models/businessloanexisting")
+const microLoans = require("../db/models/microloan");
+const medicalInsuranceData = require("../db/models/medicalinsurance");
+const microLoanShop = require("../db/models/microloansshop");
 const crypto = require("crypto");
 
 const algorithm = "aes-192-cbc";
@@ -1064,6 +1076,112 @@ const getAllWorksByStaffId=catchAsync(async (req, res, next) => {
   }
 })
 
+const getAllWorksByFranchise = catchAsync(async (req, res, next) => {
+  try {
+    const { page, pageLimit, search, sortBy, sortOrder, filter } = req.query;
+    const user = req.user;
+
+    if (!page || !pageLimit) {
+      return res.status(400).json({ error: "page and pageLimit query parameters are required" });
+    }
+
+    const franchise = await Franchise.findOne({ where: { email: user.email } });
+    if (!franchise) {
+      return res.status(404).json({ status: 'fail', message: 'Franchise not found' });
+    }
+
+    const uniqueId = franchise.franchiseUniqueId;
+    const pageNumber = parseInt(page, 10);
+    const pageLimitNumber = parseInt(pageLimit, 10);
+    const limit = pageLimitNumber;
+    const offset = (pageNumber - 1) * limit;
+
+    const detailsPromises = [
+      { model: panCardUsers(), tableName: "Pan Card" },
+      { model: definePassportDetails(), tableName: "Passport Details" },
+      { model: kswift, tableName: "Kswift" },
+      { model: BusBooking, tableName: "Bus Booking" },
+      { model: fssaiRegistrations, tableName: "FSSAI Registrations" },
+      { model: fssaiLicences, tableName: "FSSAI Licences" },
+      { model: trainBooking(), tableName: "Train Booking" },
+      { model: udyamRegistrations, tableName: "Udyam Registrations" },
+      { model: financialstatements, tableName: "Financial Statements" },
+      { model: companyFormations, tableName: "Company Formations" },
+      { model: gstRegistrationDetails(), tableName: "GST Registration" },
+      { model: gstFilings, tableName: "GST Filings" },
+      { model: incomeTaxFilingDetails(), tableName: "Income Tax Filing" },
+      { model: partnerShipDeedTable, tableName: "Partnership Deed" },
+      { model: packingLicence, tableName: "Packing Licence" },
+      { model: defineVehicleInsurance(), tableName: "Vehicle Insurance" },
+      { model: loanAgainstProperty(), tableName: "Loan Against Property" },
+      { model: defineBusinessLoanUnscuredExisting(), tableName: "Business Loan Unsecured Existing" },
+      { model: defineHousingLoan(), tableName: "Housing Loan" },
+      { model: defineBusinessLoanNewSecured(), tableName: "Business Loan New Secured" },
+      { model: newVehicleLoan(), tableName: "New Vehicle Loan" },
+      { model: usedVehicleLoan(), tableName: "Used Vehicle Loan" },
+      { model: definePersonalLoan(), tableName: "Personal Loan" },
+      { model: defineBusinessLoanUnsecuredNew(), tableName: "Business Loan Unsecured New" },
+      { model: businessLoanExistingDetails(), tableName: "Business Loan Existing" },
+      { model: microLoans, tableName: "Micro Loans" },
+      { model: medicalInsuranceData(), tableName: "Medical Insurance" },
+      { model: microLoanShop, tableName: "Micro Loan Shop" }
+    ].map(({ model, tableName }) =>
+      model.findAndCountAll({ where: { uniqueId } }).then((result) =>
+        result.rows.map((item) => ({ ...item.dataValues, tableName }))
+      )
+    );
+
+    const results = await Promise.all(detailsPromises);
+    let combinedData = results.flat();
+
+    if (filter) {
+      const filterObj = JSON.parse(filter);
+      Object.keys(filterObj).forEach((key) => {
+        const filterValue = filterObj[key];
+        if (Array.isArray(filterValue) && filterValue.length) {
+          combinedData = combinedData.filter((item) => filterValue.includes(String(item[key])));
+        }
+      });
+    }
+
+    if (search) {
+      combinedData = combinedData.filter((item) =>
+        Object.values(item).some((value) => String(value).toLowerCase().includes(search.toLowerCase()))
+      );
+    }
+
+    combinedData.sort((a, b) => {
+      const sortField = sortBy || 'updatedAt';
+      const direction = sortOrder === "asc" ? 1 : -1;
+      if (a[sortField] < b[sortField]) return -1 * direction;
+      if (a[sortField] > b[sortField]) return 1 * direction;
+      return 0;
+    });
+
+    const totalItems = combinedData.length;
+    const totalPages = Math.ceil(totalItems / limit);
+    const paginatedData = combinedData.slice(offset, offset + limit);
+
+    if (totalItems === 0) {
+      return res.status(404).json({ status: "fail", message: "No data found" });
+    }
+
+    res.status(200).json({
+      status: "success",
+      currentPage: pageNumber,
+      totalPages,
+      totalItems,
+      data: paginatedData,
+    });
+
+  } catch (error) {
+    console.error("Error:", error);
+    return next(new AppError(error.message, 500));
+  }
+});
+
+
+
 
 module.exports = {
   getPackingLicences,
@@ -1083,5 +1201,6 @@ module.exports = {
   fetchCompanyFormationDetails,
   getVehicleInsurance,
   getAllWorks,
-  getAllWorksByStaffId
+  getAllWorksByStaffId,
+  getAllWorksByFranchise
 };

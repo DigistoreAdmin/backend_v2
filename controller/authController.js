@@ -315,6 +315,40 @@ const login = catchAsync(async (req, res, next) => {
           data: sanitizedDataValues,
         });
     }
+    case "accountant":{
+      let existingUser; 
+      existingUser= await user.findOne({
+        where:{phoneNumber:phoneNumber}
+      })
+
+      if(!existingUser){
+        return next(new AppError("phoneNumber not exist",401))
+      }
+      const {accessToken, refreshToken}= await Tokens.generateTokens({
+        email:existingUser.email,
+        userType:data.userType,
+      })
+      const {password,...sanitizedDataValues}=existingUser.dataValues
+
+      return res
+        .cookie("accessToken", accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV,
+          sameSite: "None",
+          maxAge: accessTokenExpiresIn,
+        })
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV,
+          sameSite: "None",
+          maxAge: refreshTokenExpiresIn,
+        })
+        .status(200)
+        .json({
+          message: "Login success accountant",
+          data: sanitizedDataValues,
+        });
+    }
 
     default: {
       return next(new AppError("Invalid user type", 400));
