@@ -242,7 +242,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
     },
     
     acknowledgementNumber:{
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull:true
     },
     acknowledgementFile:{

@@ -3,35 +3,57 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../../config/database");
 
 const WorkTime = sequelize.define(
-  "workTimes",
+  "workTime",
   {
+    id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+      },
     workId: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    startTime: {
-      type: DataTypes.TIME,
-      allowNull:true
-    },
-    endTime: {
-      type: DataTypes.TIME,
-      allowNull: true
-    }, 
-    timeTaken: {
-      type: DataTypes.TIME,
-      allowNull: true,
-    },
-    breakStarted: {
-      type: DataTypes.TIME,
-      allowNull: true,
-    },
-    breakEnded: {
-      type: DataTypes.TIME,
-      allowNull: true,
-    },
-    totalBreakTime: {
-      type: DataTypes.TIME,
-      allowNull: true,
+    employeeRecords: {
+      type: DataTypes.ARRAY(DataTypes.JSON),
+      defaultValue: [
+        {
+          staffName: {
+            type: DataTypes.STRING,
+          },
+          assignedId: {
+            type: DataTypes.STRING,
+          },
+          startTime: {
+            type: DataTypes.STRING,
+          },
+          endTime: {
+            type: DataTypes.STRING,
+          },
+          breakTimeStarted: {
+            type: DataTypes.ARRAY(DataTypes.STRING)
+          },
+          breakTimeEnded: {
+            type: DataTypes.ARRAY(DataTypes.DATE),
+          },
+          breakTime: {
+            type: DataTypes.ARRAY(DataTypes.STRING),
+          },
+          totalBreakTime: {
+            type: DataTypes.STRING,
+          },
+          totalTimeTaken: {
+            type: DataTypes.STRING,
+          },
+          reassigned: {
+            type: DataTypes.BOOLEAN,
+          },
+          reassignedTime: {
+            type: DataTypes.STRING,
+          },
+        },
+      ],
     },
     createdAt: {
       allowNull: false,
@@ -48,7 +70,7 @@ const WorkTime = sequelize.define(
   {
     paranoid: true,
     freezeTableName: true,
-    modelName: "workTimes",
+    modelName: "workTime",
   }
 );
 

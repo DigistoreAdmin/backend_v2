@@ -5,3 +5,4 @@ const router = require('express').Router();
 router.get('/mostCommissionByFranchise',verifyToken, verifyRefreshToken,mostCommissionByFranchise)
 
 module.exports =router
+

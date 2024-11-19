@@ -44,3 +44,4 @@ const mostCommissionByFranchise = catchAsync(async (req, res, next) => {
 });
 
 module.exports = { mostCommissionByFranchise };
+
