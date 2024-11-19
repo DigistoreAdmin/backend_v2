@@ -10,7 +10,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       route: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       response: {
         type: Sequelize.JSONB,
