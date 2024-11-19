@@ -60,11 +60,13 @@ const rechapiPhoneRechargeRoute = require("../route/rechapi-routes/phoneRecharge
 const rechapiBillPaymentRoute = require("../route/rechapi-routes/billPaymentRoute");
 const busBookingRechapi = require("../route/rechapi-routes/busBookingRoute");
 const upiPaymentCreateOrder = require("../route/upiPaymentRoute/createOrderRoute");
+const getMonthlyCommissionsRoute=require("./accountantRoute/monthlyCommisionRoute")
 const checkIntentStatusRoute = require("../route/upiPaymentRoute/checkIntentStatusRoute");
 const checkStatusRoute = require("../route/upiPaymentRoute/checkStatusRoute");
 const payOrderRoute = require("../route/upiPaymentRoute/payOrderRoute");
 const upiIntentRoute = require("../route/upiPaymentRoute/upiIntentRoute");
 const createAndpayOrder = require("../route/upiPaymentRoute/createAndPayOrderRoute");
+
 
 
 
@@ -136,10 +138,12 @@ router.use("/v1/rechapiPhoneRechargeRoute", rechapiPhoneRechargeRoute);
 router.use("/v1/rechapiBillPaymentRoute", rechapiBillPaymentRoute);
 router.use("/v1/bus", busBookingRechapi);
 router.use("/v1/upiPaymentCreateOrder", upiPaymentCreateOrder);
+router.use("/v1/MonthlyCommissions",getMonthlyCommissionsRoute)
 router.use("/v1/upiPayment", checkIntentStatusRoute);
 router.use("/v1/checkStatusRoute", checkStatusRoute);
 router.use("/v1/payOrder", payOrderRoute);
 router.use("/v1/createAndpayOrderRoute", createAndpayOrder);
 router.use("/v1/upiIntent", upiIntentRoute);
+
 
 module.exports = router;
