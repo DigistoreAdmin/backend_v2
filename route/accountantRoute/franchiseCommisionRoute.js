@@ -1,8 +1,8 @@
-const { mostCommisionedFranchise } = require('../../controller/accountantController/franchiseCommision')
-const { verifyToken, verifyRefreshToken } = require('../../utils/token')
+const { mostCommissionByFranchise } = require('../../controller/accountantController/franchiseCommision');
+const { verifyToken, verifyRefreshToken } = require('../../utils/token');
+const router = require('express').Router();
 
-const router = require('express').Router()
+router.get('/mostCommissionByFranchise',verifyToken, verifyRefreshToken,mostCommissionByFranchise)
 
-router.route("/mostCommisionedFranchise").get(verifyToken,verifyRefreshToken,mostCommisionedFranchise)
+module.exports =router
 
-module.exports = router

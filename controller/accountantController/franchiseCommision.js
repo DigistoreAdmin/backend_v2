@@ -1,48 +1,47 @@
-const sequelize = require("../../config/database");
-const transationHistories = require("../../db/models/transationhistory");
 const catchAsync = require("../../utils/catchAsync");
-const {Op} = require("sequelize");
+const transactionHistory = require("../../db/models/transationhistory");
+const sequelize = require("../../config/database");
 
+const mostCommissionByFranchise = catchAsync(async (req, res, next) => {
+    try {
+        const { filter } = req.query;
+        const where = { status: "success" };
 
-const mostCommisionedFranchise=catchAsync(async(req,res)=>{
-    const {startDate, endDate} = req.query;
-
-    let whereCondition={}
-    if(startDate && endDate){
-        whereCondition.createdAt = {};
-        if (startDate) {
-            whereCondition.createdAt[Op.gte] = new Date(startDate);
+        if (filter) {
+            try {
+                const filters = JSON.parse(filter);
+                if (filters.serviceProvider) {
+                    where.serviceProvider = filters.serviceProvider; 
+                }
+            } catch (parseError) {
+                return res.status(400).json({ error: "Invalid filter format" });
+            }
         }
-        if (endDate) {
-            whereCondition.createdAt[Op.lte] = new Date(endDate);
+
+        const transactionHistories = await transactionHistory.findAll({
+            attributes: [
+                "uniqueId",
+                [sequelize.fn("COUNT", sequelize.col("uniqueId")), "count"]
+            ],
+            where,
+            group: ["uniqueId"],
+            order: [[sequelize.literal("count"), "DESC"]],
+            limit: 5,
+        });
+        
+        if (!transactionHistories.length) {
+            return res.status(200).json({ message: "No transactions found for the selected filter" });
         }
+
+        res.status(200).json({ 
+            message: "Top franchises",
+            data: transactionHistories
+        });
+    } catch (error) {
+        console.error("Error in fetching most commission by franchise:", error.message);
+        res.status(500).json({ error: "Error in franchise commission controller" });
     }
-    const result =await transationHistories.findAll({ 
-        attributes: [
-        'uniqueId',
-        [sequelize.fn('SUM', sequelize.col('franchiseCommission')), 'totalCommission']
-    ],
-    where:whereCondition,
-    group: ['uniqueId'],
-    order: [[sequelize.fn('SUM', sequelize.col('franchiseCommission')), 'DESC']],
-    limit:5,
-    raw: true,
-})
-
-if (!result || result.length === 0) {
-    return res.status(404).json({
-        status: 'fail',
-        message: 'No commission data found',
-    });
-}
-console.log('result: ', result);
-
-res.status(200).json({
-    status: 'success',
-    data: result,
 });
-})
 
-module.exports={
-    mostCommisionedFranchise
-}
+module.exports = { mostCommissionByFranchise };
+

@@ -72,6 +72,7 @@ const createAndpayOrder = require("../route/upiPaymentRoute/createAndPayOrderRou
 
 
 
+
 const router = express.Router();
 
 router.use("/v1/auth", authRouter);
@@ -147,6 +148,7 @@ router.use("/v1/checkStatusRoute", checkStatusRoute);
 router.use("/v1/payOrder", payOrderRoute);
 router.use("/v1/createAndpayOrderRoute", createAndpayOrder);
 router.use("/v1/upiIntent", upiIntentRoute);
+
 
 
 
