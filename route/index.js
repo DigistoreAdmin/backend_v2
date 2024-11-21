@@ -69,6 +69,7 @@ const payOrderRoute = require("../route/upiPaymentRoute/payOrderRoute");
 const upiIntentRoute = require("../route/upiPaymentRoute/upiIntentRoute");
 const sixMonthAnalysisRoute = require("../route/accountantRoute/sixMontAnalysisRoute");
 const createAndpayOrder = require("../route/upiPaymentRoute/createAndPayOrderRoute");
+const currentMonthAnalysisRoute = require("../route/accountantRoute/currentMonthAnalysisRoute");
 
 
 
@@ -151,7 +152,7 @@ router.use("/v1/checkStatusRoute", checkStatusRoute);
 router.use("/v1/payOrder", payOrderRoute);
 router.use("/v1/createAndpayOrderRoute", createAndpayOrder);
 router.use("/v1/upiIntent", upiIntentRoute);
-
+router.use("/v1/currentMonthAnalysisRoute", currentMonthAnalysisRoute);
 
 
 
