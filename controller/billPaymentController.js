@@ -184,6 +184,100 @@ const billPaymentRequest = catchAsync(async (req, res, next) => {
     }
       //
 
+  } else if (response.data.status === 1 && response.data.msg === "PENDING") 
+  {
+    if (result.rechargeType=="Dth") {
+      
+      const totalCommissionAmount =
+        result.commissionType === "percentage"
+          ? (response.data.amount * result.commission) / 100
+          : result.commission;
+  
+      console.log("commission", result.commission);
+  
+      console.log("toralCommittion", totalCommissionAmount);
+      const adminCommissionAmount = totalCommissionAmount * 0.25;
+  
+      console.log("adminCommissionAmount", adminCommissionAmount);
+      const franciseCommissionAmount = totalCommissionAmount * 0.75;
+      console.log("franchiseCommission", franciseCommissionAmount);
+  
+      let newBalance =
+        walletData.balance - response.data.amount + franciseCommissionAmount;
+        newBalance = Math.round(newBalance * 100) / 100;
+        console.log("newBalance", newBalance);
+        
+        const updated = await Wallet.update(
+          { balance: newBalance },
+          { where: { uniqueId: Data.franchiseUniqueId } }
+        );
+        console.log("updatedBalance", updated);
+        const serr = `Recharge Number or Id:${phoneNumber} serviceProvider:${result.serviceProvider}`;
+
+        const transatinH = await transationHistory.create({
+          transactionId: response.data.rpid,
+          uniqueId: Data.franchiseUniqueId,
+          userName: Data.franchiseName,
+          userType: user.userType,
+          service: result.rechargeType,
+          customerNumber:phoneNumber,
+          serviceNumber:accountNo,
+          serviceProvider:result.serviceProvider,
+          status: "pending",
+          amount: amount,
+          franchiseCommission: franciseCommissionAmount,
+          adminCommission: adminCommissionAmount,
+          walletBalance: newBalance,
+        });
+    
+        console.log("transatin History checking working fine", transatinH);
+    
+        if (updated && transatinH) {
+          res.status(200).json(response.data);
+        }
+              // commission
+    }else{
+        // const franciseCommissionAmount = 0.00
+        // const adminCommissionAmount = 0.00
+        const totalCommissionAmount =
+        result.commissionType === "percentage"
+          ? (response.data.amount * result.commission) / 100
+          : result.commission;
+  
+      console.log("toralCommittion", totalCommissionAmount);
+
+      let newBalance = walletData.balance - response.data.amount
+      newBalance = Math.round(newBalance * 100) / 100;
+      const updated = await Wallet.update(
+        { balance: newBalance },
+        { where: { uniqueId: Data.franchiseUniqueId } }
+      );
+      console.log("updatedBalance", updated);
+
+      const serr = `Recharge Number or Id:${phoneNumber} serviceProvider:${result.serviceProvider}`;
+
+      const transatinH = await transationHistory.create({
+        transactionId: response.data.rpid,
+        uniqueId: Data.franchiseUniqueId,
+        userName: Data.franchiseName,
+        userType: user.userType,
+        service: result.rechargeType,
+        customerNumber:phoneNumber,
+        serviceNumber:accountNo,
+        serviceProvider:result.serviceProvider,
+        status: "pending",
+        amount: amount,
+        // franchiseCommission: franciseCommissionAmount,
+        adminCommission: totalCommissionAmount,
+        walletBalance: newBalance,
+      });
+  
+      console.log("transatin History checking working fine", transatinH);
+  
+      if (updated && transatinH) {
+        res.status(200).json(response.data);
+      }
+    }
   } else {
     if (!response.data.rpid) {
       return res

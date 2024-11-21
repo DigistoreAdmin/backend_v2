@@ -87,6 +87,7 @@ const getPancardDetails = async (req, res) => {
       where = { panType: pantype };
     }
 
+
     const PancardUser = panCardUsers();
 
     const data = await PancardUser.findAndCountAll({
@@ -274,6 +275,7 @@ const fetchTrainBookingDetails = catchAsync(async (req, res) => {
 
     const pageNumber = parseInt(page, 10);
     const pageLimitNumber = parseInt(pageLimit, 10);
+
 
     const limit = pageLimitNumber;
     const offset = (pageNumber - 1) * limit;

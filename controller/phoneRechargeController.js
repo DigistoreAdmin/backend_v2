@@ -228,17 +228,22 @@ const callBackUrl = catchAsync(async (req, res, next) => {
     // d = data.uniqueId
     const amount = await Wallet.findOne({ where: { uniqueId:data.uniqueId } })
     // let newBalance = AMOUNT + amount.balance - data.franchiseCommission
-    let newBalance = Number(AMOUNT) + Number(amount.balance) - Number(data.franchiseCommission);
-    newBalance = Math.round(newBalance * 100) / 100;
-    const update = await transationHistory.update({ status:"fail", amount: AMOUNT,adminCommission: 0.00, franchiseCommission: 0.00, walletBalance: newBalance  },{where:{transactionId:TRANID}})
-    console.log("121",update);
-    console.log("newBalance",newBalance);
+    const transaction = await transationHistory.findOne({where: {transactionId: TRANID}});
     
-    const updated = await Wallet.update(
-      { balance: newBalance },
-      { where: {uniqueId:data.uniqueId} }
-    );
-    console.log(updated);
+      let newBalance = transaction.service === "Prepaid" || transaction.service === "Postpaid" || transaction.service === "Dth" 
+    ? Number(AMOUNT) + Number(amount.balance) - Number(data.franchiseCommission) 
+    : Number(AMOUNT) + Number(amount.balance);
+      // let newBalance = Number(AMOUNT) + Number(amount.balance) - Number(data.franchiseCommission);
+      newBalance = Math.round(newBalance * 100) / 100;
+      const update = await transationHistory.update({ status:"fail", amount: AMOUNT,adminCommission: 0.00, franchiseCommission: 0.00, walletBalance: newBalance  },{where:{transactionId:TRANID}})
+      console.log("121",update);
+      console.log("newBalance",newBalance);
+      
+      const updated = await Wallet.update(
+        { balance: newBalance },
+        { where: {uniqueId:data.uniqueId} }
+      );
+      console.log(updated);
     
   }
   

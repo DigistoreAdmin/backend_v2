@@ -81,6 +81,7 @@ const createStaffs = catchAsync(async (req, res, next) => {
     remarks,
   } = req.body;
 
+
   const transaction = await sequelize.transaction();
 
   try {

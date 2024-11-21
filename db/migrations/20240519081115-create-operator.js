@@ -18,8 +18,11 @@ module.exports = {
       commission: {
         type: Sequelize.DECIMAL
       },
+      commissionType: {
+        type: Sequelize.ENUM("percentage", "flat")
+      },
       rechargeType: {
-        type: Sequelize.ENUM("prepaid", "postpaid","Dth","Electricity","Water","Fastag","Landline")
+        type: Sequelize.ENUM("Prepaid", "Postpaid","Dth","Electricity","Water","Fastag","Landline")
       },
       createdAt: {
         allowNull: false,

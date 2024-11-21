@@ -73,11 +73,6 @@ const transationHistories = sequelize.define(
     deletedAt: {
       type: DataTypes.DATE,
     },
-    commissionType:{
-      type: DataTypes.ENUM('wallet', 'cash'),
-      defaultValue: 'wallet',
-      allowNull: true,
-    },
   },  {
     paranoid: true,
     freezeTableName: true,

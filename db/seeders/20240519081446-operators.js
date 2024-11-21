@@ -1,7 +1,7 @@
 
 module.exports = {
   up: async(queryInterface, Sequelize) => {
-    'prepaid', 'postpaid', 'Dth', 'Electricity', 'Water', 'Fastag', 'Landline'
+    'Prepaid', 'Postpaid', 'Dth', 'Electricity', 'Water', 'Fastag', 'Landline'
       return queryInterface.bulkInsert('operators', [
             {
               serviceProvider:"Airtel Prepaid",
@@ -9,7 +9,7 @@ module.exports = {
               commission:1.20,
               createdAt: new Date(),
               updatedAt: new Date(),
-              rechargeType:"prepaid",
+              rechargeType:"Prepaid",
               commissionType:"percentage"
             },
             {
@@ -18,7 +18,7 @@ module.exports = {
               commission:4.00,
               createdAt: new Date(),
               updatedAt: new Date(),
-              rechargeType:"prepaid",
+              rechargeType:"Prepaid",
               commissionType:"percentage"
             },
             // {
@@ -27,7 +27,7 @@ module.exports = {
             //   commission:4.00,
             //   createdAt: new Date(),
             //   updatedAt: new Date(),
-            //   rechargeType:"prepaid",
+            //   rechargeType:"Prepaid",
             //   commissionType:"percentage"
             // },
             {
@@ -36,7 +36,7 @@ module.exports = {
               commission:0.50,
               createdAt: new Date(),
               updatedAt: new Date(),
-              rechargeType:"prepaid",
+              rechargeType:"Prepaid",
               commissionType:"percentage"
             },
             {
@@ -45,7 +45,7 @@ module.exports = {
               commission:4.00,
               createdAt: new Date(),
               updatedAt: new Date(),
-              rechargeType:"prepaid",
+              rechargeType:"Prepaid",
               commissionType:"percentage"
             },
           {
@@ -54,7 +54,7 @@ module.exports = {
             commission:1.00,
             createdAt: new Date(),
             updatedAt: new Date(),
-            rechargeType:"postpaid",
+            rechargeType:"Postpaid",
             commissionType:"flat"
           },
           {
@@ -63,7 +63,7 @@ module.exports = {
             commission:1.00,
             createdAt: new Date(),
             updatedAt: new Date(),
-            rechargeType:"postpaid",
+            rechargeType:"Postpaid",
             commissionType:"flat"
           },
           {
@@ -72,7 +72,7 @@ module.exports = {
             commission:1.00,
             createdAt: new Date(),
             updatedAt: new Date(),
-            rechargeType:"postpaid",
+            rechargeType:"Postpaid",
             commissionType:"flat"
           },
           {
@@ -81,7 +81,7 @@ module.exports = {
             commission:1.00,
             createdAt: new Date(),
             updatedAt: new Date(),
-            rechargeType:"postpaid",
+            rechargeType:"Postpaid",
             commissionType:"flat"
           },
           {

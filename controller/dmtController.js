@@ -275,7 +275,7 @@ const DMTremitAPI = catchAsync(async (req, res, next) => {
   const calculation = calculateTransactionShares(body.amount);
   console.log("calculation", calculation);
   console.log("calculation transactionAmounts", calculation.transactionAmounts);
-  console.log("calculation remainingAmount", calculation.remainingAmount);
+  // console.log("calculation remainingAmount", calculation.remainingAmount);
 
   const DMTwalletBalance = await axios.get(
     "https://services.bankit.in:8443/DMR/generic/balance",
@@ -611,45 +611,50 @@ const fetchDTHRechargePlans = catchAsync(async (req, res, next) => {
 });
 
 function calculateTransactionShares(transactionAmounts) {
-  const dmtShare = 3.54;
-  let franchiseShare = 5.5;
-  let serviceCharge;
-  let remainingAmount; 
+    transactionAmounts = Number(transactionAmounts);
+  const dmtShare = 4.2;
+  
+  const serviceCharge = transactionAmounts <= 999 ? 12 : (transactionAmounts * 1.2 / 100).toFixed(2);
+  const totalAmount = (transactionAmounts + Number(serviceCharge)).toFixed(2);
+  const GST = (serviceCharge * 18 / 118).toFixed(2);
+  const GrossAmountWithHo = (serviceCharge - GST - dmtShare).toFixed(2);
+  const franchiseShare = (serviceCharge * 0.45).toFixed(2);
+  const hoCommision = (serviceCharge - GST - dmtShare - franchiseShare).toFixed(2);
+  const tds = (GrossAmountWithHo * 5 / 100).toFixed(2);
+  const netCredit = (hoCommision - tds).toFixed(2);
   // console.log("fffffff",typeof(transactionAmounts));
-  transactionAmounts = Number(transactionAmounts);
 
-  let count = Math.floor(transactionAmounts / 5000);
-  remainingAmount =
-    transactionAmounts % 5000 !== 0 && transactionAmounts > 5000
-      ? transactionAmounts - 5000 * count
-      : null;
-  if (remainingAmount != null) {
-    count = count + 1;
-  } else if (count == 0) {
-    count = count + 1;
-  }
+  // let count = Math.floor(transactionAmounts / 5000);
+  // remainingAmount =
+  //   transactionAmounts % 5000 !== 0 && transactionAmounts > 5000 ?
+  //      transactionAmounts - 5000 * count
+  //     : null;
+  // if (remainingAmount != null) {
+  //   count = count + 1;
+  // } else if (count == 0) {
+  //   count = count + 1;
+  // }
 
-  let index = Math.floor((transactionAmounts - 1) / 1000);
-  if (index >= 10) {
-    index = 9;
-  }
-  serviceCharge = (index + 1) * 10;
-  // console.log("fffffff",typeof(serviceCharge));
-  serviceCharge = Number(serviceCharge);
+  // let index = Math.floor((transactionAmounts - 1) / 1000);
+  // if (index >= 10) {
+  //   index = 9;
+  // }
+  // serviceCharge = (index + 1) * 10;
+  // // console.log("fffffff",typeof(serviceCharge));
+  // serviceCharge = Number(serviceCharge);
 
-  const netAmount = serviceCharge - dmtShare;
-  const totalFranchiseShare = franchiseShare * (serviceCharge / 10);
-  const totalAdminShare = netAmount - totalFranchiseShare;
+  // const netAmount = serviceCharge - dmtShare;
+  // const totalFranchiseShare = franchiseShare * (serviceCharge / 10);
+  // const totalAdminShare = netAmount - totalFranchiseShare;
 
   data = {
-    transactionAmounts: transactionAmounts + serviceCharge,
+    transactionAmounts: totalAmount,
     serviceCharge: serviceCharge,
     dmtShare: dmtShare,
-    netAmount: netAmount,
-    totalFranchiseShare: totalFranchiseShare,
-    totalAdminShare: totalAdminShare,
-    count: count,
-    remainingAmount: remainingAmount,
+    totalFranchiseShare: franchiseShare,
+    totalAdminShare: netCredit,
+    // count: count,
+    // remainingAmount: remainingAmount,
   };
 
   return data;

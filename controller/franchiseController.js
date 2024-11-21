@@ -326,7 +326,7 @@ const creatFranchise = catchAsync(async (req, res, next) => {
 });
 
 const updateFranchise = catchAsync(async (req, res, next) => {
-
+  const transaction = await sequelize.transaction();
   try {
 
     const {
@@ -350,9 +350,11 @@ const updateFranchise = catchAsync(async (req, res, next) => {
 
     const franchise = await Franchise.findOne({
       where: { email: users.email },
+      transaction,
     });
 
     if (!franchise) {
+      await transaction.rollback();
       return res
         .status(404)
         .json({ success: false, message: "Franchise not found" });
@@ -399,15 +401,20 @@ const updateFranchise = catchAsync(async (req, res, next) => {
       {
         where: { franchiseUniqueId: franchiseUniqueId },
       },
+      {transaction},
     );
 
     if (!updatedFranchise) {
+      await transaction.rollback();
       throw new AppError("Failed to update the franchise", 400);
     }
 
     const updatedFranchises = await Franchise.findOne({
       where: { franchiseUniqueId: franchiseUniqueId },
+      transaction,
     });
+
+    await transaction.commit();
 
     return res.status(200).json({
       success: true,
@@ -416,6 +423,7 @@ const updateFranchise = catchAsync(async (req, res, next) => {
     });
 
   } catch (error) {
+    await transaction.rollback();
     console.error("Error:", error);
     return next(new AppError(error.message, 500));
   }

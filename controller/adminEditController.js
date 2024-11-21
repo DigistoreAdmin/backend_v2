@@ -363,6 +363,7 @@ const updateFranchiseDetails = catchAsync(async (req, res, next) => {
       throw new AppError("Failed to update user details", 400);
     }
 
+
     const updatedFranchise = await Franchise.update(
       {
         ownerName,
@@ -540,6 +541,7 @@ const verifyFranchise = catchAsync(async (req, res, next) => {
   });
 })
 
+
 const staffAssign = catchAsync(async (req, res, next) => {
 
   const { workId, assignedId } = req.body;
@@ -615,12 +617,7 @@ const staffAssign = catchAsync(async (req, res, next) => {
 });
 
 
-function generateRandomNumber() {
-  const randomNumber =
-    Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
-    100000000000;
-  return randomNumber.toString();
-}
+
 
 const deleteStaff = catchAsync(async (req, res, next) => {
   const { employeeId } = req.body;
@@ -651,6 +648,13 @@ const deleteStaff = catchAsync(async (req, res, next) => {
   });
 });
 
+
+function generateRandomNumber() {
+  const randomNumber =
+    Math.floor(Math.random() * (999999999999 - 100000000000 + 1)) +
+    100000000000;
+  return randomNumber.toString();
+}
 
 
 
