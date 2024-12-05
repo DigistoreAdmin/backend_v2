@@ -155,7 +155,7 @@ const updateStaffDetails = catchAsync(async (req, res, next) => {
       employeeId,
       firstName,
       lastName,
-      emailId,
+      email,
       phoneNumber,
       dateOfBirth,
       gender,
@@ -207,7 +207,7 @@ const updateStaffDetails = catchAsync(async (req, res, next) => {
         employeeId,
         firstName,
         lastName,
-        emailId,
+        email,
         phoneNumber,
         dateOfBirth,
         gender,
@@ -274,8 +274,8 @@ const getAllStaff = catchAsync(async (req, res, next) => {
     if (filters.firstName) {
       where.firstName = filters.firstName;
     }
-    if (filters.emailId) {
-      where.emailId = filters.emailId;
+    if (filters.email) {
+      where.email = filters.email;
     }
     if (filters.phoneNumber) {
       where.phoneNumber = filters.phoneNumber;
@@ -291,7 +291,7 @@ const getAllStaff = catchAsync(async (req, res, next) => {
     }
     if (filters.district) {
       where.district = filters.district;
-    }
+    }   
     if (filters.bloodGroup) {
       where.bloodGroup = { [Op.iLike]: `${filters.bloodGroup.trim()}%` }; // Using Sequelize's iLike operator with wildcard
     }
@@ -302,7 +302,7 @@ const getAllStaff = catchAsync(async (req, res, next) => {
   if (search) {
     where[Op.or] = [
       { firstName: { [Op.iLike]: `%${search}%` } },
-      { emailId: { [Op.iLike]: `%${search}%` } },
+      { email: { [Op.iLike]: `%${search}%` } },
     ];
     if (!isNaN(phoneNumber)) {
       where[Op.or].push({ phoneNumber: { [Op.eq]: phoneNumber } });
