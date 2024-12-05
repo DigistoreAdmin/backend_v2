@@ -9,7 +9,6 @@ const { Op } = require("sequelize");
 const crypto = require("crypto");
 const wallets = require("../db/models/wallet");
 
-
 const algorithm = "aes-192-cbc";
 const secret = process.env.FRANCHISE_SECRET_KEY;
 const key = crypto.scryptSync(secret, "salt", 24);
@@ -27,7 +26,6 @@ const decryptData = (encryptedData) => {
     let decrypted = decipher.update(encryptedText, "hex", "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;
-
   } catch (error) {
     console.error("Decryption error:", error);
     return null;
@@ -35,7 +33,8 @@ const decryptData = (encryptedData) => {
 };
 
 const getAllFranchises = catchAsync(async (req, res, next) => {
-  const { sort, filter, search, page, pageLimit, startDate, endDate } = req.query;
+  const { sort, filter, search, page, pageLimit, startDate, endDate } =
+    req.query;
   const order = sort ? [[sort, "DESC"]] : [["createdAt", "DESC"]];
   const where = {};
 
@@ -112,7 +111,6 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
   }
 });
 
-
 const getFranchise = catchAsync(async (req, res) => {
   const { franchiseUniqueId } = req.query;
 
@@ -145,7 +143,6 @@ const getFranchise = catchAsync(async (req, res) => {
   return res
     .status(200)
     .json({ success: "success", data: franchiseDataWithBalance });
-
 });
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {
@@ -274,8 +271,8 @@ const getAllStaff = catchAsync(async (req, res, next) => {
     if (filters.firstName) {
       where.firstName = filters.firstName;
     }
-    if (filters.emailId) {
-      where.emailId = filters.emailId;
+    if (filters.email) {
+      where.email = filters.email;
     }
     if (filters.phoneNumber) {
       where.phoneNumber = filters.phoneNumber;
@@ -302,7 +299,7 @@ const getAllStaff = catchAsync(async (req, res, next) => {
   if (search) {
     where[Op.or] = [
       { firstName: { [Op.iLike]: `%${search}%` } },
-      { emailId: { [Op.iLike]: `%${search}%` } },
+      { email: { [Op.iLike]: `%${search}%` } },
     ];
     if (!isNaN(phoneNumber)) {
       where[Op.or].push({ phoneNumber: { [Op.eq]: phoneNumber } });
