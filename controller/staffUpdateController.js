@@ -44,8 +44,7 @@ const loanStatus = catchAsync(async (req, res) => {
       throw new AppError("Files not uploaded", 400);
     }
 
-    console.log("body:", req.body);
-    console.log("files:", req.files);
+    
 
     if (!customerName && !mobileNumber) {
       return res.status(404).json({ message: "Missing required fields" });

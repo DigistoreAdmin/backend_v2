@@ -3,7 +3,7 @@ const { Model, DataTypes ,Op} = require('sequelize');
 const sequelize = require('../../config/database');
 
 const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
-  console.log("panType", panType);
+  // console.log("panType", panType);
 
   const allowNullForNewPan = panType === "newPancard" ? false : true
   const allowN = isCollege === 'true' ? false : true;
@@ -16,7 +16,7 @@ const definePancardUser = (panType, isCollege, isDuplicateOrChangePan) => {
   const allowNullPOI = panType === "NRIPancard" ? true : false;
   const allowNullPS = panType === "minorPancard" ? true : false;
   const allowS = panType === "NRIPancard" ? true : false;
-  console.log("allows", allowS)
+  // console.log("allows", allowS)
 
   const PancardUser = sequelize.define('pancardUser', {
     id: {
