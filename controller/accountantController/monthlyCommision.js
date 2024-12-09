@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const TransactionHistory = require("../../db/models/transationHistory");
+const TransactionHistory = require("../../db/models/transationhistory");
 const catchAsync = require('../../utils/catchAsync');
 
 const getMonthlyCommissions = catchAsync(async (req, res) => {

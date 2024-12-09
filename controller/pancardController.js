@@ -264,7 +264,7 @@ const createPancard = async (req, res, next) => {
       uniqueId: franchise.franchiseUniqueId,
       userName: franchise.franchiseName,
       userType: user.userType,
-      service: "pancard-create",
+      service: "Pan Card",
       customerNumber: phoneNumber,
       serviceNumber: accountNo,
       serviceProvider: "pancard",
@@ -343,7 +343,7 @@ const staffPanCardReject = catchAsync(async (req, res, next) => {
 
     await transationHistory.update(
       {
-        service: "pancard-rejected",
+        service: "Pan Card",
         status: "fail",
         walletBalance: newBalance,
         franchiseCommission: 0.0,
@@ -410,7 +410,8 @@ const staffPanCardComplete = catchAsync(async (req, res, next) => {
 
   try {
     await transationHistory.update(
-      { status: "success", service: "pancard-create" },
+      { status: "success" , service:"Pan Card",},
+
       { where: { transactionId: workId } }
     );
 

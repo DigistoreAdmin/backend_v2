@@ -29,9 +29,9 @@ const incomeTaxFilingDetails = (
   typeofCapitalGain,
   securities
 ) => {
-  console.log("typeof transaction::", typeofTransaction);
-  console.log("typeof typeofCapitalGain::", typeofCapitalGain);
-  console.log("typeof securites:", securities);
+  // console.log("typeof transaction::", typeofTransaction);
+  // console.log("typeof typeofCapitalGain::", typeofCapitalGain);
+  // console.log("typeof securites:", securities);
 
   const allowsecurity = ["companyShares", "mutualFunds"].includes(securities)
     ? false

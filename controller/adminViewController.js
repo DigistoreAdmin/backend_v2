@@ -9,6 +9,7 @@ const { Op } = require("sequelize");
 const crypto = require("crypto");
 const wallets = require("../db/models/wallet");
 
+
 const algorithm = "aes-192-cbc";
 const secret = process.env.FRANCHISE_SECRET_KEY;
 const key = crypto.scryptSync(secret, "salt", 24);
@@ -26,6 +27,7 @@ const decryptData = (encryptedData) => {
     let decrypted = decipher.update(encryptedText, "hex", "utf8");
     decrypted += decipher.final("utf8");
     return decrypted;
+
   } catch (error) {
     console.error("Decryption error:", error);
     return null;
@@ -111,6 +113,7 @@ const getAllFranchises = catchAsync(async (req, res, next) => {
   }
 });
 
+
 const getFranchise = catchAsync(async (req, res) => {
   const { franchiseUniqueId } = req.query;
 
@@ -143,6 +146,7 @@ const getFranchise = catchAsync(async (req, res) => {
   return res
     .status(200)
     .json({ success: "success", data: franchiseDataWithBalance });
+
 });
 
 const updateStaffDetails = catchAsync(async (req, res, next) => {

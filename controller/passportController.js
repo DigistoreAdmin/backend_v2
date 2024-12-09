@@ -189,7 +189,7 @@ const createPassport = catchAsync(async (req, res, next) => {
       transactionId: workId,
       userName: franchise.franchiseName,
       userType: user.userType,
-      service: "Passport create",
+      service: "Passport",
       status: "pending",
       amount: fixedPassportAmount,
       franchiseCommission: commissionToFranchise,
@@ -266,7 +266,7 @@ const passportUpdateReject = catchAsync(async (req, res, next) => {
 
     await transationHistories.update(
       {
-        service: "Passport rejected",
+        service: "Passport",
         status: "fail",
         walletBalance: updatedBalance,
         franchiseCommission: 0.0,
