@@ -71,6 +71,7 @@ const sixMonthAnalysisRoute = require("../route/accountantRoute/sixMontAnalysisR
 const createAndpayOrder = require("../route/upiPaymentRoute/createAndPayOrderRoute");
 const currentMonthAnalysisRoute = require("../route/accountantRoute/currentMonthAnalysisRoute");
 const timeLineRoute = require("../route/timeLineRoute");
+const workStatusRoute = require("../route/workStatusRoute");
 
 const router = express.Router();
 
@@ -152,5 +153,6 @@ router.use("/v1/createAndpayOrderRoute", createAndpayOrder);
 router.use("/v1/upiIntent", upiIntentRoute);
 router.use("/v1/currentMonthAnalysisRoute", currentMonthAnalysisRoute);
 router.use("/v1/timeLineRoute", timeLineRoute);
+router.use("/v1/workStatusRoute", workStatusRoute);
 
 module.exports = router;
