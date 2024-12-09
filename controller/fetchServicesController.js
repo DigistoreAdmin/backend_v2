@@ -1105,7 +1105,7 @@ const getAllWorksByFranchise = catchAsync(async (req, res, next) => {
 
     const detailsPromises = [
       { model: panCardUsers(), tableName: "Pan Card" },
-      { model: definePassportDetails(), tableName: "Passport Details" },
+      { model: definePassportDetails(), tableName: "Passport" },
       { model: kswift, tableName: "Kswift" },
       { model: BusBooking, tableName: "Bus Booking" },
       { model: fssaiRegistrations, tableName: "FSSAI Registrations" },
