@@ -873,13 +873,18 @@ const getAllWorks = catchAsync(async (req, res, next) => {
 
 const getAllWorksByStaffId=catchAsync(async (req, res, next) => {
   try {
-    let { page, pageLimit, search, sortBy, sortOrder, filter,assignedId } = req.query;
+    const user=req.user;
+    let { page, pageLimit, search, sortBy, sortOrder, filter } = req.query;
 
-    if(!assignedId){
-      return res.status(400).json({
-        error: "Please provide Assigned Id",
-      });
+    const Staff = defineStaffsDetails();
+
+    const staffExists = await Staff.findOne({where:{email: user.email}})
+    console.log("assignedId : ", staffExists.employeeId);
+    
+    if (!staffExists) {
+      return res.status(404).json({ status: 'fail', message: 'Staff not found' });
     }
+
 
     if (!page || !pageLimit) {
       return res.status(400).json({
@@ -1021,7 +1026,7 @@ const getAllWorksByStaffId=catchAsync(async (req, res, next) => {
   
      filter = filter ? (typeof filter === 'string' ? JSON.parse(filter) : filter) : {};
     
-     filter.assignedId = assignedId;
+     filter.assignedId = staffExists.employeeId;
  
      console.log("Updated filter:", filter);
      
