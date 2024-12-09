@@ -5,8 +5,8 @@ const azureStorage = require("azure-storage");
 const intoStream = require("into-stream");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
-const wallets = require("../db/models/wallet");
-const transationHistories = require("../db/models/transationhistory");
+const wallets =require("../db/models/wallet")
+const transationHistories=require("../db/models/transationhistory");
 const { Op } = require("sequelize");
 
 const containerName = "imagecontainer";
@@ -50,7 +50,6 @@ const createPassport = catchAsync(async (req, res, next) => {
       return next(new AppError("Franchise not found", 401));
     }
     const uniqueId = franchise.franchiseUniqueId;
-    console.log("uniqueId: ", uniqueId);
     if (!uniqueId) {
       return next(new AppError("Missing unique id for the franchise", 400));
     }
@@ -99,7 +98,6 @@ const createPassport = catchAsync(async (req, res, next) => {
     }
 
     const Wallet = await wallets.findOne({ where: { uniqueId } });
-    console.log("Wallet: ", Wallet);
 
     if (Wallet.balance < fixedPassportAmount) {
       return next(new AppError("Insufficient Franchise wallet", 400));
@@ -226,18 +224,16 @@ const getPlacesByZone = catchAsync(async (req, res) => {
 
 const passportUpdateReject = catchAsync(async (req, res, next) => {
   try {
-    const { rejectReason, workId } = req.body;
+    const {  rejectReason, workId } = req.body;
 
-    if (!workId || !rejectReason) {
-      return res
-        .status(400)
-        .json({ message: "WorkId and Reject reason are mandatory" });
+    if(!workId || !rejectReason){
+      return res.status(400).json({ message: "WorkId and Reject reason are mandatory" });
     }
 
     const passportDetails = definePassportDetails();
 
     const passportRecord = await passportDetails.findOne({
-      where: { workId },
+      where: {  workId }
     });
 
     if (!passportRecord) {
@@ -249,14 +245,13 @@ const passportUpdateReject = catchAsync(async (req, res, next) => {
         .status(404)
         .json({ message: `Passport is in ${passportRecord.status} state` });
     }
+
     passportRecord.rejectReason = rejectReason;
     passportRecord.status = "rejected";
     await passportRecord.save();
 
-    const Wallet = await wallets.findOne({
-      where: { uniqueId: passportRecord.uniqueId },
-    });
-    if (!Wallet) {
+    const Wallet = await wallets.findOne({ where: { uniqueId:passportRecord.uniqueId } });
+    if(!Wallet){
       return res.status(404).json({ message: "Wallet data not found" });
     }
     const fixedPassportAmount = 1750;
@@ -280,16 +275,23 @@ const passportUpdateReject = catchAsync(async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      message: "An error occurred in rejecting passport",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({
+        message: "An error occurred in rejecting passport",
+        error: error.message,
+      });
   }
 });
 
 const passportUpdateComplete = catchAsync(async (req, res) => {
   try {
-    const { workId, passportAppointmentDate, username, password } = req.body;
+    const {
+      workId,
+      passportAppointmentDate,
+      username,
+      password,
+    } = req.body;
     const { passportFile } = req.files;
     const user = req.user;
 
@@ -314,7 +316,7 @@ const passportUpdateComplete = catchAsync(async (req, res) => {
         .status(404)
         .json({ message: `Passport is in ${passportRecord.status} state` });
     }
-    
+
     const uploadFile = async (file) => {
       if (file) {
         try {
@@ -338,9 +340,9 @@ const passportUpdateComplete = catchAsync(async (req, res) => {
     username ? (passportRecord.username = username) : null;
     password ? (passportRecord.password = password) : null;
     passportFileUrl ? (passportRecord.passportFile = passportFileUrl) : null;
-    passportRecord.status = "completed";
+    passportRecord.status="completed"
 
-    const completedPassport = await passportRecord.save();
+    const completedPassport= await passportRecord.save();
 
     await transationHistories.update(
       {
@@ -355,10 +357,12 @@ const passportUpdateComplete = catchAsync(async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({
-      message: "An error occurred while completing passport",
-      error: error.message,
-    });
+    res
+      .status(500)
+      .json({
+        message: "An error occurred while completing passport",
+        error: error.message,
+      });
   }
 });
 
