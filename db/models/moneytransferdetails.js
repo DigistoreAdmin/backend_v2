@@ -67,7 +67,7 @@ const defineMoneyTransferDetails = (transactionType) => {
       },
       referenceNo: {
         type: DataTypes.BIGINT,
-        allowNull: allowNullVe,
+        allowNull: true,
       },
       amount: {
         type: DataTypes.DECIMAL(10, 2), // Changed to DECIMAL data type
