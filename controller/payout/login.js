@@ -1,5 +1,5 @@
-// const { payoutImpsUser } = require("../models"); 
-const getBearerToken = require("./token"); 
+const  payoutImpsUser  = require("../../db/models/payoutimpsuser"); 
+const {getBearerToken} = require("./token"); 
 const bcrypt = require("bcrypt"); 
 
 
@@ -26,7 +26,7 @@ const loginUser = async (req, res) => {
     }
 
     // Generate token for the user
-    const token = getBearerToken({ id: user.id, phoneNumber: user.phoneNumber });
+    const token = await getBearerToken();
 
     // Respond with the token
     return res.status(200).json({

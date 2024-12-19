@@ -6,7 +6,14 @@ const clientId = "37798069-30dd-48af-b548-08490c1b574e";
 const tokenUrl = "https://apiext.uat.idfcfirstbank.com/authorization/oauth2/token";
 const kid = process.env.kid 
 const aud = "https://app.uat-opt.idfcfirstbank.com/platform/oauth/oauth2/token";
-const privateKey = process.env.privateKey;
+const privateKey =  `
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA7jk6y4NwPxk8eR9LZp9dJ8M5VZc8r3Hn5E2L8cxD6gH9x7eX
+W6s0E7zJ0mKXdVfJf1oN9f6Bo7kZG1hUdAUm+d4bJvEFmvm9UBTJeMbbIHXQ2Vfk
+...
+ZlV+SD+Kc1Y6B2fZ69gjb+z9rQxeuL7Cz9B+V3dP1b+7JdE49LV1b8RqrqpdB==
+-----END RSA PRIVATE KEY-----
+`;
 
 // Step 1: Generate JWT Token
 function generateJwtToken() {
@@ -25,10 +32,14 @@ function generateJwtToken() {
   };
 
   // Sign the token using RS256 algorithm and private key
-  return jwt.sign(payload, privateKey, { algorithm: "RS256", header });
+  // return jwt.sign(payload, privateKey, { algorithm: "RS256", header });
+  const token = jwt.sign({ foo: "bar" }, privateKey, { algorithm: "RS256" });
+  console.log("JWT Token:", token);
 }
 
-async function getBearerToken() {
+
+const getBearerToken = async () => {
+// async function getBearerToken() {
   const jwtToken = generateJwtToken();
 
   const data = new URLSearchParams({

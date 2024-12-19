@@ -4,7 +4,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../../config/database");
 
 const payoutImpsUser = sequelize.define(
-  "payoutImpsUser",
+  "payoutImpsUsers",
   {
     id: {
       allowNull: false,
@@ -69,7 +69,7 @@ const payoutImpsUser = sequelize.define(
   {
     paranoid: true,
     freezeTableName: true,
-    modelName: "payoutImpsUser",
+    modelName: "payoutImpsUsers",
   }
 );
 
