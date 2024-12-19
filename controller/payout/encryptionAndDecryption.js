@@ -112,15 +112,15 @@ function decrypt(encrypted, secretKey) {
 }
 
 // Main function for demonstration
-(function main() {
-  const secretHexaKey = "73616d706c65496466634145536b6579"; // 16-byte key in hexadecimal format
-  const data = "EncryptMe";
+// (function main() {
+//   const secretHexaKey = "73616d706c65496466634145536b6579"; // 16-byte key in hexadecimal format
+//   const data = "EncryptMe";
 
-  // Encryption
-  const encOutput = encrypt(data, secretHexaKey);
-  console.log("Encryption:", encOutput);
+//   // Encryption
+//   const encOutput = encrypt(data, secretHexaKey);
+//   console.log("Encryption:", encOutput);
 
-  // Decryption
-  const decOutput = decrypt(encOutput, secretHexaKey);
-  console.log("Decryption:", decOutput);
-})();
+//   // Decryption
+//   const decOutput = decrypt(encOutput, secretHexaKey);
+//   console.log("Decryption:", decOutput);
+// })();

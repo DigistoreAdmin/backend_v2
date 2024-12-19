@@ -1,9 +1,35 @@
 const axios = require('axios');
 const catchAsync = require("../../utils/catchAsync");
-
+const payoutImpsTransactionHistory = require('../../db/models/payoutimpstransactionhistory')
 
 
 const impsFundTransfer = catchAsync(async (req, res, next) => {
+
+    const requiredFields = [
+        'source', 'transactionID', 'debitAccountNumber',
+        'creditAccountNumber', 'remitterName', 'amount',
+        'currency', 'transactionType', 'paymentDescription',
+        'beneficiaryIFSC', 'mobileNo'
+    ];
+
+    for (const field of requiredFields) {
+        if (!req.body[field]) {
+            return res.status(400).json({
+                error: `Missing required field: ${field}`
+            });
+        }
+    }
+    const { mobileNo } = req.body;
+
+    // Regular expression to check if mobileNo has exactly 10 digits
+    const phoneRegex = /^\d{10}$/;
+
+    if (!phoneRegex.test(mobileNo)) {
+        return res.status(400).json({
+            success: false,
+            message: "mobileNo must be exactly 10 digits",
+        });
+    }
   
   const requestData = {
       initiateAuthGenericFundTransferAPIReq: {
@@ -33,20 +59,40 @@ const impsFundTransfer = catchAsync(async (req, res, next) => {
               // 'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
           }
       });
+      
 
-      // Step 3: Send response back to the client
-      res.status(200).json({
-          data: response.data
-      });
+        const metaData = response.data.initiateAuthGenericFundTransferAPIResp.metaData;
+        const resourceData = response.data.initiateAuthGenericFundTransferAPIResp.resourceData;
+      
+        await payoutImpsTransactionHistory.create({
+          status: resourceData.status === "ACPT" ? "SUCCESS" : metaData.status,
+          code: metaData.code || null,
+          message: metaData.message || null,
+          version: metaData.version || null,
+          time: metaData.time || null,
+          transactionReferenceNo: resourceData.transactionReferenceNo || null,
+          transactionID: resourceData.transactionID || null,
+          beneficiaryName: resourceData.beneficiaryName || null,
+          reason: null,
+          service: null,
+          details: null,
+          balance: null, //need to add
+          bankCharge: null, //need to add
+          HOCommission: null, //need to add
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        res.status(200).json({
+            data: response.data
+        });
 
   } catch (error) {
-      // Handle errors from the external API
-      res.status(500).json({
-        data: response.data
-      });
+        const errorData = error.response ? error.response.data : error.message;
+        res.status(500).json({
+            error: errorData
+        });
   }
 });
-
 
 
 module.exports = {
